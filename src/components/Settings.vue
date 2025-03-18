@@ -6,6 +6,7 @@ import ExportButton from './History/ExportButton.vue'
 import ImportButton from './History/ImportButton.vue'
 import {
   baseUrl,
+  apiKey,
   historyMessageLength,
   enableMarkdown,
   showSystem,
@@ -51,6 +52,7 @@ const confirmWipe = () => {
         </div>
 
         <TextInput id="base-url" label="Base URL" v-model="baseUrl" />
+        <TextInput id="api-key" label="API Key" v-model="apiKey" />
 
         <TextInput id="gravatar-email" label="Gravatar Email" v-model="gravatarEmail" />
 

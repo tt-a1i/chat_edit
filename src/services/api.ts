@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { baseUrl } from './appConfig.ts'
+import { baseUrl, apiKey } from './appConfig.ts'
 import { Message } from './database.ts'
 
 export type ChatRequest = {
@@ -111,8 +111,12 @@ export type GenerateEmbeddingsResponse = {
 }
 
 // Define a method to get the full API URL for a given path
-const getApiUrl = (path: string) =>
-  `${baseUrl.value || 'http://localhost:11434/api'}${path}`
+const getApiUrl = (path: string) => `${baseUrl.value}${path}`
+
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${apiKey.value}`
+})
 
 const abortController = ref<AbortController>(new AbortController())
 const signal = ref<AbortSignal>(abortController.value.signal)
@@ -124,37 +128,90 @@ export const useApi = () => {
     request: ChatRequest,
     onDataReceived: (data: any) => void,
   ): Promise<any[]> => {
-    const res = await fetch(getApiUrl('/chat'), {
+    const messages = request.messages?.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    })) || []
+
+    const response = await fetch(getApiUrl('/v1/chat/completions'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-      signal: signal.value,
+      headers: getHeaders(),
+      body: JSON.stringify({
+        model: request.model,
+        messages: messages,
+        stream: true,
+        temperature: 0.3
+      }),
+      signal: signal.value
     })
 
-    if (!res.ok) {
-      throw new Error('Network response was not ok')
+    if (!response.ok) {
+      throw new Error(`Network response was not ok: ${response.status}`)
     }
 
-    const reader = res.body?.getReader()
+    const reader = response.body?.getReader()
     let results: ChatResponse[] = []
 
     if (reader) {
       while (true) {
         const { done, value } = await reader.read()
-        if (done) {
-          break
-        }
+        if (done) break
 
-        try {
-          const chunk = new TextDecoder().decode(value)
-          const parsedChunk: ChatPartResponse = JSON.parse(chunk)
+        const chunk = new TextDecoder().decode(value)
+        const lines = chunk.split('\n').filter(line => line.trim() !== '')
 
-          onDataReceived(parsedChunk)
-          results.push(parsedChunk)
-        } catch (e) {
-          // Carry on...
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = line.slice(6).trim()
+              
+              // 处理特殊的[DONE]消息
+              if (data === '[DONE]') {
+                const completedResponse = {
+                  model: request.model,
+                  created_at: new Date().toISOString(),
+                  message: {
+                    role: 'assistant',
+                    content: ''
+                  },
+                  done: true
+                }
+                onDataReceived(completedResponse)
+                continue
+              }
+
+              const json = JSON.parse(data)
+              if (json.choices?.[0]?.delta?.content) {
+                const partialResponse = {
+                  model: request.model,
+                  created_at: new Date().toISOString(),
+                  message: {
+                    role: 'assistant',
+                    content: json.choices[0].delta.content
+                  },
+                  done: false
+                }
+                onDataReceived(partialResponse)
+                results.push(partialResponse)
+              }
+
+              // 处理结束消息
+              if (json.choices?.[0]?.finish_reason === 'stop') {
+                const completedResponse = {
+                  model: request.model,
+                  created_at: new Date().toISOString(),
+                  message: {
+                    role: 'assistant',
+                    content: ''
+                  },
+                  done: true
+                }
+                onDataReceived(completedResponse)
+              }
+            } catch (e) {
+              console.error('Failed to parse SSE message:', e)
+            }
+          }
         }
       }
     }
@@ -168,9 +225,7 @@ export const useApi = () => {
   ): Promise<CreateModelResponse> => {
     const response = await fetch(getApiUrl('/create'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
@@ -179,13 +234,43 @@ export const useApi = () => {
 
   // List local models
   const listLocalModels = async (): Promise<ListLocalModelsResponse> => {
-    const response = await fetch(getApiUrl('/tags'), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    return await response.json()
+    try {
+      const response = await fetch(getApiUrl('/v1/models'), {
+        method: 'GET',
+        headers: getHeaders(),
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch models: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      return {
+        models: (data.data || []).map((model: any) => ({
+          name: model.id,
+          modified_at: new Date().toISOString(),
+          size: 0
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching models:', error)
+      // 返回一些默认模型以防止完全失败
+      return {
+        models: [
+          {
+            name: 'moonshot-v1-8k',
+            modified_at: new Date().toISOString(),
+            size: 0
+          },
+          {
+            name: 'moonshot-v1-32k',
+            modified_at: new Date().toISOString(),
+            size: 0
+          }
+        ]
+      }
+    }
   }
 
   // Show model information
@@ -194,9 +279,7 @@ export const useApi = () => {
   ): Promise<ShowModelInformationResponse> => {
     const response = await fetch(getApiUrl('/show'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
@@ -207,9 +290,7 @@ export const useApi = () => {
   const copyModel = async (request: CopyModelRequest): Promise<CopyModelResponse> => {
     const response = await fetch(getApiUrl('/copy'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
@@ -222,9 +303,7 @@ export const useApi = () => {
   ): Promise<DeleteModelResponse> => {
     const response = await fetch(getApiUrl('/delete'), {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
@@ -235,9 +314,7 @@ export const useApi = () => {
   const pullModel = async (request: PullModelRequest): Promise<PullModelResponse> => {
     const response = await fetch(getApiUrl('/pull'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
     return await response.json()
@@ -247,9 +324,7 @@ export const useApi = () => {
   const pushModel = async (request: PushModelRequest): Promise<PushModelResponse> => {
     const response = await fetch(getApiUrl('/push'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
@@ -262,9 +337,7 @@ export const useApi = () => {
   ): Promise<GenerateEmbeddingsResponse> => {
     const response = await fetch(getApiUrl('/embeddings'), {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify(request),
     })
 
