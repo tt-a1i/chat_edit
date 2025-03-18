@@ -4,7 +4,7 @@ import ChatMessage from './ChatMessage.vue'
 import { useChats } from '../services/chat.ts'
 import { showSystem } from '../services/appConfig.ts'
 
-const { messages } = useChats()
+const { messages, isStreaming } = useChats()
 const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 
@@ -47,6 +47,22 @@ onUnmounted(() => chatElement.value?.removeEventListener('scroll', handleUserScr
 const visibleMessages = computed(() =>
   showSystem.value ? messages?.value : messages?.value.filter((m) => m.role != 'system'),
 )
+
+// Reset userInterferedWithScroll when streaming starts
+watch(isStreaming, (newVal) => {
+  if (newVal) {
+    userInterferedWithScroll.value = false
+    scrollToBottom()
+  }
+})
+
+// Ensure we scroll during streaming
+const streamingMessageId = computed(() => {
+  if (isStreaming.value && visibleMessages.value.length > 0) {
+    return visibleMessages.value[visibleMessages.value.length - 1].id
+  }
+  return null
+})
 </script>
 
 <template>
@@ -54,6 +70,10 @@ const visibleMessages = computed(() =>
     ref="chatElement"
     class="flex-1 overflow-y-auto scroll-smooth rounded-xl p-4 text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
   >
-    <ChatMessage v-for="message in visibleMessages" :message="message" />
+    <ChatMessage 
+      v-for="message in visibleMessages" 
+      :message="message" 
+      :is-streaming="isStreaming && message.id === streamingMessageId"
+    />
   </div>
 </template>

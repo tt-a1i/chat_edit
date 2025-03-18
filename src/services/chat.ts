@@ -247,9 +247,14 @@ export function useChats() {
   }
 
   const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
-    ongoingAiMessages.value.has(chatId)
-      ? appendToAiMessage(data.message.content, chatId)
-      : startAiMessage(data.message.content, chatId)
+    // 检查是否已经有正在进行的 AI 消息
+    if (ongoingAiMessages.value.has(chatId)) {
+      // 如果有，则将新内容追加到现有消息
+      appendToAiMessage(data.message.content, chatId)
+    } else {
+      // 如果没有，则创建一个新的 AI 消息
+      startAiMessage(data.message.content, chatId)
+    }
   }
 
   const handleAiCompletion = async (data: ChatCompletedResponse, chatId: number) => {
@@ -309,10 +314,15 @@ export function useChats() {
       content: initialContent,
       createdAt: new Date(),
     }
-
+  
     try {
+      // 添加到数据库并获取 ID
       message.id = await dbLayer.addMessage(message)
+      
+      // 存储到正在进行的消息映射中
       ongoingAiMessages.value.set(chatId, message)
+      
+      // 添加到当前消息列表（仅添加一次）
       messages.value.push(message)
     } catch (error) {
       console.error('Failed to start AI message:', error)
@@ -322,19 +332,22 @@ export function useChats() {
   const appendToAiMessage = async (content: string, chatId: number) => {
     const aiMessage = ongoingAiMessages.value.get(chatId)
     if (aiMessage) {
+      // 追加内容
       aiMessage.content += content
+      
       try {
+        // 更新数据库中的消息
         await dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
-
-        // Only "load the messages" if we are on this chat atm.
-        if (chatId == activeChat.value?.id) {
-          setMessages(await dbLayer.getMessages(chatId))
+        
+        // 确保界面更新
+        // 注意：Vue 应该自动检测到引用对象的变化，但有时可能需要额外的更新
+        if (activeChat.value?.id === chatId) {
+          // 如果需要，这里可以触发强制刷新
+          // 在 Vue 3 中通常不需要，因为响应式系统应该能处理
         }
       } catch (error) {
         console.error('Failed to append to AI message:', error)
       }
-    } else {
-      console.log('No ongoing AI message?')
     }
   }
 
