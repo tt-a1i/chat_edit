@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, toRaw } from 'vue'
 import { Chat, db, Message } from './database'
 import { historyMessageLength, currentModel, useConfig } from './appConfig'
 import { useAI } from './useAI.ts'
@@ -245,19 +245,22 @@ export function useChats() {
       console.error('Failed to regenerate response:', error)
     }
   }
-
+const firstMessage = ref(false)
   const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
-    // 检查是否已经有正在进行的 AI 消息
-    if (ongoingAiMessages.value.has(chatId)) {
+    console.log(toRaw(ongoingAiMessages.value))
+      // 检查是否已经有正在进行的 AI 消息
+    if (firstMessage.value) {
       // 如果有，则将新内容追加到现有消息
       appendToAiMessage(data.message.content, chatId)
     } else {
       // 如果没有，则创建一个新的 AI 消息
       startAiMessage(data.message.content, chatId)
-    }
+      firstMessage.value = true
+    }    
   }
 
   const handleAiCompletion = async (data: ChatCompletedResponse, chatId: number) => {
+    firstMessage.value = false
     const aiMessage = ongoingAiMessages.value.get(chatId)
     if (aiMessage) {
       try {
@@ -267,7 +270,7 @@ export function useChats() {
       }
     } else {
       console.error('no ongoing message to finalize:')
-      debugger
+      // debugger
     }
   }
 
