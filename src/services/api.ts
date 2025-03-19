@@ -111,9 +111,9 @@ export type GenerateEmbeddingsResponse = {
 }
 
 // Define a method to get the full API URL for a given path
-const getApiUrl = (path: string) => `${baseUrl.value}${path}`
+export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
 
-const getHeaders = () => ({
+export const getHeaders = () => ({
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${apiKey.value}`
 })

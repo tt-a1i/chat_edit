@@ -2,6 +2,12 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
+import { ref } from 'vue'
+import { baseUrl, apiKey } from '../../services/appConfig'
+import { useAuthStore } from '../../stores/auth'
+import { getApiUrl, getHeaders } from '../../services/api'
+import { get } from '@vueuse/core'
+// import { useAppStore } from '../../stores/app'
 export interface ChatResponse {
   text: string
   error?: boolean
@@ -12,16 +18,33 @@ export interface PromptHistory {
   prompt: string
   timestamp: string
 }
-
+export interface ChatEditingRequest {
+  session_id: string
+  prompt: string
+  selected_text: string
+  model?: string
+}
 let lastMessageWasEmpty = false
+// 创建abort controller和signal
+const abortController = ref<AbortController>(new AbortController())
+const signal = ref<AbortSignal>(abortController.value.signal)
+
+/**
+ * 使用流式方式进行AI编辑会话
+ * @param prompt 用户提问
+ * @param selected_text 选中的文本内容
+ * @param callback 接收数据的回调函数
+ * @param controller 可选的AbortController
+ * @param model 可选的模型名称
+ * @returns 返回对话响应
+ */
 export async function streamChat(
-  sessionId: string,
   prompt: string,
   selected_text: string,
   callback: (data: ChatResponse) => void,
   controller?: AbortController,
+  model?: string,
 ) {
-  const token = useAuthStore().accessToken
   const data: ChatResponse = {
     text: '',
     error: false,
@@ -29,20 +52,19 @@ export async function streamChat(
 
   const _controller = controller || new AbortController()
 
-  await fetchEventSource('/api/chat', {
+  await fetchEventSource(getApiUrl('/v1/chat/completions'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      'Accept-Language': useAppStore().acceptLanguage,
-    },
+    headers: getHeaders(),
     body: JSON.stringify({
-      prompt,
-      session_id: sessionId,
-      enable_sse: true,
-      doc_content_reference: {
-        text: selected_text,
-      },
+      model: "moonshot-v1-32k",
+      messages: [
+        {
+          role: "user",
+          content: `选中的文本内容: ${selected_text}， 用户提问: ${prompt}`
+        }
+      ],
+      stream: true,
+      temperature: 0.3,
     }),
     signal: _controller.signal,
     openWhenHidden: true,
