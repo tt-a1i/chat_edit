@@ -2,11 +2,6 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
-import * as Session from '@/types/session'
-import { useAppStore, useAuthStore } from '@/stores'
-import { HttpError } from '@/types/error'
-import i18n from '@/locales'
-
 export function getEditingSessionInitData() {
   return {
     title: '',

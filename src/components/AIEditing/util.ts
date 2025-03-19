@@ -1,3 +1,4 @@
+import { AIEditingAPI } from '@/api';
 import MarkdownIt from 'markdown-it'
 import type { editor } from 'monaco-editor'
 import * as monaco from 'monaco-editor'
@@ -6,8 +7,7 @@ import type { Ref } from 'vue'
 import { nextTick } from 'vue'
 import { createExporter } from './export'
 import { defaultDiffEditorOptions } from './monacoConfig'
-import { AIEditingAPI } from '@/api'
-import i18n from '@/locales'
+import * as AIEditingAPI from './api.ts'
 
 interface DiffEditorParams {
   currentRange: { index: number, length: number } | null
@@ -466,7 +466,7 @@ export function updateWordCountDisplay(wordCountDisplay: HTMLElement | null, qui
     .replace(/\s+/g, '') // 移除所有空格
     .replace(/[^\u4E00-\u9FA5a-z0-9]/gi, '').length // 移除特殊符号
 
-  const title = i18n.global.t('ai_editing.wordCount', { count: wordCount })
+  const title = `字数：${wordCount}`
   wordCountDisplay.textContent = title
 }
 export function checkEmptyLine(
@@ -696,7 +696,7 @@ export async function handleSend({
   const originalPlaceholder = promptInputRef.placeholder || ''
 
   promptInputRef.value = ''
-  promptInputRef.placeholder = i18n.global.t('ai_editing.aiResponse.loading')
+  promptInputRef.placeholder = "正在生成回答..."
 
   const selectedText = currentRange
     ? quill.getText(currentRange.index, currentRange.length)
@@ -707,7 +707,7 @@ export async function handleSend({
 
   if (!selectedText && !actualPrompt.trim()) {
     if (responseContent) {
-      responseContent.textContent = i18n.global.t('ai_editing.prompt')
+      responseContent.textContent = "输入提示..."
       responseContent.classList.remove('loading')
     }
     promptInputRef.placeholder = originalPlaceholder
@@ -758,11 +758,11 @@ export async function handleSend({
   }
   catch (error) {
     if (error.name === 'AbortError') {
-      responseContent.textContent = i18n.global.t('ai_editing.error.aborted')
+      responseContent.textContent = "生成已中止"
     }
     else if (responseContent) {
       responseContent.classList.remove('loading')
-      responseContent.textContent = i18n.global.t('ai_editing.generation_error')
+      responseContent.textContent = "生成回答时出现错误，请重试。"
     }
   }
   finally {

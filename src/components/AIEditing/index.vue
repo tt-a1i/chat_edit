@@ -31,13 +31,12 @@ import {
   showExportMenu,
   updateCreationTimeDisplay,
   updateWordCountDisplay,
-} from './util.js'
+} from './util.ts'
 import { createExporter } from './export'
-import { AIEditingAPI } from '@/api'
+import * as AIEditingAPI from './api.ts'
 import {
   initMonaco,
 } from './monacoConfig'
-const { t } = useI18n()
 // 组件状态
 let quill = null
 // eslint-disable-next-line unused-imports/no-unused-vars
@@ -79,8 +78,6 @@ const abortController = ref(null)
 const isTranslationPrompt = ref(false)
 
 const hiddenPrompt = ref('')
-
-const appStore = useAppStore()
 
 // 添加上传对话框的状态控制
 const showUploadModal = ref(false)
@@ -584,7 +581,7 @@ function initQuillEditor() {
             userOnly: false,
           },
         },
-        placeholder: t('ai_editing.placeholder'),
+        placeholder: '在这里输入内容，或者使用 / 唤起AI',
         theme: 'snow',
       }
 
@@ -592,18 +589,18 @@ function initQuillEditor() {
       quill.root.innerHTML = ''
 
       // 只有在会话已初始化且有ID时才尝试加载内容
-      if (currentSession.value?.id) {
+     /*  if (currentSession.value?.id) {
         const savedContent = await loadEditorContent(currentSession.value.id)
 
         if (savedContent !== null && savedContent !== undefined) {
           quill.root.innerHTML = savedContent
         }
-      }
+      } */
 
       // 初始化时设置暗黑模式
-      if (appStore.isDark) {
+/*       if (appStore.isDark) {
         editorElement.closest('.editor-container')?.classList.add('dark-mode')
-      }
+      } */
       const fixPlaceholderWithIME = () => {
         const editorElement = quill.root
 
@@ -666,9 +663,6 @@ function initQuillEditor() {
           // 保存新的选区
           currentRange = range
           highlightSelection(quill, range)
-
-          // 每次显示菜单时重置选项卡为"系统"
-          activeTab.value = 'system'
 
           const bounds = quill.getBounds(range.index, range.length)
           const editorContainer = document.querySelector('#editor')
@@ -937,14 +931,14 @@ function updateEditorPlaceholder() {
 
     const placeholderElement = container.querySelector('.ql-editor[data-placeholder]')
     if (placeholderElement) {
-      const newPlaceholder = t('ai_editing.placeholder')
+      const newPlaceholder = "在这里输入内容，或者使用 / 唤起AI"
       placeholderElement.setAttribute('data-placeholder', newPlaceholder)
     }
 
     // AI提示输入框的placeholder
     const promptInput = document.getElementById('promptInput')
     if (promptInput) {
-      promptInput.setAttribute('placeholder', t('ai_editing.prompt'))
+      promptInput.setAttribute('placeholder', "请输入内容")
     }
 
     // 更新字数统计显示
@@ -965,21 +959,21 @@ function updateToolbarTooltips() {
       return
 
     const toolbarButtons = {
-      '.ql-header': t('ai_editing.tooltip.header'),
-      '.ql-bold': t('ai_editing.tooltip.bold'),
-      '.ql-italic': t('ai_editing.tooltip.italic'),
-      '.ql-underline': t('ai_editing.tooltip.underline'),
-      '.ql-align': t('ai_editing.tooltip.align'),
-      '.ql-link': t('ai_editing.tooltip.link'),
-      '.ql-list[value="ordered"]': t('ai_editing.tooltip.list_ordered'),
-      '.ql-list[value="bullet"]': t('ai_editing.tooltip.list_bullet'),
-      '.ql-table': t('ai_editing.tooltip.table'),
-      '.ql-export': t('ai_editing.tooltip.export'),
-      '.ql-import': t('ai_editing.tooltip.import'),
-      '.ql-copy-content': t('ai_editing.tooltip.copy_content'),
-      '.ql-undo': t('ai_editing.tooltip.undo'),
-      '.ql-redo': t('ai_editing.tooltip.redo'),
-      '.ql-color': t('ai_editing.tooltip.color'),
+      '.ql-header': "标题",
+      '.ql-bold': "加粗",
+      '.ql-italic': "斜体",
+      '.ql-underline': "下划线",
+      '.ql-align': "对齐",
+      '.ql-link': "插入链接",
+      '.ql-list[value="ordered"]': "有序列表",
+      '.ql-list[value="bullet"]': "无序列表",
+      '.ql-table': "插入表格",
+      '.ql-export': "导出",
+      '.ql-import': "导入",
+      '.ql-copy-content': "复制内容",
+      '.ql-undo': "撤销",
+      '.ql-redo': "重做",
+      '.ql-color': "文字颜色",
     }
 
     Object.entries(toolbarButtons).forEach(([selector, tooltip]) => {
@@ -1028,7 +1022,7 @@ onBeforeUnmount(() => {
         <div class="input-container">
           <textarea
             id="promptInput"
-            :placeholder="t('ai_editing.prompt')"
+            :placeholder="请输入内容"
             rows="1"
             @input="autoResize"
             @keydown="handlePromptKeydown"
@@ -1043,50 +1037,33 @@ onBeforeUnmount(() => {
             <div class="left-buttons">
               <button id="insertAfter">
                 <i class="fas fa-plus" />
-                {{ t('ai_editing.aiResponse.insertAfter') }}
+                {{ "插入到后面" }}
               </button>
               <button id="replace">
                 <i class="fas fa-exchange-alt" />
-                {{ t('ai_editing.aiResponse.replace') }}
+                {{ "替换内容" }}
               </button>
               <button v-show="!isTranslationPrompt" id="compare">
                 <i class="fas fa-code-compare" />
-                {{ t('ai_editing.aiResponse.compare') }}
+                {{ "原文对比" }}
               </button>
             </div>
             <div class="right-buttons">
               <button id="aiResponseRegenerateBtn">
                 <i class="fas fa-sync-alt" />
-                {{ t('ai_editing.aiResponse.regenerate') }}
+                {{ "重新生成" }}
               </button>
               <button id="aiResponseCopyBtn">
                 <i class="fas fa-copy" />
-                {{ t('ai_editing.aiResponse.copy') }}
+                {{ "复制" }}
               </button>
             </div>
           </div>
         </div>
       </div>
       <div id="verticalMenu" class="vertical-menu" tabindex="0">
-        <div class="menu-tabs">
-          <div
-            class="menu-tab"
-            :class="{ active: activeTab === 'system' }"
-            @click="switchTab('system')"
-          >
-            {{ t('ai_editing.vertical_menu.system') }}
-          </div>
-          <div
-            class="menu-tab"
-            :class="{ active: activeTab === 'custom' }"
-            @click="switchTab('custom')"
-          >
-            {{ t('ai_editing.vertical_menu.custom') }}
-          </div>
-        </div>
-
         <!-- 系统提示词面板 -->
-        <div v-if="activeTab === 'system'" class="menu-content system-prompts">
+        <div class="menu-content system-prompts">
           <div
             v-for="prompt in promptsData?.system"
             :key="prompt.id"
@@ -1103,14 +1080,14 @@ onBeforeUnmount(() => {
     </div>
     <div id="exportMenu" class="export-menu">
       <div class="export-menu-item" data-format="markdown">
-        {{ t('ai_editing.exportMenu.markdown') }}
+        {{ "导出为markdown" }}
       </div>
       <div class="export-menu-item" data-format="docx">
-        {{ t('ai_editing.exportMenu.docx') }}
+        {{ "导出为docx" }}
       </div>
       <!--
       <div class="export-menu-item" data-format="pdf">
-        {{ t('ai_editing.exportMenu.pdf') }}
+        {{ "导出为PDF" }}
       </div>
       -->
     </div>
@@ -1119,13 +1096,13 @@ onBeforeUnmount(() => {
         <div id="diffEditor" />
         <div class="diff-actions">
           <button id="insertAfterDiff" class="diff-btn insert">
-            {{ t('ai_editing.diffEditor.insertAfter') }}
+            {{ "插入到后面" }}
           </button>
           <button id="confirmReplace" class="diff-btn confirm">
-            {{ t('ai_editing.diffEditor.confirm') }}
+            {{ "确认替换" }}
           </button>
           <button id="cancelReplace" class="diff-btn cancel">
-            {{ t('ai_editing.diffEditor.cancel') }}
+            {{ "取消" }}
           </button>
         </div>
       </div>

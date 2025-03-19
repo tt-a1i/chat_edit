@@ -1,4 +1,3 @@
-import { AIEditingAPI } from '@/api'
 
 // 防抖函数
 function debounce(func: (...args: any[]) => void, wait: number) {
