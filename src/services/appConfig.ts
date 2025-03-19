@@ -1,8 +1,15 @@
 import { useLocalStorage } from '@vueuse/core'
 import gravatarUrl from 'gravatar-url'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Config, db } from './database'
 
+// Scene management
+export const SCENES = {
+  CHAT: 'chat',
+  AI_EDITING: 'ai_editing'
+}
+
+export const currentScene = ref(SCENES.CHAT)
 export const currentModel = useLocalStorage('currentModel', 'none')
 export const gravatarEmail = useLocalStorage('gravatarEmail', '')
 export const historyMessageLength = useLocalStorage('historyMessageLength', 10)
@@ -17,9 +24,17 @@ export const apiKey = useLocalStorage('apiKey', 'sk-yKsCTYQTG2cRGplbTmq45V5srKN8
 export const isDarkMode = useLocalStorage('darkMode', true)
 export const isSettingsOpen = useLocalStorage('settingsPanelOpen', true)
 export const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
+export const isAIEditingOpen = ref(false)
 export const toggleSettingsPanel = () => (isSettingsOpen.value = !isSettingsOpen.value)
 export const toggleSystemPromptPanel = () =>
   (isSystemPromptOpen.value = !isSystemPromptOpen.value)
+
+export const switchScene = (scene: string) => {
+  currentScene.value = scene
+  if (scene === SCENES.AI_EDITING) {
+    isSystemPromptOpen.value = false
+  }
+}
 
 // Database Layer
 export const configDbLayer = {

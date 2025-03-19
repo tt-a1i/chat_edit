@@ -1,0 +1,348 @@
+import {
+  EventStreamContentType,
+  fetchEventSource,
+} from '@microsoft/fetch-event-source'
+import * as Session from '@/types/session'
+import { useAppStore, useAuthStore } from '@/stores'
+import { HttpError } from '@/types/error'
+import i18n from '@/locales'
+
+export function getEditingSessionInitData() {
+  return {
+    title: '',
+    type: Session.Type.AIEditing,
+    status: Session.Status.Active,
+    option: {
+      opType: 'draft_editing',
+    },
+    ext: {},
+  }
+}
+
+export async function getSessionPrompts(
+  sessionId: string,
+): Promise<PromptHistory[]> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch prompts: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.data as PromptHistory[]
+  }
+  catch (error) {
+    console.error('Error fetching session prompts:', error)
+    throw error
+  }
+}
+export interface ChatResponse {
+  text: string
+  error?: boolean
+  errorMessage?: string
+}
+export interface PromptHistory {
+  id: string
+  prompt: string
+  timestamp: string
+}
+
+let lastMessageWasEmpty = false
+export async function streamChat(
+  sessionId: string,
+  prompt: string,
+  selected_text: string,
+  callback: (data: ChatResponse) => void,
+  controller?: AbortController,
+) {
+  const token = useAuthStore().accessToken
+  const data: ChatResponse = {
+    text: '',
+    error: false,
+  }
+
+  const _controller = controller || new AbortController()
+
+  await fetchEventSource('/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Accept-Language': useAppStore().acceptLanguage,
+    },
+    body: JSON.stringify({
+      prompt,
+      session_id: sessionId,
+      enable_sse: true,
+      doc_content_reference: {
+        text: selected_text,
+      },
+    }),
+    signal: _controller.signal,
+    openWhenHidden: true,
+
+    async onopen(response) {
+      if (
+        response.ok
+        && response.headers.get('content-type') === EventStreamContentType
+      ) {
+        return // 连接成功
+      }
+      const responseClone = response.clone()
+      const errorData = await responseClone.json()
+
+      // 处理限流错误的特殊情况
+      if (response.status === 429 && errorData.rate_limit) {
+        const timeSpace = errorData.rate_limit.window / 3600
+        const shuffle = errorData.rate_limit.limit
+        if (window.$message) {
+          window.$message.error(i18n.global.t('ai_editing.dynamic_limit_message', { timeSpace, shuffle }))
+        }
+      }
+      if (response.headers.get('content-type')?.includes('application/json')) {
+        const error = await response.json()
+        throw new HttpError({
+          status: response.status,
+          statusText: response.statusText,
+          code: error?.code,
+          message: error?.message || response.statusText,
+          data: error?.data,
+        })
+      }
+      throw new Error(
+        `Failed to open SSE connection: ${response.status} ${response.statusText}`,
+      )
+    },
+
+    onmessage(msg) {
+      // console.log(msg)
+      // 处理服务端推送的消息
+      if (msg.data === '[DONE]' || msg.event === 'meta') {
+        _controller.abort()
+        return
+      }
+      if (msg.event === 'msg_id') {
+        return
+      }
+      if (msg.data.trim() === '') {
+        if (!lastMessageWasEmpty) {
+          data.text += '\n' // 添加一个换行符
+          lastMessageWasEmpty = true
+        }
+      }
+      else {
+        data.text += msg.data
+        lastMessageWasEmpty = false
+      }
+      callback({
+        ...data,
+        text: data.text,
+      })
+    },
+
+    onerror(err) {
+      data.error = true
+      data.errorMessage = err.message
+      callback(data)
+      throw err // 停止重试
+    },
+  })
+
+  return data
+}
+
+/**
+ * 保存草稿内容到服务器
+ * @param sessionId 会话ID
+ * @param content 草稿内容
+ */
+export async function saveDraft(sessionId: string, content: string): Promise<void> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/draft`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+      body: JSON.stringify({ text: content }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to save draft: ${response.statusText}`)
+    }
+  }
+  catch (error) {
+    console.error('Error saving draft:', error)
+    throw error
+  }
+}
+
+/**
+ * 从服务器获取草稿内容
+ * @param sessionId 会话ID
+ * @returns 草稿内容
+ */
+export async function loadDraft(sessionId: string): Promise<string | null> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/draft`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+    })
+
+    if (!response.ok) {
+      // eslint-disable-next-line no-console
+      console.log(`Failed to fetch draft: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.data?.text || null
+  }
+  catch (error) {
+    console.error('Error loading draft:', error)
+    return null
+  }
+}
+
+// 添加生成标题的API方法
+export function generateSessionTitle(sessionId: string) {
+  return http({
+    url: '/api/chat/gen_title',
+    method: 'GET',
+    params: { session_id: sessionId },
+  })
+}
+// 保存提示词到服务器
+export async function saveSessionPrompt(
+  sessionId: string,
+  template: string,
+): Promise<any> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+      body: JSON.stringify({
+        name: template,
+        template,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to save prompt: ${response.statusText}`)
+    }
+
+    return await response.json()
+  }
+  catch (error) {
+    console.error('Error saving prompt:', error)
+    throw error
+  }
+}
+
+// 删除提示词
+export async function deleteSessionPrompt(
+  sessionId: string,
+  promptId: string,
+): Promise<any> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts/${promptId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`删除提示词失败: ${response.statusText}`)
+    }
+
+    return await response.json()
+  }
+  catch (error) {
+    console.error('删除提示词失败:', error)
+    throw error
+  }
+}
+// 更新提示词
+export async function updateSessionPrompt(
+  sessionId: string,
+  promptId: string,
+  template: string,
+): Promise<any> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts/${promptId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+      body: JSON.stringify({
+        name: template,
+        template,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`更新提示词失败: ${response.statusText}`)
+    }
+
+    return await response.json()
+  }
+  catch (error) {
+    console.error('更新提示词失败:', error)
+    throw error
+  }
+}
+
+// 更新提示词排序
+export async function updatePromptsOrder(
+  sessionId: string,
+  ordering: string[],
+): Promise<any> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts/ordering`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+      body: JSON.stringify({
+        ordering,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`更新提示词排序失败: ${response.statusText}`)
+    }
+
+    return await response.json()
+  }
+  catch (error) {
+    console.error('更新提示词排序失败:', error)
+    throw error
+  }
+}

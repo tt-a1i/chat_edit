@@ -7,6 +7,7 @@ import {
   IconTrashX,
   IconUserCircle,
   IconMessageCode,
+  IconEdit,
 } from '@tabler/icons-vue'
 
 import {
@@ -14,6 +15,9 @@ import {
   isSystemPromptOpen,
   toggleSettingsPanel,
   toggleSystemPromptPanel,
+  currentScene,
+  SCENES,
+  switchScene
 } from '../services/appConfig.ts'
 import { useChats } from '../services/chat.ts'
 
@@ -22,16 +26,25 @@ const { sortedChats, activeChat, switchChat, deleteChat, startNewChat } =
 
 const onNewChat = () => {
   checkSystemPromptPanel()
+  switchScene(SCENES.CHAT)
   return startNewChat('New chat')
 }
 
 const onSwitchChat = (chatId: number) => {
   checkSystemPromptPanel()
+  switchScene(SCENES.CHAT)
   return switchChat(chatId)
 }
 
 const checkSystemPromptPanel = () => {
   isSystemPromptOpen.value = false
+}
+
+const toggleAIEditing = () => {
+  switchScene(currentScene.value === SCENES.AI_EDITING ? SCENES.CHAT : SCENES.AI_EDITING)
+  if (currentScene.value === SCENES.AI_EDITING) {
+    isSystemPromptOpen.value = false
+  }
 }
 
 const lang = navigator.language
@@ -52,6 +65,30 @@ const lang = navigator.language
         </button>
       </div>
 
+      <!-- Menu options -->
+      <div class="flex flex-col gap-2 p-2 border-b border-gray-200 dark:border-gray-800">
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          :class="{ 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.CHAT }"
+          @click="switchScene(SCENES.CHAT)"
+        >
+          <IconMessageCode class="size-5" />
+          <span>Chat</span>
+        </button>
+        
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          :class="{ 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.AI_EDITING }"
+          @click="switchScene(SCENES.AI_EDITING)"
+        >
+          <IconEdit class="size-5" />
+          <span>AI Editing</span>
+        </button>
+      </div>
+
+      <!-- Chat history -->
       <div
         class="h-full space-y-4 overflow-y-auto border-b border-gray-200 px-2 py-4 dark:border-gray-800"
       >
@@ -117,6 +154,15 @@ const lang = navigator.language
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80" />
 
           Settings
+        </button>
+        <button
+          type="button"
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          :class="{ 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.AI_EDITING }"
+          @click="toggleAIEditing"
+        >
+          <IconEdit class="size-4 opacity-50 group-hover:opacity-80" />
+          <span>AI Editing</span>
         </button>
       </div>
     </div>
