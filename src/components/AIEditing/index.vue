@@ -303,7 +303,6 @@ onMounted(() => {
     }
 
     await handleSend({
-      currentSession: currentSession.value,
       promptInputRef,
       promptValue: prompt,
       currentRange,

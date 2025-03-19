@@ -2,43 +2,6 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
-export function getEditingSessionInitData() {
-  return {
-    title: '',
-    type: Session.Type.AIEditing,
-    status: Session.Status.Active,
-    option: {
-      opType: 'draft_editing',
-    },
-    ext: {},
-  }
-}
-
-export async function getSessionPrompts(
-  sessionId: string,
-): Promise<PromptHistory[]> {
-  try {
-    const token = useAuthStore().accessToken
-    const response = await fetch(`/api/session/${sessionId}/prompts`, {
-      method: 'GET',
-      headers: {
-        'Authorization': token ? `Bearer ${token}` : '',
-        'Accept-Language': useAppStore().acceptLanguage,
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch prompts: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    return data.data as PromptHistory[]
-  }
-  catch (error) {
-    console.error('Error fetching session prompts:', error)
-    throw error
-  }
-}
 export interface ChatResponse {
   text: string
   error?: boolean
@@ -159,7 +122,7 @@ export async function streamChat(
  * @param sessionId 会话ID
  * @param content 草稿内容
  */
-export async function saveDraft(sessionId: string, content: string): Promise<void> {
+/* export async function saveDraft(sessionId: string, content: string): Promise<void> {
   try {
     const token = useAuthStore().accessToken
     const response = await fetch(`/api/session/${sessionId}/draft`, {
@@ -180,14 +143,14 @@ export async function saveDraft(sessionId: string, content: string): Promise<voi
     console.error('Error saving draft:', error)
     throw error
   }
-}
+} */
 
 /**
  * 从服务器获取草稿内容
  * @param sessionId 会话ID
  * @returns 草稿内容
  */
-export async function loadDraft(sessionId: string): Promise<string | null> {
+/* export async function loadDraft(sessionId: string): Promise<string | null> {
   try {
     const token = useAuthStore().accessToken
     const response = await fetch(`/api/session/${sessionId}/draft`, {
@@ -210,18 +173,18 @@ export async function loadDraft(sessionId: string): Promise<string | null> {
     console.error('Error loading draft:', error)
     return null
   }
-}
+} */
 
 // 添加生成标题的API方法
-export function generateSessionTitle(sessionId: string) {
+/* export function generateSessionTitle(sessionId: string) {
   return http({
     url: '/api/chat/gen_title',
     method: 'GET',
     params: { session_id: sessionId },
   })
-}
+} */
 // 保存提示词到服务器
-export async function saveSessionPrompt(
+/* export async function saveSessionPrompt(
   sessionId: string,
   template: string,
 ): Promise<any> {
@@ -250,10 +213,10 @@ export async function saveSessionPrompt(
     console.error('Error saving prompt:', error)
     throw error
   }
-}
+} */
 
 // 删除提示词
-export async function deleteSessionPrompt(
+/* export async function deleteSessionPrompt(
   sessionId: string,
   promptId: string,
 ): Promise<any> {
@@ -277,9 +240,9 @@ export async function deleteSessionPrompt(
     console.error('删除提示词失败:', error)
     throw error
   }
-}
+} */
 // 更新提示词
-export async function updateSessionPrompt(
+/* export async function updateSessionPrompt(
   sessionId: string,
   promptId: string,
   template: string,
@@ -309,10 +272,10 @@ export async function updateSessionPrompt(
     console.error('更新提示词失败:', error)
     throw error
   }
-}
+} */
 
 // 更新提示词排序
-export async function updatePromptsOrder(
+/* export async function updatePromptsOrder(
   sessionId: string,
   ordering: string[],
 ): Promise<any> {
@@ -340,4 +303,41 @@ export async function updatePromptsOrder(
     console.error('更新提示词排序失败:', error)
     throw error
   }
+} */
+/* export function getEditingSessionInitData() {
+return {
+  title: '',
+  type: Session.Type.AIEditing,
+  status: Session.Status.Active,
+  option: {
+    opType: 'draft_editing',
+  },
+  ext: {},
 }
+} */
+
+/* export async function getSessionPrompts(
+  sessionId: string,
+): Promise<PromptHistory[]> {
+  try {
+    const token = useAuthStore().accessToken
+    const response = await fetch(`/api/session/${sessionId}/prompts`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+        'Accept-Language': useAppStore().acceptLanguage,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch prompts: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data.data as PromptHistory[]
+  }
+  catch (error) {
+    console.error('Error fetching session prompts:', error)
+    throw error
+  }
+} */

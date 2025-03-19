@@ -1,4 +1,3 @@
-import { AIEditingAPI } from '@/api';
 import MarkdownIt from 'markdown-it'
 import type { editor } from 'monaco-editor'
 import * as monaco from 'monaco-editor'
@@ -661,7 +660,6 @@ export function showExportMenu({ exportMenuRef }: ShowExportMenuParams) {
 }
 
 export interface HandleSendParams {
-  currentSession: { id: string }
   promptInputRef: HTMLInputElement
   promptValue?: string
   currentRange: { index: number, length: number } | null
@@ -675,7 +673,6 @@ export interface HandleSendParams {
 }
 
 export async function handleSend({
-  currentSession,
   promptInputRef,
   promptValue,
   currentRange,
@@ -687,8 +684,6 @@ export async function handleSend({
   onResponse,
   isTranslationPrompt,
 }: HandleSendParams) {
-  if (!currentSession?.id)
-    return
 
   const actualPrompt = promptValue || promptInputRef.value
   aiResponseRef.dataset.lastPrompt = actualPrompt
@@ -724,7 +719,6 @@ export async function handleSend({
     abortController.value = new AbortController()
 
     await AIEditingAPI.streamChat(
-      currentSession.id,
       actualPrompt,
       selectedText,
       (response) => {
