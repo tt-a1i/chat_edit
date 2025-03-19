@@ -103,29 +103,68 @@ export async function streamChat(
     },
 
     onmessage(msg) {
-      // console.log(msg)
-      // 处理服务端推送的消息
-      if (msg.data === '[DONE]' || msg.event === 'meta') {
-        _controller.abort()
-        return
-      }
-      if (msg.event === 'msg_id') {
-        return
-      }
-      if (msg.data.trim() === '') {
-        if (!lastMessageWasEmpty) {
-          data.text += '\n' // 添加一个换行符
-          lastMessageWasEmpty = true
+      try {
+        // 处理完成信号
+        if (msg.data === '[DONE]') {
+          data.done = true
+          callback({
+            ...data,
+            done: true
+          })
+          _controller.abort()
+          return
         }
+
+        // 跳过特殊事件
+        if (msg.event === 'meta' || msg.event === 'msg_id') {
+          return
+        }
+
+        try {
+          // 尝试解析JSON
+          const jsonData = JSON.parse(msg.data)
+
+          if (jsonData.choices && jsonData.choices[0]) {
+            // 处理内容增量
+            if (jsonData.choices[0].delta && jsonData.choices[0].delta.content) {
+              const content = jsonData.choices[0].delta.content
+              data.text += content
+              callback({
+                ...data,
+                text: data.text
+              })
+            }
+
+            // 处理结束原因
+            if (jsonData.choices[0].finish_reason === 'stop') {
+              data.done = true
+              callback({
+                ...data,
+                done: true
+              })
+              _controller.abort()
+            }
+          }
+        } catch (e) {
+          // 如果不是JSON格式，按原始方式处理
+          if (msg.data.trim() === '') {
+            if (!lastMessageWasEmpty) {
+              data.text += '\n' // 添加一个换行符
+              lastMessageWasEmpty = true
+            }
+          } else {
+            data.text += msg.data
+            lastMessageWasEmpty = false
+          }
+
+          callback({
+            ...data,
+            text: data.text
+          })
+        }
+      } catch (err) {
+        console.error('处理消息失败:', err)
       }
-      else {
-        data.text += msg.data
-        lastMessageWasEmpty = false
-      }
-      callback({
-        ...data,
-        text: data.text,
-      })
     },
 
     onerror(err) {
