@@ -70,7 +70,52 @@ function hideUI() {
 let exportMenuRef = null
 
 // const currentSession = ref(null)
-const promptsData = ref(null)
+const promptsData = ref({
+  system: [
+    {
+      id: '1',
+      name: '翻译为中文',
+      name_en: 'Translate to Chinese',
+      template: '将以下文本翻译为中文，保持原文的意思、格式和语气：',
+      en_name: '🇨🇳'
+    },
+    {
+      id: '2',
+      name: '翻译为英文',
+      name_en: 'Translate to English',
+      template: '将以下文本翻译为英文，保持原文的意思、格式和语气：',
+      en_name: '🇬🇧'
+    },
+    {
+      id: '3',
+      name: '润色文本',
+      name_en: 'Polish Text',
+      template: '请对以下文本进行润色，提升语言表达质量，但保持原意不变：',
+      en_name: '✨'
+    },
+    {
+      id: '4',
+      name: '扩写内容',
+      name_en: 'Expand Content',
+      template: '请扩展以下文本，添加更多细节、例子或解释，使其更加全面：',
+      en_name: '📈'
+    },
+    {
+      id: '5',
+      name: '缩写内容',
+      name_en: 'Condense Content',
+      template: '请将以下文本精简，保留关键信息但使其更加简洁：',
+      en_name: '📉'
+    },
+    {
+      id: '6',
+      name: '总结要点',
+      name_en: 'Summarize',
+      template: '请总结以下文本的主要观点和要点：',
+      en_name: '📋'
+    }
+  ]
+})
 
 const isGenerating = ref(false)
 const abortController = ref(null)
@@ -1071,7 +1116,6 @@ onBeforeUnmount(() => {
             :data-prompt-id="prompt.id"
             @click="handleMenuItemClick(prompt)"
           >
-            {{ "✨" }}
             {{ prompt.en_name }}
             {{ currentLanguage === 'en-US' ? prompt.name_en : prompt.name }}
           </div>
