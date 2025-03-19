@@ -1,0 +1,884 @@
+{
+  "common": {
+    "add": "添加",
+    "addSuccess": "添加成功",
+    "edit": "编辑",
+    "editSuccess": "编辑成功",
+    "delete": "删除",
+    "deleteSuccess": "删除成功",
+    "copy": "复制",
+    "copied": "复制成功",
+    "copyCode": "复制代码",
+    "yes": "是",
+    "no": "否",
+    "confirm": "确定",
+    "cancel": "取消",
+    "wrong": "服务暂时不可用",
+    "abort": "用户终止",
+    "success": "操作成功",
+    "failed": "操作失败",
+    "login": "登录",
+    "accurate": "赞",
+    "notAccurate": "踩",
+    "unauthorizedTips": "未经授权，请先进行登录。",
+    "envTip": "你现在正处于{envName}环境",
+    "development": "开发",
+    "staging": "测试",
+    "sizelimit": "文件大小应小于10MB",
+    "formatlimit": "仅支持图片格式文件",
+    "numberlimit": "最多只能上传 {maxFiles} 个文件",
+    "addfile": "添加文件",
+    "addfilemessage": "拖动文件到此处以添加到对话中",
+    "vltip": "点击、拖动或粘贴图片到此处进行上传",
+    "totalPixelLimit": "图片超过最大像素总和限制",
+    "loadError": "图片加载失败，请重试",
+    "waiting": "请稍等...",
+    "export": "导出",
+
+    "tip": "提示",
+    "send": "发送",
+    "submit": "提交",
+    "clear": "清空",
+    "regenerate": "重新生成",
+    "promptFull": "上下文已达到最大长度，请开启新会话。",
+    "limited": "您的账号使用{modelName}模型每{duration}个小时可以发送{count}条消息。",
+    "customService": "客服",
+    "contactUs": "联系我们",
+
+    "expired": "服务已过期 | 还剩1天 | 还剩{n}天",
+    "days": "无 | 1天 | {n}天",
+
+    "imagesHidden": "图片已隐藏"
+  },
+  "session": {
+    "share": {
+      "prefix": "点击链接查看和WestlakeChat智能助手的对话：",
+      "shareNote": "分享后所有人都可查看该会话所有内容",
+      "shared": "该会话已经分享，所有人都可查看该会话所有内容",
+      "shareUrlCopyed": "分享链接已复制到剪贴板",
+      "copyLink": "复制链接",
+      "cancelShare": "取消分享",
+      "start": "开始使用 WestlakeChat",
+      "shareAlter": "内容由AI生成，请仔细甄别"
+    },
+
+    "newSession": "新会话",
+    "recentSession": "最近会话",
+    "deleteHistoryConfirm": "确定删除会话?",
+    "clearAll": "确定要清空所有会话?",
+    "scene": "场景",
+    "sessionFull": "已达到最大会话数，请删除会话。",
+    "wordCheckFailed":
+      "抱歉，我无法回答这个问题。可能是因为这超出了我的能力范围，或者因为在这种情况下讨论这个问题并不合适。还有什么我可以帮助您的吗？",
+    "modelLimited":
+      "这个模型目前处于有限的测试阶段，仅向少数测试用户提供。一旦完全开发和测试完成，我们计划将其扩展到更广泛的用户群体中。请继续关注后续更新。",
+    "reachedLimited":
+      "你已经达到了{modelName}模型每{window}个小时{limit}次消息的次数限制， 请使用另一个模型开始新的会话或稍后再试",
+    "sceneType": {
+      "chat": "学术问答",
+      "search": "搜索",
+      "scholar": "学术",
+      "editing": "论文编辑",
+      "reading": "AI阅读",
+      "podcast": "AI播客",
+      "ai_editing": "AI编辑",
+      "translation": "翻译助手",
+      "writing": "AI写作"
+    },
+    "sceneTypeDesc": {
+      "chat": "学术搜索，答案更可靠",
+      "search": "基于论文数据库的检索+问答系统",
+      "editing": "润色、翻译、代码解释",
+      "reading": "论文阅读，翻译总结",
+      "podcast": "论文资料，边听边学",
+      "ai_editing": "校对、润色，文章更出彩",
+      "translation": "AI翻译，更专业更自然",
+      "writing": "深度搜索，一键成文"
+    },
+
+    "shortcutScene": {
+      "reading": "AI阅读",
+      "podcast": "AI播客",
+      "translate": "文章翻译",
+      "proofread": "文章润色",
+      "code": "代码解释"
+    },
+    "chatStatus": {
+      "thinking": "思考中 ...",
+      "using_plugin": "使用插件中",
+      "used_plugin": "已使用插件",
+      "failed_plugin": "使用插件失败"
+    },
+    "model": "模型",
+    "models": {
+      "FutureGene": {
+        "name": "FutureGene",
+        "desc": "未来基因自研大语言模型，基于通义千问"
+      },
+      "gpt-4o": {
+        "name": "GPT 4o",
+        "desc": "基于OpenAI ChatGPT，使用生命科学领域知识进行了增强"
+      },
+      "o1-preview": {
+        "name": "GPT o1",
+        "desc": "基于OpenAI ChatGPT，使用生命科学领域知识进行了增强"
+      },
+      "claude": {
+        "name": "Claude 3.5",
+        "desc": "基于Anthropic Claude，使用生命科学领域知识进行了增强"
+      },
+      "claude-37-sonnet": {
+        "name": "Claude 3.7 Sonnet Thinking",
+        "desc": "基于Anthropic Claude，擅长编程"
+      },
+      "deepseek-r1": {
+        "name": "DeepSeek R1",
+        "desc": "基于DeepSeek R1，擅长推理和深度思考"
+      }
+    },
+    "chatModelDesc": {
+      "gpt4": "基于OpenAI ChatGPT,使用生命科学领域知识进行了增强",
+      "futuregene": "未来基因自研大语言模型，基于通义千问",
+      "Claude": "基于Anthropic Claude,使用生命科学领域知识进行了增强",
+      "deepseek": "基于DeepSeek，擅长推理和深度思考"
+    },
+    "trialLimitedNote": "您的账号暂不支持该场景，请进行服务购买。"
+  },
+  "chat": {
+    "placeholder": "问我任何事... (Shift+Enter换行)",
+    "placeholderMobile": "问我任何事...",
+    "pluginUsing": "没使用插件 | 正在使用1个插件 | 正在使用{n}个插件",
+    "pluginUsed": "没使用插件 | 已使用1个插件 | 已使用{n}个插件",
+    "generalSearch": "联网搜索",
+    "literatureSearch": "文献搜索",
+    "generalSearchTip": "通过互联网获取最新资讯、行业动态、实时数据等",
+    "literatureSearchTip": "检索PubMed、Arxiv等学术数据库，为您提供相关的科研论文",
+    "thought": "已深度思考"
+  },
+  "search": {
+    "placeholder": "输入你的问题...",
+    "placeholderFollow": "进一步提问...",
+    "sources": "来源",
+    "author": "作者",
+    "journal": "期刊",
+    "published": "发表时间",
+    "articleFound": "没找到文章 | 共找到1篇文章  | 共找到{n}篇文章",
+    "expand": "展开",
+    "collapse": "收起",
+    "useReading": "使用AI阅读",
+    "moreBtn": "搜索更多",
+    "moreBtnHint": "为你搜索更多文献，每次点击可最多再搜索15篇 ",
+    "deeperBtn": "文献搜索",
+    "deeperBtnHint": "回答不准确？点击后进行文献搜索",
+    "lowerTitle": "升级提示",
+    "lowerContent": "基础版本不支持搜索更多，请升级到高级版本，可支持最多搜索40篇文献。",
+    "purchaseBtn": "去购买",
+    "cancelBtn": "取消",
+    "search": "搜索",
+    "ask": "提问",
+    "suggestion": "你可以这样提问",
+    "sectionType": {
+      "HYPOTHETICAL_RESPONSE": "直觉",
+      "AGENT_REFLECTION": "思考",
+      "ACTUAL_RESPONSE": "回答"
+    }
+  },
+  "edit": {
+    "opType": {
+      "polishEnglish": "英文润色",
+      "polishChinese": "中文润色",
+      "translateChineseToEnglish": "中译英",
+      "translateEnglishToChinese": "英译中",
+      "explainCode": "解释代码"
+    },
+    "overflow": "超出长度限制"
+  },
+  "read": {
+    "title": "针对 PDF 文件内容进行问答",
+    "placeholder": "输入你的问题...",
+    "pasteLink": "粘贴文档链接",
+    "dragDoc": "拖动文档到这里 或者 ",
+    "uploadFile": "上传一个文件",
+    "summaryPrefix": "文章摘要：",
+    "analyzeDocument": "WestlakeChat 正在分析你的文档... \n(可能需要1-2分钟)",
+    "analyzeFailed": "发生错误，请重试。",
+    "docTooShort": "文档中的文本信息不足，请使用其他文档。",
+    "ask": "提问",
+    "translate": "翻译",
+    "explain": "解释"
+  },
+  "enterprise": {
+    "placeholder": "输入你的问题..."
+  },
+  "gateway": {
+    "placeholder": "输入你的问题..."
+  },
+  "writing": {
+    "reviewWriting": "综述论文",
+    "reviewDesc": "自然科学类的综述论文，如生物、医学、计算机科学等，引用英文学术文献",
+    "reviewLang": "论文语言",
+    "reviewTerm": "本平台所有内容由AI生成，请您仔细甄别并审核生成内容的准确性，使用时请遵守学术规范和知识产权相关要求。",
+    "placeholder": "请输入你研究的相关主题、领域以及关注的重点（如方法、应用、挑战等），例如：/n研究主题：从遗传关联到致病基因的因果推断，主要领域是人类复杂性状与疾病的遗传基础。关注重点：1）基于GWAS数据的基因统计推断方法（如共定位分析、孟德尔随机化）；2）多组学数据整合策略（表观遗传调控与基因表达定量位点）；3）增强子-基因映射技术；4）网络生物学在基因优先级排序中的应用。",
+    "replyPlaceholder": "请输入你的回答...",
+    "refuseContent": "您的主题不在自然科学类的综述论文内",
+    "viewDetail": "查看详情",
+    "chart": {
+      "referenceDistribution": "被引次数分布",
+      "jcrDistribution": "期刊分区分布",
+      "yearDistribution": "发表时间分布",
+      "scoreData": "论文得分分布"
+    },
+    "stepTitle": {
+      "thinking": "正在思考",
+      "search": "正在检索论文 | 已经检索到 1 篇论文 | 已经检索到 {n} 篇论文",
+      "search_done": "检索论文完成 | 已经检索到 1 篇论文 | 已经检索到 {n} 篇论文",
+      "read": "正在阅读论文 | 已经阅读完 1 篇论文 | 已经阅读完 {n} 篇论文",
+      "read_done": "阅读论文完成 | 已经阅读完 1 篇论文 | 已经阅读完 {n} 篇论文",
+      "write": "正在生成论文",
+      "write_done": "论文生成完成",
+      "success_done": "思维导图生成完成",
+      "failed_done": "生成文章时出现错误"
+    }
+  },
+  "setting": {
+    "settings": "设置",
+    "username": "昵称",
+    "theme": "主题",
+    "language": "语言",
+    "test": "测试环境",
+    "clearAllSessions": "清空所有会话",
+    "logout": "退出登录",
+    "guide": "提问指导",
+    "subscriptionManagement": "订阅管理",
+    "fillEmail": "请完善邮箱信息",
+    "about": "关于"
+  },
+  "login": {
+    "title": "FutureGene 账号登录",
+    "login": "登录",
+    "mobile": "手机",
+    "mobilePlaceholder": "请输入手机号",
+    "verifyCode": "验证码",
+    "verifyCodePlaceholder": "输入验证码",
+
+    "send": "发送",
+    "register": "注册账号",
+    "westlakeSSO": "西湖大学师生登录入口",
+
+    "success": "成功",
+    "error": "错误",
+    "tooManyRequest": "请求过于频繁",
+    "tooManyRequestTip": "您的操作过于频繁，请稍后再试",
+    "sendSuccess": "验证码发送成功，有效期5分钟",
+    "sendFailed": "验证码发送失败",
+    "verifyFailed": "验证失败",
+    "loginSuccess": "登录成功",
+    "loginFailed": "登录失败",
+    "loginFailedTip": "登录失败，请检查手机号和验证码是否正确",
+
+    "noAccess": "未开通",
+    "noAccessTip": "手机号未开通访问权限",
+    "noAccessRegister": "点此注册"
+  },
+  "subscriptionManagement": {
+    "subscriptionManagement": "订阅管理",
+    "account": "账号",
+    "expireTime": "到期时间",
+    "expired": "订阅服务已过期",
+    "permanent": "长期有效",
+    "renew": "续费"
+  },
+  "promotion": {
+    "title": "推荐用户得Claude试用权",
+    "info": "活动说明",
+    "desc": "1、将海报分享给好友，您的好友通过海报二维码进行注册并购买服务，您将获得Claude 模型30天使用权益。\n2、每邀请一位好友付费注册成功可累加权益。",
+    "downloadPoster": "下载海报",
+    "copyLink": "复制链接"
+  },
+  "podcastPromotion": {
+    "title": "重磅更新：AI播客上线试运行啦，快来体验吧~",
+    "desc": "试运行公告：\n\n亲爱的小伙伴们，AI播客功能目前在试运行阶段，以下事项请注意：\n1、试运行期间该功能可能随时进行优化调整或下架。\n2、试用期间赠送免费试用额度，正式上线后以实际额度为准。\n3、请随时给我们反馈建议或问题。",
+    "button": "去体验"
+  },
+  "home": {
+    "signup": "注册",
+    "login": "登录",
+    "enter": "进入会话",
+    "description": "为学生和科研人员考虑的[最大优惠]力度",
+    "success": "成功",
+    "error": "错误",
+    "carousel": {
+      "title": "科研人的得力 AI 助手",
+      "items": [
+        "专业的学术问答、AI 阅读有效提升你的科研效率",
+        "集成了专业领域数据、RAG 和工具调用，降低模型幻觉",
+        "采用先进的AI模型，包括自研的 FutureGene 以及其他一线模型如 GPT-4o、GPT-o1、Claude、DeepSeek R1 满血版"
+      ],
+      "explain": "每个月为用户节约",
+      "unit": "小时"
+    },
+    "card": {
+      "title": "科研场景多重覆盖，快来试试吧！",
+      "items": [
+        {
+          "title": "知识查询",
+          "desc": "科研领域的知识增强，专业文库搜索，回答带引用，信息更可靠！"
+        },
+        {
+          "title": "论文编辑",
+          "desc": "文章校对、润色，精确翻译，助你文稿更出色！"
+        },
+        {
+          "title": "科研编程",
+          "desc": "代码解读、代码生成、数据分析与可视化，让科研编程更简单！"
+        },
+        {
+          "title": "文献阅读",
+          "desc": "上传论文，一键帮你总结要点，提升阅读效率！"
+        }
+      ]
+    },
+    "contrast": {
+      "common": "通用AI",
+      "items": [
+        {
+          "title": "RAG",
+          "desc": {
+            "advan": [
+              "从外部知识库（arXiv，PubMed等）中检索相关信息，减少幻觉",
+              "实时访问外部数据源，提供最新的信息"
+            ],
+            "disadvan": [
+              "依赖于其内部训练数据，容易产生幻觉",
+              "基于训练数据产生回答，无法实时获取新的信息"
+            ]
+          }
+        },
+        {
+          "title": "专业领域数据训练",
+          "desc": {
+            "advan": [
+              "数据涵盖科学领域研究论文、教材与参考书等丰富资源",
+              "能够理解和处理复杂的科研问题"
+            ],
+            "disadvan": ["通用语料训练，缺乏专业领域的知识", "回答通用领域的问题"]
+          }
+        },
+        {
+          "title": "工具调用",
+          "desc": {
+            "advan": [
+              "补充了计算器、脚本程序等工具，可以提供准确的计算和数据处理能力",
+              "可以通过简单的自然语言指令调用外部工具完成复杂编程"
+            ],
+            "disadvan": ["无计算工具，处理数学或计算问题容易出错", "无脚本程序工具，在代码编程上较弱"]
+          }
+        }
+      ]
+    },
+    "product": {
+      "title": "科研场景多重覆盖",
+      "button": "了解更多",
+      "items": [
+        {
+          "title": "学术问答",
+          "header": "文库搜索，给你更专业的回答",
+          "items": [
+            "多模态对话，文本与图像深度解析",
+            "搜索专业文献数据库，如PubMed、arXiv",
+            "引用列表清晰呈现，附带简短摘要、期刊、发表时间、论文链接等便于阅读"
+          ]
+        },
+        {
+          "title": "AI阅读",
+          "header": "高效阅读，效率成倍提升",
+          "items": [
+            "上传PDF，迅速提取关键要点，生成核心摘要",
+            "沉浸式阅读，随时圈选内容进行提问、翻译、解释",
+            "快速掌握核心内容，让科研阅读事半功倍"
+          ]
+        },
+        {
+          "title": "论文编辑",
+          "header": "让AI帮你润色学术论文",
+          "items": [
+            "帮助你校对润色句子结构、纠正语法错误、建议更合适的词汇表达",
+            "提供专业的学术英语翻译",
+            "协助生成符合期刊格式要求的参考文献列表"
+          ]
+        },
+        {
+          "title": "AI播客",
+          "header": "上传资料，边听边学",
+          "items": [
+            "上传你的学习资料即可生成一段有趣的播客",
+            "生硬的论文阅读转变成高效的音频学习",
+            "支持丰富的文档格式包含PDF、Word、 txt、PPT、网页链接和文本"
+          ]
+        }
+      ]
+    },
+    "comment": {
+      "title": "的西湖大学师生在用\n好评如潮",
+      "button": "立即体验"
+    },
+    "faq": {
+      "title": "常见问题",
+      "wechatOfficial": "微信公众号",
+      "wechatScan": "微信扫一扫",
+      "productScan": "扫码关注了解更多产品资讯",
+      "questionScan": "任何问题请联系客服咨询",
+      "items": [
+        {
+          "question": "是否支持开发票？",
+          "answer": "个人或团队都支持开具发票（类目为：技术服务）可联系客服开具。"
+        },
+        {
+          "question": "支持哪些学科？",
+          "answer":
+            "WestlakeChat支持广泛的科学学科，特别是在生命科学、医学、化学、物理学、计算机、材料科学、环境科学和工程学等领域。"
+        },
+        {
+          "question": "模型有没有幻觉？",
+          "answer":
+            "WestlakeChat的模型通过使用大规模预训练语言模型和监督学习技术，旨在减少生成内容中的错误和不一致，从而提高模型的可靠性和准确性，在RAG方面，补充了外部知识库如：arXiv、PubMed等，在工具调用方面也补充了计算器、脚本程序等。此外，模型也会定期进行更新和优化，以适应新的研究进展和数据变化，在生成内容时，模型会尝试从多个来源验证信息的准确性，以减少错误的产生。"
+        },
+        {
+          "question": "支持哪些模型？",
+          "answer":
+            "除了我们自研的FutureGene模型，WestlakeChat还调接了claude3.5、o1-preview、GPT-4o，平台高级会员均可使用。"
+        },
+        {
+          "question": "与Sider、Poe有什么区别？",
+          "answer":
+          "WestlakeChat是基于 RAG 的开源工具，支持多模态问答和多种复杂推理，可在多个图片和表格的文档上执行问答，并支持多模态文档解析，用户能通过简单对话从文档中获取深入洞察和答案，而 Sider、Poe 等封装接口应用相对更侧重于对已有语言模型接口的简单整合和调用，Poe 虽然有RAG但搜索的大多是通用网站而非专业文库（且不支持开具发票）。"
+        }
+      ]
+    },
+    "introduction": {
+      "title": "产品介绍",
+      "productNews": "产品动态",
+      "functionIntro": "功能介绍",
+      "functions": [
+        {
+          "title": "产品介绍",
+          "description": [
+            {
+              "header": "简介",
+              "content": [
+                "WestlakeChat 是由未来基因与西湖大学联合研发的AI智能平台，专为科研工作者设计，旨在提供一个高效、便捷的科研辅助工具。平台集成了学术问答、论文编辑、AI阅读、AI播客等功能，支持实时多模态对话、论文的快速查找、文本编辑与翻译、文章快速总结问答，极大地提升了科研和教学工作的效率与便捷性。"
+              ]
+            },
+            {
+              "header": "平台特点",
+              "content": [
+                "1. 强大的搜索功能：采用RAG技术，接入外部知识库（arXiv，PubMed等），生成引用列表。",
+                "2. 工具调用：补充了计算器、脚本程序等工具，可以提供准确的计算和数据处理能力。",
+                "3. 专业领域数据训练：数据涵盖科学领域研究论文、教材与参考书等丰富资源。",
+                "4. 多模态对话：支持文本、图像深度解析与交互。"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "学术问答",
+          "description": [
+            {
+              "header": "支持多轮问答",
+              "content": [
+                "WestlakeChat 除了在专业领域的数据进行训练，还集成了外部文献数据库，能够精准定位到最前沿的研究成果。用户只需输入相关问题，如“请给我找发表在nature cell 上关于渐冻症的重要的研究论文”，系统即可快速呈现搜索结果，包括期刊作者、发表时间等详细信息，并附带简短的中文摘要和论文链接。点击链接可直接跳转到相应文章页面，进一步查看参考文献。尤其是一句话中文摘要对于中文母语者来说非常友好，可以快速浏览相关文献的重要内容。",
+                "学术问答模块还可以通过自然语言帮助你在各种场景进行辅助工作，例如帮你写一封回复编辑的专业邮件，整理投稿期刊要求的论文格式，编写一段复杂的python代码等等。"
+              ]
+            },
+            {
+              "header": "支持图片对话",
+              "content": [
+                "WestlakeChat 支持多模态对话功能，无论是文本信息的精准理解与回应，还是对图像等非文本数据的深度解析与交互处理，都能游刃有余。用户可以点击、拖拽或黏贴图片进行上传，系统会解析内容并提供详细的解释和答案。例如，用户可以上传一张论文中的图片，系统会解析图像内容并提供相关的科学解释和建议。"
+              ]
+            },
+            {
+              "header": "其他辅助功能",
+              "content": [
+                "1. 在问答页面用户提问右侧点击修改按钮 ，支持对已提交的问题重新提问。",
+                "2. 在用户提问页面模型回答后支持复制、点赞、点踩。",
+                "3. 左侧会话列表支持重新命名会话或删除会话。"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "论文编辑",
+          "description": [
+            {
+              "header": "润色翻译",
+              "content": [
+                "撰写高质量的学术论文不仅需要扎实的专业知识，还需要良好的书面英语表达能力。WestlakeChat 提供的文本编辑功能可以帮助作者润色句子结构、纠正语法错误、提供专业的学术英语翻译，甚至建议更合适的词汇选择。"
+              ]
+            },
+            {
+              "header": "解释代码",
+              "content": [
+                "现代科学研究往往涉及大量的数据分析和程序开发。WestlakeChat 调用了丰富的编程资源工具库，如计算器、脚本程序以及实用代码片段等，帮助用户降低编程门槛，你只需将复杂代码输入，即可生成详细的解释。当然，如果你希望模型帮你编写程序，也可以在问答模块直接将编程需求输入给模型，WestlakeChat会输出详细的编程思路和示例。"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "AI阅读",
+          "description": [
+            {
+              "header": "概要总结",
+              "content": [
+                "阅读大量文献是科研工作的重要组成部分。WestlakeChat 让这一过程变得更加高效。用户只需将PDF文件上传，系统便能迅速提取关键要点，生成简洁明了的摘要，帮助用户快速了解论文主旨，同时还生成相关的提问建议，节省科研人员宝贵的时间和精力。"
+              ]
+            },
+            {
+              "header": "AI Copilot模式",
+              "content": [
+                "WestlakeChat 的AI阅读功能不仅限于生成摘要，用户还可以针对文中的具体内容进行提问、翻译、解释，AI都能帮助用户深入理解并提供详细的答案和解析。"
+              ]
+            },
+            {
+              "header": "其他辅助功能",
+              "content": [
+                "1. 点击左上角功能区，支持PDF缩放和页码选择，方便用户对内容进行快速选择浏览。",
+                "2. 点击右下角“PDF” 按钮，可以自由切换阅读模式或问答模式"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "AI播客",
+          "description": [
+            {
+              "header": "",
+              "content": [
+                "在学术研究的道路上，时间宝贵，效率至关重要。为了帮助科研人员和学生更高效地获取和消化学术资料，我们推出了“AI播客“功能，让您的学习和研究变得更加轻松有趣。"
+              ]
+            },
+            {
+              "header": "上传便捷",
+              "content": [
+                "只需上传您的学术论文、研究报告或专业书籍，我们将自动为您生成生动且有洞见的播客音频。目前支持的文件格式包括PDF、Word、TXT和PPT。"
+              ]
+            },
+            {
+              "header": "专业合成",
+              "content": [
+                "我们的播客采用先进的语音合成技术，确保每一段音频都清晰、流畅且生动，为您带来愉悦的听觉体验。我们特别生成中文音频，为中文母语者提供更好的体验。"
+              ]
+            },
+            {
+              "header": "智能摘要",
+              "content": [
+                "为了帮助您快速抓住论文的重点，我们的系统通过智能摘要和关键词提取，为您梳理论文的核心要点。您可以在播客中随时暂停，查看摘要章节，提高学习和研究的效率。"
+              ]
+            },
+            {
+              "header": "随时分享",
+              "content": [
+                "您可以分享链接或通过微信扫码，随时收听播客，让学习变得轻松自如。如果您觉得内容非常有趣，还可以一键分享给微信好友或发布到朋友圈。"
+              ]
+            }
+          ]
+        }
+      ],
+      "checkDetail": "查看详情",
+      "newsDetails": [
+        {
+          "date": "2025年1月6日",
+          "title": "AI播客正式上线试运行",
+          "link": "https://mp.weixin.qq.com/s/OOYO0wPau7I_RGwEnQcCDQ",
+          "details": [
+            "1、支持丰富的文档格式包含PDF、Word、txt、PPT",
+            "2、上传学习资料即可生成一段有趣的中文播客",
+            "3、支持分享给微信好友或者发送到朋友圈"
+          ]
+        },
+        {
+          "date": "2024年12月31日",
+          "title": "WestlakeChat与RAG技术的深度融合",
+          "link": "https://mp.weixin.qq.com/s/nvufdBm84QsuIJWzph6fOg",
+          "details": ["1、RAG技术的核心优势", "2、WestlakeChat如何使用RAG", "3、案例对比"]
+        },
+        {
+          "date": "2024年12月24日",
+          "title": "比谷歌学术更懂中文的AI搜索",
+          "link": "https://mp.weixin.qq.com/s/LgilRyH8AJXgaWktwcuUQQ",
+          "details": [
+            "1、首页改版，新增多个使用场景入口",
+            "2、问答常见优化文献列表展示",
+            "3、阅读场景优化用户体验"
+          ]
+        },
+        {
+          "date": "2024年12月18日",
+          "title": "谷歌学术搜索 vs WestlakeChat搜索",
+          "link": "https://mp.weixin.qq.com/s/LgilRyH8AJXgaWktwcuUQQ",
+          "details": [
+            "1、WestlakeChat搜索提供文献聚合能力",
+            "2、精准关键词匹配，搜到更相关的内容",
+            "3、更懂中文，母语友好的摘要生成"
+          ]
+        },
+        {
+          "date": "2024年12月16日",
+          "title": "全面了解WestlakeChat-科研人的得力AI助手",
+          "link": "https://mp.weixin.qq.com/s/qnKXuV59_WCHAh6_-82iPw",
+          "details": ["1、功能介绍", "2、常见问题解答"]
+        },
+        {
+          "date": "2024年12月10日",
+          "title": "WestlakeChat 重磅更新来袭",
+          "link": "https://mp.weixin.qq.com/s/h_uxs-L2Ry1D6jeGn-ljZw",
+          "details": [
+            "1、问答场景增加引用列表展示，提升回答响应速度，支持图片问答",
+            "2、阅读场景支持AI copilot模式，圈选段落进行翻译、解释、提问",
+            "3、接入接入GPT-o1模型，支持多语言版本"
+          ]
+        },
+        {
+          "date": "2024年11月19日",
+          "title": "【重磅福利】邀请好友注册获得Claude 3.5免费试用权",
+          "link": "https://mp.weixin.qq.com/s/VhBnveve9mwaXNsTJ0q6qw",
+          "details": ["1、分享二维码或链接，邀请好友注册即可获得Claude 3.5模型的试用权"]
+        }
+      ]
+    },
+    "pricing": {
+      "title": "服务定价",
+      "pricingPlan": "定价方案",
+      "purchase": "立即购买",
+      "renew": "立即续费",
+      "freeTrial": "免费试用",
+      "contact": "联系我们",
+      "invoice": "可开具正规发票(技术服务)",
+      "suggestion":
+        "适用人群的建议:学生建议基础版，日常有较多文献检索、论文编辑，对模型推理能力要求较高的人建议高级版",
+      "perid": {
+        "month": {
+          "title": "按月",
+          "unit": "/月"
+        },
+        "year": {
+          "title": "按年",
+          "unit": "/年"
+        }
+      },
+      "announcement": {
+        "title": "公告",
+        "greeting": "亲爱的WestlakeChat用户们, 您好！",
+        "message":
+          "感谢大家过去一年的支持与陪伴。我们的早鸟价优惠活动（20元/月）将于2024年12月31日正式结束，届时产品价格将恢复至60元/月，优惠后48元/月。\n我们承诺，WestlakeChat都将一如既往地提供最专业、最贴心的服务。\n再次感谢您的支持与理解，祝您科研顺利，新年快乐！",
+        "signature": "WestlakeChat团队"
+      },
+      "plans": [
+        {
+          "title": "基础版",
+          "discount": "8折优惠",
+          "functions": [
+            "FutureGene、DeepSeek R1、Claude 3.7 Sonnet模型",
+            "学术问答(最多搜索10篇)",
+            "论文润色翻译，代码解释",
+            "文献阅读(每天限制20篇)",
+            "AI播客(每月限制15篇)"
+          ]
+        },
+        {
+          "title": "高级版",
+          "discount": "8折优惠",
+          "functions": [
+            "基础版所有功能",
+            "更强的文献检索和推理能力",
+            "学术问答(最多搜索40篇)",
+            "文献阅读(不限次数)",
+            "带RAG强化的GPT-4o、GPT-o1、Claude、DeepSeek R1",
+            "AI播客(每月限制30篇)"
+          ]
+        },
+        {
+          "title": "团队版",
+          "discount": "团队更多优惠",
+          "functions": ["批量购买基础版、高级版", "为更多用户提供折扣价", "专门的服务支持"]
+        }
+      ],
+      "constract": {
+        "model": "使用的模型",
+        "function": "相关功能",
+        "models": ["FutureGene模型", "GPT-4o", "GPT-o1 preview", "Claude 3.5 Sonnet", "Claude 3.7 Sonnet", "DeepSeek R1"],
+        "functions": ["学术问答", "AI阅读", "AI播客", "其他"],
+        "plans": [
+          {
+            "title": "基础版",
+            "limits": ["50条/3小时", "×", "×", "×", "50条/3小时（活动期内）", "50条/3小时"],
+            "details": ["每次问答最多搜索10篇文献", "每天限制20篇", "每月限制15篇(试运行期间)", "-"]
+          },
+          {
+            "title": "高级版",
+            "limits": ["无限制", "50条/24小时", "10条/24小时", "50条/24小时", "无限制（活动期内）", "无限制"],
+            "details": [
+              "每次问答最多搜索40篇文献",
+              "不限次数",
+              "每月限制30篇(试运行期间)",
+              "优先体验最新模型，优先体验最新功能"
+            ]
+          }
+        ]
+      },
+      "faq": {
+        "title": "常见问题",
+        "items": [
+          {
+            "question": "如何进行账号注册？",
+            "answer":
+              "点击【注册】后选择相关的订阅服务，填写账号信息，并完成在线付款后，即可开通账号。"
+          },
+          {
+            "question": "支持哪些支付方式？",
+            "answer": "当前支持微信支付，后续将支持支付宝支付。"
+          },
+          {
+            "question": "支持退款吗？",
+            "answer":
+              "如果您支付成功但订单购买失败，可联系客服进行退款。如果支付成功服务生效则暂不支持退款。"
+          },
+          {
+            "question": "中国版和国际版的价格为什么有所区别？",
+            "answer":
+              "由于我们在海外运营涉及更高的成本，包括跨境支付手续费、服务器网络支持等，因此国际版的费用会略有提高。我们致力于为全球用户提供高质量、流畅、稳定的服务。"
+          },
+          {
+            "question": "支持开发票吗？",
+            "answer": "个人或团队都支持开具发票，开票可联系客服。"
+          }
+        ]
+      },
+      "contactUs": {
+        "title": "您有任何问题可联系我们哦~",
+        "items": ["团队服务咨询", "使用问题反馈", "业务咨询", "支付问题"]
+      }
+    },
+    "addPodcast": "播客额度{n}次 | 播客额度{n}次 | 播客额度{n}次",
+    "purchase": {
+      "title": "服务购买",
+      "fillInfo": "请填写信息",
+      "phonePlaceholder": "请输入手机号",
+      "verfificationCode": "验证码",
+      "nextStep": "下一步",
+      "registerNote": "未注册的用户将自动注册，已注册用户将在原账号上延长服务期限",
+      "orderInfo": "订单信息",
+      "orderAmount": "订单金额",
+      "orderType": "订单类型",
+      "account": "账号",
+      "payMethod": "支付方式",
+      "wechatPay": "微信支付",
+      "alipay": "支付宝支付",
+      "confirm": "确认支付",
+      "renewalNote": "当前为手动续费，服务到期后我们不会自动扣费",
+      "wechatScan": "请使用微信扫码支付",
+
+      "sendSuccess": "验证码发送成功，有效期5分钟",
+      "sendFailed": "验证码发送失败",
+      "verifyFailed": "验证失败",
+      "paySuccess": "支付成功",
+      "payFailed": "支付失败",
+      "backtoLogin": "立即使用",
+      "contactCustomerService": "联系客服",
+
+      "processing": "正在处理",
+      "issues": "遇到问题？",
+
+      "processSuccess": "注册成功",
+      "processFailed": "注册失败",
+      "alreadyRegisteredNote": "已注册用户无法免费试用"
+    }
+  },
+  "ai_editing": {
+    "dynamic_limit_message": "你已达到每{timeSpace}小时{shuffle}次AI会话次数的限制，请稍后再试",
+    "mobile_warning": "请在电脑端使用该功能",
+    "tooltip": {
+      "undo": "撤销",
+      "redo": "恢复键入",
+      "header": "标题",
+      "bold": "加粗",
+      "italic": "斜体",
+      "underline": "下划线",
+      "color": "文字颜色",
+      "align": "对齐方式",
+      "list_ordered": "有序列表",
+      "list_bullet": "无序列表",
+      "table": "插入表格",
+      "export": "导出,支持markdown,word,pdf",
+      "import": "导入,支持word文档",
+      "copy_content": "复制全文",
+      "link": "插入链接"
+    },
+    "wordCount": "字数：{count}",
+    "aiResponse": {
+      "loading": "正在生成回答...",
+      "insertAfter": "插入到后面",
+      "replace": "替换内容",
+      "compare": "原文对比",
+      "regenerate": "重新生成",
+      "copy": "复制"
+    },
+    "diffEditor": {
+      "insertAfter": "插入到后面",
+      "confirm": "确认替换",
+      "cancel": "取消"
+    },
+    "prompt": "输入提示...",
+    "exportMenu": {
+      "markdown": "导出为 Markdown",
+      "docx": "导出为 Word",
+      "pdf": "导出为 PDF"
+    },
+    "import": {
+      "title": "导入文档",
+      "drag": "点击或者拖动文件到该区域来上传",
+      "support": "支持 .docx 和 .doc 格式的 Word 文档",
+      "cancel": "取消",
+      "warning": "警告",
+      "warningContent": "导入将覆盖编辑器中的现有内容，确定要继续吗？",
+      "success": "导入成功",
+      "failed": "导入失败"
+    },
+    "placeholder": "输入内容开始创作，空行行首按“/”键启动AI助手",
+    "vertical_menu": {
+      "sort": "排序",
+      "system": "系统",
+      "custom": "自定义",
+      "new": "新建",
+      "no_custom_prompts": "暂无自定义提示词"
+    },
+    "prompt_edit": {
+      "edit_title": "编辑提示词",
+      "new_title": "新建提示词",
+      "content": "提示词内容",
+      "cancel": "取消",
+      "save": "保存",
+      "delete": "删除",
+      "delete_confirm_title": "确认删除",
+      "delete_confirm_content": "确定要删除这个提示词吗？此操作不可撤销。",
+      "placeholder": "输入提示词内容"
+    },
+    "generation_error": "生成回答时出现错误，请重试。",
+    "error": {
+      "generation": "生成回答时出现错误，请重试。",
+      "aborted": "生成已中止",
+      "empty_prompt": "提示词内容不能为空",
+      "save_failed": "保存提示词失败，请重试",
+      "prompt_updated": "提示词更新成功",
+      "prompt_saved": "提示词保存成功"
+    },
+    "prompt_sort": {
+      "title": "排序提示词",
+      "instructions": "拖动项目以对提示词进行重新排序",
+      "no_prompts": "没有自定义提示词可排序",
+      "save": "保存排序",
+      "cancel": "取消",
+      "success": "提示词排序已保存",
+      "error": "保存排序失败"
+    }
+  }
+}

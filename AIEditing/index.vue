@@ -11,7 +11,6 @@ import { renderMarkdown } from './markdown'
 import 'katex/dist/katex.min.css'
 import 'github-markdown-css/github-markdown.css'
 import { loadEditorContent, saveEditorContent } from './storage'
-import PromptSorter from './components/PromptSorter.vue'
 import {
   checkEmptyLine,
   clearHighlight,
@@ -33,22 +32,12 @@ import {
   updateCreationTimeDisplay,
   updateWordCountDisplay,
 } from './util.js'
-import { useSessionHook } from '@/hooks'
-import { useAppStore } from '@/stores/app'
-import { createExporter } from '@/scenes/AIEditing/export'
+import { createExporter } from './export'
 import { AIEditingAPI } from '@/api'
 import {
   initMonaco,
-} from '@/scenes/AIEditing/monacoConfig'
-
+} from './monacoConfig'
 const { t } = useI18n()
-
-const {
-  currentSession,
-  updateCurrentSession,
-  persistCurrentSession,
-  refreshCurrentSession,
-} = useSessionHook()
 // 组件状态
 let quill = null
 // eslint-disable-next-line unused-imports/no-unused-vars
@@ -92,98 +81,6 @@ const isTranslationPrompt = ref(false)
 const hiddenPrompt = ref('')
 
 const appStore = useAppStore()
-
-watch(() => appStore.isDark, (isDark) => {
-  nextTick(() => {
-    const editorContainer = document.querySelector('.editor-container')
-    const writingContainer = document.querySelector('.writing-editor')
-    if (isDark) {
-      editorContainer?.classList.add('dark-mode')
-      writingContainer?.classList.add('dark-mode')
-    }
-    else {
-      editorContainer?.classList.remove('dark-mode')
-    }
-  })
-}, { immediate: true })
-
-watch(
-  [() => currentSession.value?.id],
-  async ([newId, oldId]) => {
-    // 只有当会话ID改变且编辑器已初始化时才执行
-    if (quill && quill.getText().trim().length === 0 && newId && newId !== oldId) {
-      // 先清空编辑器
-      quill.root.innerHTML = ''
-
-      if (newId) {
-        // 尝试从新会话加载内容
-        const savedContent = await loadEditorContent(newId)
-        if (savedContent !== null && savedContent !== undefined) {
-          quill.root.innerHTML = savedContent
-        }
-      }
-    }
-  },
-)
-const currentLanguage = ref('zh-CN')
-watch(() => appStore.language, (language) => {
-  currentLanguage.value = language
-  setTimeout(() => {
-    updateToolbarTooltips()
-    updateEditorPlaceholder()
-  }, 100)
-}, {
-  immediate: true,
-})
-
-async function initSession() {
-  if (currentSession.value.id)
-    return
-  const sessionInitData = AIEditingAPI.getEditingSessionInitData()
-  await updateCurrentSession(sessionInitData)
-  await persistCurrentSession()
-  await refreshCurrentSession()
-  promptsData.value = await AIEditingAPI.getSessionPrompts(
-    currentSession.value.id,
-  )
-}
-onBeforeMount(async () => {
-  // 如果已经有session但没有promptsData，获取promptsData
-  if (currentSession.value?.id && !promptsData.value) {
-    promptsData.value = await AIEditingAPI.getSessionPrompts(
-      currentSession.value.id,
-    )
-  }
-})
-
-// 添加初始化session的方法
-// 使用API生成会话标题替代简单截取文本的方法
-async function updateSessionTitle() {
-  // 确保会话已初始化且有ID
-  if (currentSession.value?.id) {
-    const text = quill.getText().trim()
-
-    // 只在文本长度达到一定值(如10个字符)且标题是默认值时才请求生成新标题
-    if (text.length >= 10 && (!currentSession.value.title || currentSession.value.title === '未命名文档')) {
-      try {
-        // 调用API生成标题
-        const response = await AIEditingAPI.generateSessionTitle(currentSession.value.id)
-
-        if (response && response.title) {
-          // 使用API返回的标题更新会话
-          await updateCurrentSession({ title: response.title })
-        }
-      }
-      catch (error) {
-        console.error('生成标题失败:', error)
-
-        // 当API调用失败时回退到原来的方法
-        const fallbackTitle = text.substring(0, 20).replace(/\n/g, ' ').trim()
-        await updateCurrentSession({ title: fallbackTitle })
-      }
-    }
-  }
-}
 
 // 添加上传对话框的状态控制
 const showUploadModal = ref(false)
@@ -860,19 +757,15 @@ function initQuillEditor() {
         }
       })
       quill.on('text-change', async (delta, oldDelta, source) => {
-        // 首次输入内容时初始化session
-        if (!currentSession.value?.id && quill.getText().trim().length > 0) {
-          initSession()
-        }
         // 保存内容到服务器
-        if (currentSession.value?.id) {
+        /* if (currentSession.value?.id) {
           saveEditorContent(quill.root.innerHTML, currentSession.value.id)
           clearTimeout(window.titleUpdateTimer)
 
           window.titleUpdateTimer = setTimeout(async () => {
             await updateSessionTitle()
           }, 2000) // 2秒后执行，减少API调用频率
-        }
+        } */
         if (source === 'user') {
           // 使用 setTimeout 确保在渲染完成后再清除高亮
           setTimeout(() => {
@@ -1103,216 +996,6 @@ onBeforeUnmount(() => {
     abortController.value.abort()
   }
 })
-
-// 添加自定义提示词相关状态
-const activeTab = ref('system') // 'system' or 'custom'
-
-const isEditingPrompt = ref(false)
-const currentEditingPrompt = ref(null)
-const newPromptName = ref('')
-const newPromptTemplate = ref('')
-
-// 编辑提示词
-function editPrompt(prompt, event) {
-  if (event) {
-    event.stopPropagation()
-  }
-  // 确保ID始终以字符串形式处理，避免精度损失
-  currentEditingPrompt.value = {
-    ...prompt,
-    id: prompt.id.toString(), // 强制转换为字符串
-  }
-  newPromptName.value = prompt.name || ''
-  newPromptTemplate.value = prompt.template
-  isEditingPrompt.value = true
-}
-
-// 保存提示词
-async function savePrompt() {
-  if (!newPromptTemplate.value.trim()) {
-    window.$message.warning(t('ai_editing.error.empty_prompt'))
-    return
-  }
-
-  try {
-    // 确保会话已初始化
-    if (!currentSession.value?.id) {
-      await initSession()
-    }
-
-    if (currentEditingPrompt.value) {
-      // 编辑现有提示词 - 使用PUT接口
-      await AIEditingAPI.updateSessionPrompt(
-        currentSession.value.id,
-        String(currentEditingPrompt.value.id),
-        newPromptTemplate.value,
-      )
-    }
-    else {
-      // 创建新提示词 - 使用POST接口
-      await AIEditingAPI.saveSessionPrompt(
-        String(currentSession.value.id),
-        newPromptTemplate.value,
-      )
-    }
-
-    // 刷新提示词列表
-    promptsData.value = await AIEditingAPI.getSessionPrompts(currentSession.value.id)
-
-    window.$message.success(currentEditingPrompt.value ? t('ai_editing.error.prompt_updated') : t('ai_editing.error.prompt_saved'))
-    resetPromptForm()
-  }
-  catch (error) {
-    console.error('保存提示词失败:', error)
-    window.$message.error(t('ai_editing.error.save_failed'))
-  }
-}
-
-// 删除提示词
-// 删除提示词
-function deletePrompt(promptId) {
-  window.$dialog.warning({
-    title: t('ai_editing.prompt_edit.delete_confirm_title'),
-    content: t('ai_editing.prompt_edit.delete_confirm_content'),
-    positiveText: t('common.confirm'),
-    negativeText: t('common.cancel'),
-    onPositiveClick: async () => {
-      try {
-        // 调用API删除服务器上的提示词
-        await AIEditingAPI.deleteSessionPrompt(
-          currentSession.value.id,
-          String(promptId),
-        )
-
-        // 从本地数据中移除已删除的提示词
-        if (promptsData.value?.user) {
-          promptsData.value.user = promptsData.value.user.filter(p => p.id !== promptId)
-        }
-
-        // 关闭编辑提示词的模态框
-        isEditingPrompt.value = false
-
-        // 重置表单状态
-        currentEditingPrompt.value = null
-        newPromptName.value = ''
-        newPromptTemplate.value = ''
-
-        // 显示成功消息
-        window.$message.success(t('common.deleteSuccess'))
-      }
-      catch (error) {
-        console.error('删除提示词失败:', error)
-        window.$message.error(t('common.failed'))
-      }
-    },
-  })
-}
-
-// 重置表单
-function resetPromptForm() {
-  isEditingPrompt.value = false
-  currentEditingPrompt.value = null
-  newPromptName.value = ''
-  newPromptTemplate.value = ''
-}
-
-// 创建新提示词
-function createNewPrompt(event) {
-  if (event) {
-    event.stopPropagation()
-  }
-  resetPromptForm()
-  isEditingPrompt.value = true
-}
-
-// 处理自定义提示词的点击
-function handleCustomPromptClick(prompt) {
-  if (sendBtnRef) {
-    // 始终使用字符串表示ID
-    hiddenPrompt.value = prompt.template
-    promptInputRef.value = ''
-
-    isTranslationPrompt.value
-      = prompt.name?.includes('翻译')
-        || prompt.template?.toLowerCase().includes('translate')
-        || prompt.name?.includes('中文')
-        || prompt.template?.toLowerCase().includes('english')
-
-    sendBtnRef.click()
-  }
-}
-function switchTab(tab) {
-  activeTab.value = tab
-  nextTick(() => {
-    // 找到当前激活的内容区域
-    const activeContent = document.querySelector('.vertical-menu .menu-content')
-    if (activeContent) {
-      activeContent.scrollTop = 0
-    }
-  })
-}
-
-// 监听垂直菜单显示状态
-watch(() => verticalMenuRef?.style.display, (newVal) => {
-  if (newVal === 'block') {
-    nextTick(() => {
-      // 重置滚动位置
-      const menuContents = document.querySelectorAll('.vertical-menu .menu-content')
-      menuContents.forEach((content) => {
-        content.scrollTop = 0
-      })
-    })
-  }
-}, { flush: 'post' })
-
-const isShowingSortPanel = ref(false)
-// 显示排序面板
-function showSortPanel(event) {
-  if (event) {
-    event.stopPropagation()
-  }
-  if (!promptsData.value?.user?.length) {
-    window.$message.warning(t('ai_editing.prompt_sort.no_prompts'))
-    return
-  }
-
-  isShowingSortPanel.value = true
-}
-
-// 保存排序结果
-async function saveSortOrder(sortedIds) {
-  try {
-    // 确保会话已初始化
-    if (!currentSession.value?.id) {
-      await initSession()
-    }
-
-    // 调用API保存排序
-    await AIEditingAPI.updatePromptsOrder(
-      currentSession.value.id,
-      sortedIds,
-    )
-
-    // 更新本地提示词数据顺序
-    if (promptsData.value?.user) {
-      // 创建一个映射以便于快速查找
-      const promptMap = {}
-      promptsData.value.user.forEach((prompt) => {
-        promptMap[String(prompt.id)] = prompt
-      })
-
-      // 根据新顺序重建数组
-      promptsData.value.user = sortedIds.map(id => promptMap[id])
-    }
-
-    window.$message.success(t('ai_editing.prompt_sort.success'))
-    isShowingSortPanel.value = false
-  }
-  catch (error) {
-    console.error('保存提示词排序失败:', error)
-    window.$message.error(t('ai_editing.prompt_sort.error'))
-  }
-}
 </script>
 
 <template>
@@ -1416,93 +1099,6 @@ async function saveSortOrder(sortedIds) {
             {{ currentLanguage === 'en-US' ? prompt.name_en : prompt.name }}
           </div>
         </div>
-
-        <!-- 自定义提示词面板 -->
-        <div v-else class="menu-content custom-prompts">
-          <div class="custom-prompts-header">
-            <button class="add-prompt-btn" @click="createNewPrompt($event)">
-              <i class="fas fa-plus" /> {{ t('ai_editing.vertical_menu.new') }}
-            </button>
-            <button class="sort-prompt-btn" @click="showSortPanel($event)">
-              <i class="fas fa-sort" />{{ t('ai_editing.vertical_menu.sort') }}
-            </button>
-          </div>
-          <div class="prompt-divider" />
-          <div v-if="!promptsData?.user || promptsData.user.length === 0" class="empty-prompts">
-            {{ t('ai_editing.vertical_menu.no_custom_prompts') }}
-          </div>
-
-          <div
-            v-for="prompt in promptsData?.user"
-            :key="prompt?.id"
-            class="menu-item custom-prompt-item"
-          >
-            <div
-              class="prompt-content"
-              :title="prompt.name"
-              @click="handleCustomPromptClick(prompt)"
-            >
-              {{ prompt.name }}
-            </div>
-
-            <div class="prompt-actions">
-              <span class="prompt-action" @click.stop="editPrompt(prompt, $event)">
-                <i class="fas fa-ellipsis-h" />
-              </span>
-            </div>
-          </div>
-        </div>
-        <PromptSorter
-          v-model:show="isShowingSortPanel"
-          :prompts="promptsData?.user || []"
-          :is-dark="appStore.isDark"
-          @click.stop
-          @save="saveSortOrder"
-        />
-
-        <!-- 编辑提示词的弹出窗口 -->
-        <NModal v-model:show="isEditingPrompt" @click.stop>
-          <NCard
-            style="width: 500px"
-            :title="currentEditingPrompt ? t('ai_editing.prompt_edit.edit_title') : t('ai_editing.prompt_edit.new_title')"
-            :bordered="false"
-            size="huge"
-            role="dialog"
-            aria-modal="true"
-          >
-            <NSpace vertical>
-              <div>
-                <div style="margin-bottom: 8px">
-                  {{ t('ai_editing.prompt_edit.content') }}
-                </div>
-                <NInput
-                  v-model:value="newPromptTemplate"
-                  type="textarea"
-                  :placeholder="t('ai_editing.prompt_edit.placeholder')"
-                  :autosize="{ minRows: 3, maxRows: 6 }"
-                />
-              </div>
-            </NSpace>
-
-            <template #footer>
-              <NSpace justify="end">
-                <NButton @click="resetPromptForm">
-                  {{ t('ai_editing.prompt_edit.cancel') }}
-                </NButton>
-                <NButton type="primary" @click="savePrompt">
-                  {{ t('ai_editing.prompt_edit.save') }}
-                </NButton>
-                <NButton
-                  v-if="currentEditingPrompt"
-                  type="error"
-                  @click="deletePrompt(String(currentEditingPrompt.id))"
-                >
-                  {{ t('ai_editing.prompt_edit.delete') }}
-                </NButton>
-              </NSpace>
-            </template>
-          </NCard>
-        </NModal>
       </div>
     </div>
     <div id="exportMenu" class="export-menu">

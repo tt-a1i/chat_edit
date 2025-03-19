@@ -5,7 +5,7 @@ import type Quill from 'quill'
 import type { Ref } from 'vue'
 import { nextTick } from 'vue'
 import { createExporter } from './export'
-import { defaultDiffEditorOptions } from '@/scenes/AIEditing/monacoConfig'
+import { defaultDiffEditorOptions } from './monacoConfig'
 import { AIEditingAPI } from '@/api'
 import i18n from '@/locales'
 
