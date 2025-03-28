@@ -2,21 +2,43 @@
 import { computed, ref } from 'vue'
 import { useTextareaAutosize } from '@vueuse/core'
 import { useChats } from '../services/chat.ts'
-import { showSystem } from '../services/appConfig.ts'
+import { showSystem, currentModel } from '../services/appConfig.ts'
 import { IconPlayerStopFilled, IconSend, IconWhirl } from '@tabler/icons-vue'
+import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
-const { addSystemMessage, addUserMessage, abort, hasActiveChat, hasMessages, regenerateResponse } = useChats()
+const { addSystemMessage, addUserMessage, abort, hasActiveChat, hasMessages, regenerateResponse, switchModel } = useChats()
+const { availableModels } = useAI()
 
 const isSystemMessage = ref(false)
 const isInputValid = computed<boolean>(() => !!userInput.value.trim())
 const isAiResponding = ref(false)
 const flag = ref(true)
+const showModelWarning = ref(false)
+
+const checkModelSelected = (): boolean => {
+  // 检查是否已选择模型
+  if (!currentModel.value && availableModels.value.length > 0) {
+    // 如果没有选择模型但有可用模型，默认选择第一个
+    switchModel(availableModels.value[0].name)
+    return true
+  }
+  return !!currentModel.value
+}
 
 const onSubmit = () => {
   if (isAiResponding.value) {
     abort()
     isAiResponding.value = false
+    return
+  }
+
+  // 检查是否选择了模型
+  if (!checkModelSelected()) {
+    showModelWarning.value = true
+    setTimeout(() => {
+      showModelWarning.value = false
+    }, 3000) // 3秒后自动隐藏提示
     return
   }
 
@@ -84,6 +106,13 @@ const handleCompositionEnd = () => {
       </div>
     </div>
     <div class="relative">
+      <!-- 添加模型警告提示 -->
+      <div 
+        v-if="showModelWarning" 
+        class="absolute top-[-40px] left-0 right-0 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm dark:bg-red-900 dark:text-red-100"
+      >
+        请先选择一个模型才能发送消息
+      </div>
       <textarea
         ref="textarea"
         v-model="userInput"
