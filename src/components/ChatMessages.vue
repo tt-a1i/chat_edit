@@ -70,7 +70,7 @@ const streamingMessageId = computed(() => {
 <template>
   <div
     ref="chatElement"
-    class="flex-1 overflow-y-auto scroll-smooth rounded-xl p-4 text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7 space-y-2 chat-messages-container"
+    class="flex-1 overflow-y-auto scroll-smooth rounded-xl p-4 text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7 space-y-2 chat-messages-container bg-gray-50/50 dark:bg-gray-900"
   >
     <ChatMessage
       v-for="message in visibleMessages"
@@ -100,6 +100,26 @@ const streamingMessageId = computed(() => {
 }
 
 .dark .chat-messages-container::-webkit-scrollbar-thumb {
-  background-color: rgba(75, 85, 99, 0.5);
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+.dark .chat-messages-container {
+  scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
+}
+
+/* 动画优化 */
+@media (prefers-reduced-motion: no-preference) {
+  .dark .animate-pulse {
+    animation: darkPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes darkPulse {
+  0%, 100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 </style>

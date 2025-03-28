@@ -38,13 +38,13 @@ interface Props {
       <select
         :disabled="disabled"
         :value="activeChat?.model ?? currentModel"
-        class="w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        class="w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 transition-colors duration-300"
         @change="handleModelChange"
       >
         <option :value="undefined" disabled selected>
           选择模型
         </option>
-        <option v-for="model in availableModels" :value="model.name">
+        <option v-for="model in availableModels" :value="model.name" class="dark:bg-gray-800">
           {{ model.name }}
         </option>
       </select>
@@ -52,7 +52,7 @@ interface Props {
       <button
         :disabled="disabled"
         title="刷新可用模型"
-        class="inline-flex items-center justify-center rounded-lg border-none bg-gray-100 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        class="inline-flex items-center justify-center rounded-lg border-none bg-gray-100 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
         @click="performRefreshModel"
       >
         <IconRefresh

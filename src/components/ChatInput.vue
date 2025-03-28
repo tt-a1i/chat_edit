@@ -87,19 +87,19 @@ function handleCompositionEnd() {
   <form @submit.prevent="onSubmit">
     <div class="flex px-2 flex-col sm:flex-row items-center">
       <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
-        <label>
-          <input v-model="isSystemMessage" type="radio" :value="false">
+        <label class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+          <input v-model="isSystemMessage" type="radio" :value="false" class="mr-1">
           用户
         </label>
-        <label>
-          <input v-model="isSystemMessage" type="radio" :value="true">
+        <label class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+          <input v-model="isSystemMessage" type="radio" :value="true" class="mr-1">
           系统
         </label>
       </div>
       <div v-if="hasMessages" class="ml-auto">
         <button
           type="button"
-          class="rounded-lg text-blue-700 text-sm font-medium transition duration-200 ease-in-out hover:text-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:text-gray-400 disabled:opacity-50 dark:text-blue-500 dark:hover:text-blue-400 dark:focus:ring-blue-800 dark:disabled:text-gray-600"
+          class="rounded-lg text-blue-700 text-sm font-medium transition duration-200 ease-in-out hover:text-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:text-gray-400 disabled:opacity-50 dark:text-blue-400 dark:hover:text-blue-300 dark:focus:ring-blue-800 dark:disabled:text-gray-600"
           @click="regenerateResponse"
         >
           重新生成回答
@@ -110,14 +110,14 @@ function handleCompositionEnd() {
       <!-- 添加模型警告提示 -->
       <div
         v-if="showModelWarning"
-        class="absolute top-[-40px] left-0 right-0 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm dark:bg-red-900 dark:text-red-100"
+        class="absolute top-[-40px] left-0 right-0 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm dark:bg-red-900/90 dark:text-red-100 backdrop-blur-sm shadow-md"
       >
         请先选择一个模型才能发送消息
       </div>
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-4 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-600 sm:text-base shadow-sm"
+        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-4 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-500 sm:text-base shadow-sm transition-all duration-300"
         placeholder="输入内容"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
@@ -126,7 +126,7 @@ function handleCompositionEnd() {
       <button
         type="submit"
         :disabled="isInputValid == false && isAiResponding == false"
-        class="group absolute bottom-2 right-2.5 flex size-10 items-center justify-center rounded-lg bg-blue-700 text-sm font-medium text-white transition duration-200 ease-in-out hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 dark:disabled:bg-gray-600 sm:text-base"
+        class="group absolute bottom-2 right-2.5 flex size-10 items-center justify-center rounded-lg bg-blue-700 text-sm font-medium text-white transition duration-200 ease-in-out hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-500/70 dark:disabled:bg-gray-600 sm:text-base"
       >
         <IconPlayerStopFilled
           v-if="isAiResponding"
