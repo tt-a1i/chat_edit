@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useTextareaAutosize } from '@vueuse/core'
-import { useChats } from '../services/chat.ts'
-import { showSystem, currentModel } from '../services/appConfig.ts'
 import { IconPlayerStopFilled, IconSend, IconWhirl } from '@tabler/icons-vue'
+import { useTextareaAutosize } from '@vueuse/core'
+import { computed, ref } from 'vue'
+import { currentModel, showSystem } from '../services/appConfig.ts'
+import { useChats } from '../services/chat.ts'
 import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
@@ -16,7 +16,7 @@ const isAiResponding = ref(false)
 const flag = ref(true)
 const showModelWarning = ref(false)
 
-const checkModelSelected = (): boolean => {
+function checkModelSelected(): boolean {
   // 检查是否已选择模型
   if (!currentModel.value && availableModels.value.length > 0) {
     // 如果没有选择模型但有可用模型，默认选择第一个
@@ -26,7 +26,7 @@ const checkModelSelected = (): boolean => {
   return !!currentModel.value
 }
 
-const onSubmit = () => {
+function onSubmit() {
   if (isAiResponding.value) {
     abort()
     isAiResponding.value = false
@@ -45,7 +45,8 @@ const onSubmit = () => {
   if (isInputValid.value) {
     if (isSystemMessage.value) {
       addSystemMessage(userInput.value.trim())
-    } else {
+    }
+    else {
       addUserMessage(userInput.value.trim()).then(() => {
         isAiResponding.value = false
       })
@@ -57,11 +58,11 @@ const onSubmit = () => {
   }
 }
 
-const shouldSubmit = ({ key, shiftKey }: KeyboardEvent): boolean => {
+function shouldSubmit({ key, shiftKey }: KeyboardEvent): boolean {
   return key === 'Enter' && !shiftKey
 }
 
-const onKeydown = (event: KeyboardEvent) => {
+function onKeydown(event: KeyboardEvent) {
   if (shouldSubmit(event) && flag.value) {
     // Pressing enter while the ai is responding should not abort the request
     if (isAiResponding.value) {
@@ -73,11 +74,11 @@ const onKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const handleCompositionStart = () => {
+function handleCompositionStart() {
   flag.value = false
 }
 
-const handleCompositionEnd = () => {
+function handleCompositionEnd() {
   flag.value = true
 }
 </script>
@@ -85,21 +86,21 @@ const handleCompositionEnd = () => {
 <template>
   <form @submit.prevent="onSubmit">
     <div class="flex px-2 flex-col sm:flex-row items-center">
-      <div class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2" v-if="showSystem">
+      <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
         <label>
-          <input type="radio" :value="false" v-model="isSystemMessage">
+          <input v-model="isSystemMessage" type="radio" :value="false">
           User
         </label>
         <label>
-          <input type="radio" :value="true" v-model="isSystemMessage">
+          <input v-model="isSystemMessage" type="radio" :value="true">
           System
         </label>
       </div>
-      <div class="ml-auto" v-if="hasMessages">
+      <div v-if="hasMessages" class="ml-auto">
         <button
           type="button"
-          @click="regenerateResponse"
           class="rounded-lg text-blue-700 text-sm font-medium transition duration-200 ease-in-out hover:text-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:text-gray-400 disabled:opacity-50 dark:text-blue-500 dark:hover:text-blue-400 dark:focus:ring-blue-800 dark:disabled:text-gray-600"
+          @click="regenerateResponse"
         >
           Regenerate response
         </button>
@@ -107,8 +108,8 @@ const handleCompositionEnd = () => {
     </div>
     <div class="relative">
       <!-- 添加模型警告提示 -->
-      <div 
-        v-if="showModelWarning" 
+      <div
+        v-if="showModelWarning"
         class="absolute top-[-40px] left-0 right-0 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm dark:bg-red-900 dark:text-red-100"
       >
         请先选择一个模型才能发送消息
@@ -121,7 +122,7 @@ const handleCompositionEnd = () => {
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
         @compositionend="handleCompositionEnd"
-      ></textarea>
+      />
       <button
         type="submit"
         :disabled="isInputValid == false && isAiResponding == false"
@@ -133,8 +134,8 @@ const handleCompositionEnd = () => {
           :size="20"
         />
         <IconWhirl
-          class="absolute animate-spin opacity-50 transition duration-200 ease-in-out group-hover:opacity-0"
           v-if="isAiResponding"
+          class="absolute animate-spin opacity-50 transition duration-200 ease-in-out group-hover:opacity-0"
           :size="20"
         />
 

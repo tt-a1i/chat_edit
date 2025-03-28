@@ -1,12 +1,13 @@
+import type { Config } from './database'
 import { useLocalStorage } from '@vueuse/core'
 import gravatarUrl from 'gravatar-url'
 import { computed, ref } from 'vue'
-import { Config, db } from './database'
+import { db } from './database'
 
 // Scene management
 export const SCENES = {
   CHAT: 'chat',
-  AI_EDITING: 'ai_editing'
+  AI_EDITING: 'ai_editing',
 }
 
 export const currentScene = ref(SCENES.CHAT)
@@ -26,10 +27,11 @@ export const isSettingsOpen = useLocalStorage('settingsPanelOpen', true)
 export const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
 export const isAIEditingOpen = ref(false)
 export const toggleSettingsPanel = () => (isSettingsOpen.value = !isSettingsOpen.value)
-export const toggleSystemPromptPanel = () =>
-  (isSystemPromptOpen.value = !isSystemPromptOpen.value)
+export function toggleSystemPromptPanel() {
+  return isSystemPromptOpen.value = !isSystemPromptOpen.value
+}
 
-export const switchScene = (scene: string) => {
+export function switchScene(scene: string) {
   currentScene.value = scene
   if (scene === SCENES.AI_EDITING) {
     isSystemPromptOpen.value = false
@@ -83,8 +85,9 @@ export function useConfig() {
     try {
       const modelConfig = await configDbLayer.getConfig(model)
       const defaultConfig = await configDbLayer.getConfig('default')
-      return { modelConfig: modelConfig, defaultConfig: defaultConfig }
-    } catch (error) {
+      return { modelConfig, defaultConfig }
+    }
+    catch (error) {
       console.error('Failed to initialize config:', error)
     }
     return null

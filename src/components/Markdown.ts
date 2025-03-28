@@ -1,7 +1,8 @@
-import { Component, computed, defineComponent, h, ref } from 'vue'
-import highlightjs from 'markdown-it-highlightjs'
+import type { Component } from 'vue'
 import markdownit from 'markdown-it'
+import highlightjs from 'markdown-it-highlightjs'
 import katex from 'markdown-it-katex'
+import { computed, defineComponent, h, ref } from 'vue'
 import 'katex/dist/katex.min.css'
 
 const Markdown: Component = defineComponent({
@@ -16,12 +17,12 @@ const Markdown: Component = defineComponent({
       markdownit({
         html: true,
         linkify: true,
-        typographer: true
-      })
+        typographer: true,
+      }),
     )
     md.value.use(katex, {
       throwOnError: false,
-      errorColor: '#cc0000'
+      errorColor: '#cc0000',
     })
     md.value.use(highlightjs, {
       inline: true,
@@ -29,13 +30,11 @@ const Markdown: Component = defineComponent({
       ignoreIllegals: true,
     })
 
-
-
     const content = computed(() => md.value.render(props.source))
 
     return () => h('div', {
       innerHTML: content.value,
-      class: 'markdown-body katex-math' // 添加必要的类名
+      class: 'markdown-body katex-math', // 添加必要的类名
     })
   },
 })

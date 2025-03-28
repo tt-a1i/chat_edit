@@ -1,18 +1,18 @@
+import type { Message } from './database.ts'
 import { ref } from 'vue'
-import { baseUrl, apiKey } from './appConfig.ts'
-import { Message } from './database.ts'
+import { apiKey, baseUrl } from './appConfig.ts'
 
-export type ChatRequest = {
+export interface ChatRequest {
   model: string
   messages?: Message[]
 }
 
-export type ChatMessage = {
+export interface ChatMessage {
   role: string
   content: string
 }
 
-export type ChatCompletedResponse = {
+export interface ChatCompletedResponse {
   model: string
   created_at: string
   message: ChatMessage
@@ -25,7 +25,7 @@ export type ChatCompletedResponse = {
   eval_duration: number
 }
 
-export type ChatPartResponse = {
+export interface ChatPartResponse {
   model: string
   created_at: string
   message: ChatMessage
@@ -34,94 +34,96 @@ export type ChatPartResponse = {
 
 export type ChatResponse = ChatCompletedResponse | ChatPartResponse
 
-export type CreateModelRequest = {
+export interface CreateModelRequest {
   name: string
   path: string
 }
 
-export type CreateModelResponse = {
+export interface CreateModelResponse {
   status: string
 }
 
-export type Model = {
+export interface Model {
   name: string
   modified_at: string
   size: number
 }
-export type ListLocalModelsResponse = {
+export interface ListLocalModelsResponse {
   models: Model[]
 }
 
-export type ShowModelInformationRequest = {
+export interface ShowModelInformationRequest {
   name: string
 }
 
-export type ShowModelInformationResponse = {
+export interface ShowModelInformationResponse {
   license: string
   modelfile: string
   parameters: string
   template: string
 }
 
-export type CopyModelRequest = {
+export interface CopyModelRequest {
   source: string
   destination: string
 }
 
-export type CopyModelResponse = {
+export interface CopyModelResponse {
   status: string
 }
 
-export type DeleteModelRequest = {
+export interface DeleteModelRequest {
   model: string
 }
 
-export type DeleteModelResponse = {
+export interface DeleteModelResponse {
   status: string
 }
 
-export type PullModelRequest = {
+export interface PullModelRequest {
   name: string
   insecure?: boolean
 }
 
-export type PullModelResponse = {
+export interface PullModelResponse {
   status: string
   digest: string
   total: number
 }
 
-export type PushModelRequest = {
+export interface PushModelRequest {
   name: string
   insecure?: boolean
 }
 
-export type PushModelResponse = {
+export interface PushModelResponse {
   status: string
 }
 
-export type GenerateEmbeddingsRequest = {
+export interface GenerateEmbeddingsRequest {
   model: string
   prompt: string
   options?: Record<string, any>
 }
 
-export type GenerateEmbeddingsResponse = {
+export interface GenerateEmbeddingsResponse {
   embeddings: number[]
 }
 
 // Define a method to get the full API URL for a given path
 export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
 
-export const getHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${apiKey.value}`
-})
+export function getHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey.value}`,
+  }
+}
 
 const abortController = ref<AbortController>(new AbortController())
 const signal = ref<AbortSignal>(abortController.value.signal)
 // Define the API client functions
-export const useApi = () => {
+export function useApi() {
   const error = ref(null)
 
   const generateChat = async (
@@ -130,7 +132,7 @@ export const useApi = () => {
   ): Promise<any[]> => {
     const messages = request.messages?.map(msg => ({
       role: msg.role,
-      content: msg.content
+      content: msg.content,
     })) || []
 
     const response = await fetch(getApiUrl('/v1/chat/completions'), {
@@ -138,11 +140,11 @@ export const useApi = () => {
       headers: getHeaders(),
       body: JSON.stringify({
         model: request.model,
-        messages: messages,
+        messages,
         stream: true,
-        temperature: 0.3
+        temperature: 0.3,
       }),
-      signal: signal.value
+      signal: signal.value,
     })
 
     if (!response.ok) {
@@ -155,7 +157,8 @@ export const useApi = () => {
     if (reader) {
       while (true) {
         const { done, value } = await reader.read()
-        if (done) break
+        if (done)
+          break
 
         const chunk = new TextDecoder().decode(value)
         const lines = chunk.split('\n').filter(line => line.trim() !== '')
@@ -164,7 +167,7 @@ export const useApi = () => {
           if (line.startsWith('data: ')) {
             try {
               const data = line.slice(6).trim()
-              
+
               // 处理特殊的[DONE]消息
               if (data === '[DONE]') {
                 const completedResponse = {
@@ -172,9 +175,9 @@ export const useApi = () => {
                   created_at: new Date().toISOString(),
                   message: {
                     role: 'assistant',
-                    content: ''
+                    content: '',
                   },
-                  done: true
+                  done: true,
                 }
                 onDataReceived(completedResponse)
                 continue
@@ -187,9 +190,9 @@ export const useApi = () => {
                   created_at: new Date().toISOString(),
                   message: {
                     role: 'assistant',
-                    content: json.choices[0].delta.content
+                    content: json.choices[0].delta.content,
                   },
-                  done: false
+                  done: false,
                 }
                 onDataReceived(partialResponse)
                 results.push(partialResponse)
@@ -202,13 +205,14 @@ export const useApi = () => {
                   created_at: new Date().toISOString(),
                   message: {
                     role: 'assistant',
-                    content: ''
+                    content: '',
                   },
-                  done: true
+                  done: true,
                 }
                 onDataReceived(completedResponse)
               }
-            } catch (e) {
+            }
+            catch (e) {
               console.error('Failed to parse SSE message:', e)
             }
           }
@@ -239,21 +243,22 @@ export const useApi = () => {
         method: 'GET',
         headers: getHeaders(),
       })
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch models: ${response.status}`)
       }
 
       const data = await response.json()
-      
+
       return {
         models: (data.data || []).map((model: any) => ({
           name: model.id,
           modified_at: new Date().toISOString(),
-          size: 0
-        }))
+          size: 0,
+        })),
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error fetching models:', error)
       // 返回一些默认模型以防止完全失败
       return {
@@ -261,14 +266,14 @@ export const useApi = () => {
           {
             name: 'moonshot-v1-8k',
             modified_at: new Date().toISOString(),
-            size: 0
+            size: 0,
           },
           {
             name: 'moonshot-v1-32k',
             modified_at: new Date().toISOString(),
-            size: 0
-          }
-        ]
+            size: 0,
+          },
+        ],
       }
     }
   }

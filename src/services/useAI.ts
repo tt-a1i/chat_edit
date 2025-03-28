@@ -1,18 +1,20 @@
-import {
+import type {
   ChatCompletedResponse,
   ChatPartResponse,
   ChatResponse,
   Model,
-  useApi,
 } from './api.ts'
+import type { Message } from './database'
 
 import { ref } from 'vue'
-import { Message } from './database'
+import {
+  useApi,
+} from './api.ts'
 
 // Define availableModels outside the function to ensure a shared state.
 const availableModels = ref<Model[]>([])
 
-export const useAI = () => {
+export function useAI() {
   const { generateChat, listLocalModels } = useApi()
   const generate = async (
     model: string,
@@ -29,7 +31,8 @@ export const useAI = () => {
     await generateChat({ model, messages: chatHistory }, (data: ChatResponse) => {
       if (!data.done && onMessage) {
         onMessage(data as ChatPartResponse)
-      } else if (data.done && onDone) {
+      }
+      else if (data.done && onDone) {
         onDone(data as ChatCompletedResponse)
       }
     })
