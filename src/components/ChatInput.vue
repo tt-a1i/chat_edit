@@ -89,11 +89,11 @@ function handleCompositionEnd() {
       <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
         <label>
           <input v-model="isSystemMessage" type="radio" :value="false">
-          User
+          用户
         </label>
         <label>
           <input v-model="isSystemMessage" type="radio" :value="true">
-          System
+          系统
         </label>
       </div>
       <div v-if="hasMessages" class="ml-auto">
@@ -102,7 +102,7 @@ function handleCompositionEnd() {
           class="rounded-lg text-blue-700 text-sm font-medium transition duration-200 ease-in-out hover:text-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:text-gray-400 disabled:opacity-50 dark:text-blue-500 dark:hover:text-blue-400 dark:focus:ring-blue-800 dark:disabled:text-gray-600"
           @click="regenerateResponse"
         >
-          Regenerate response
+          重新生成回答
         </button>
       </div>
     </div>
@@ -117,7 +117,7 @@ function handleCompositionEnd() {
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-4 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-600 sm:text-base"
+        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-4 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-700 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-600 sm:text-base shadow-sm"
         placeholder="输入内容"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"

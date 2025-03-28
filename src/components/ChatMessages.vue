@@ -1,26 +1,28 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
-import ChatMessage from './ChatMessage.vue'
-import { useChats } from '../services/chat.ts'
 import { showSystem } from '../services/appConfig.ts'
+import { useChats } from '../services/chat.ts'
+import ChatMessage from './ChatMessage.vue'
 
 const { messages, isStreaming } = useChats()
 const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 
-const isAtBottom = () => {
-  if (!chatElement.value) return false
+function isAtBottom() {
+  if (!chatElement.value)
+    return false
 
   const { scrollTop, scrollHeight, clientHeight } = chatElement.value
   return scrollHeight - scrollTop <= clientHeight + 10 // 10 is a small threshold
 }
 
-const handleUserScroll = () => {
+function handleUserScroll() {
   userInterferedWithScroll.value = !isAtBottom()
 }
 
-const scrollToBottom = () => {
-  if (userInterferedWithScroll.value) return
+function scrollToBottom() {
+  if (userInterferedWithScroll.value)
+    return
 
   nextTick(() => {
     if (chatElement.value) {
@@ -45,7 +47,7 @@ watch(messages, () => {
 onUnmounted(() => chatElement.value?.removeEventListener('scroll', handleUserScroll))
 
 const visibleMessages = computed(() =>
-  showSystem.value ? messages?.value : messages?.value.filter((m) => m.role != 'system'),
+  showSystem.value ? messages?.value : messages?.value.filter(m => m.role != 'system'),
 )
 
 // Reset userInterferedWithScroll when streaming starts
@@ -68,12 +70,36 @@ const streamingMessageId = computed(() => {
 <template>
   <div
     ref="chatElement"
-    class="flex-1 overflow-y-auto scroll-smooth rounded-xl p-4 text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
+    class="flex-1 overflow-y-auto scroll-smooth rounded-xl p-4 text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7 space-y-2 chat-messages-container"
   >
-    <ChatMessage 
-      v-for="message in visibleMessages" 
-      :message="message" 
+    <ChatMessage
+      v-for="message in visibleMessages"
+      :message="message"
       :is-streaming="isStreaming && message.id === streamingMessageId"
     />
   </div>
 </template>
+
+<style scoped>
+.chat-messages-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.chat-messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 20px;
+}
+
+.dark .chat-messages-container::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+</style>

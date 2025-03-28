@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { IconRefresh } from '@tabler/icons-vue'
-import { useChats } from '../services/chat.ts'
-import { useAI } from '../services/useAI.ts'
 import { ref } from 'vue'
 import { currentModel } from '../services/appConfig'
+import { useChats } from '../services/chat.ts'
+import { useAI } from '../services/useAI.ts'
 
+const { disabled = false } = defineProps<Props>()
 const { activeChat, switchModel, hasMessages } = useChats()
 const { refreshModels, availableModels } = useAI()
 
 const refreshingModel = ref(false)
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-const performRefreshModel = async () => {
+async function performRefreshModel() {
   refreshingModel.value = true
   await Promise.all([refreshModels(), sleep(1000)])
 
@@ -20,16 +21,15 @@ const performRefreshModel = async () => {
   })
 }
 
-const handleModelChange = (event: Event) => {
+function handleModelChange(event: Event) {
   const wip = event.target as HTMLSelectElement
   console.log('switch', wip.value)
   switchModel(wip.value)
 }
 
-type Props = {
+interface Props {
   disabled?: boolean
 }
-const { disabled = false } = defineProps<Props>()
 </script>
 
 <template>
@@ -38,10 +38,12 @@ const { disabled = false } = defineProps<Props>()
       <select
         :disabled="disabled"
         :value="activeChat?.model ?? currentModel"
-        @change="handleModelChange"
         class="w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        @change="handleModelChange"
       >
-        <option :value="undefined" disabled selected>Select a model</option>
+        <option :value="undefined" disabled selected>
+          选择模型
+        </option>
         <option v-for="model in availableModels" :value="model.name">
           {{ model.name }}
         </option>
@@ -49,12 +51,12 @@ const { disabled = false } = defineProps<Props>()
 
       <button
         :disabled="disabled"
-        title="Refresh available models"
-        @click="performRefreshModel"
+        title="刷新可用模型"
         class="inline-flex items-center justify-center rounded-lg border-none bg-gray-100 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-700 dark:text-gray-100"
+        @click="performRefreshModel"
       >
         <IconRefresh
-          class="h-4 w-4 -scale-100 text-white"
+          class="h-4 w-4 -scale-100 text-gray-700 dark:text-gray-200"
           :class="{ 'animate-spin': refreshingModel }"
         />
       </button>

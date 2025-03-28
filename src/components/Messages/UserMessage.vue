@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { Message } from '../../services/database.ts'
+import type { Message } from '../../services/database.ts'
 import { avatarUrl, enableMarkdown } from '../../services/appConfig.ts'
 import Markdown from '../Markdown.ts'
 
-type Props = {
+interface Props {
   message: Message
 }
 
@@ -11,16 +11,16 @@ const { message } = defineProps<Props>()
 </script>
 
 <template>
-  <div class="flex flex-row px-2 py-4 sm:px-4">
-    <img v-if="avatarUrl" class="mr-2 flex size-10 rounded-full sm:mr-4" :src="avatarUrl" />
+  <div class="flex flex-row px-2 py-4 sm:px-4 mb-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
+    <img v-if="avatarUrl" class="mr-2 flex size-10 rounded-full sm:mr-4" :src="avatarUrl">
     <div
       v-else
-      class="mr-2 flex size-10 aspect-square items-center justify-center rounded-full bg-white text-center text-2xl dark:bg-gray-600 sm:mr-4"
+      class="mr-2 flex size-10 aspect-square items-center justify-center rounded-full bg-blue-100 text-center text-2xl dark:bg-blue-800 sm:mr-4"
     >
       🧑
     </div>
 
-    <div class="flex max-w-3xl items-center">
+    <div class="flex max-w-3xl items-start">
       <code v-if="!enableMarkdown" class="whitespace-pre-line text-gray-900 dark:text-gray-100">
         {{ message.content }}
       </code>
