@@ -1,8 +1,10 @@
-import { computed, nextTick, ref, toRaw } from 'vue'
-import { Chat, db, Message } from './database'
-import { historyMessageLength, currentModel, useConfig } from './appConfig'
+import type { ChatCompletedResponse, ChatPartResponse } from './api.ts'
+import type { Chat, Message } from './database'
+import { computed, ref } from 'vue'
+import { useApi } from './api.ts'
+import { currentModel, historyMessageLength } from './appConfig'
+import { db } from './database'
 import { useAI } from './useAI.ts'
-import { ChatCompletedResponse, ChatPartResponse, useApi } from './api.ts'
 
 interface ChatExport extends Chat {
   messages: Message[]
@@ -84,20 +86,21 @@ export function useChats() {
   const initialize = async () => {
     try {
       chats.value = await dbLayer.getAllChats()
-      
+
       // 如果没有聊天记录，创建一个新的
       if (chats.value.length === 0) {
         await startNewChat('New Chat')
-      } else {
+      }
+      else {
         await switchChat(sortedChats.value[0].id!)
       }
-      
+
       // 设置默认模型
       if (!currentModel.value || currentModel.value === 'none') {
         currentModel.value = 'moonshot-v1-8k'
       }
-      
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to initialize chats:', error)
       // 如果初始化失败，至少创建一个新聊天
       await startNewChat('New Chat')
@@ -115,25 +118,29 @@ export function useChats() {
           await switchModel(activeChat.value.model)
         }
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Failed to switch to chat with ID ${chatId}:`, error)
     }
   }
 
   const switchModel = async (model: string) => {
     currentModel.value = model
-    if (!activeChat.value) return
+    if (!activeChat.value)
+      return
 
     try {
       await dbLayer.updateChat(activeChat.value.id!, { model })
       activeChat.value.model = model
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Failed to switch model to ${model}:`, error)
     }
   }
 
   const renameChat = async (newName: string) => {
-    if (!activeChat.value) return
+    if (!activeChat.value)
+      return
 
     activeChat.value.name = newName
     await dbLayer.updateChat(activeChat.value.id!, { name: newName })
@@ -152,19 +159,22 @@ export function useChats() {
       chats.value.push(newChat)
       setActiveChat(newChat)
       setMessages([])
-      
+
       // 添加默认的系统消息
       await addSystemMessage(
-        "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"
+        '你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。',
       )
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to start a new chat:', error)
     }
   }
 
   const addSystemMessage = async (content: string | null, meta?: any) => {
-    if (!activeChat.value) return
-    if (!content) return
+    if (!activeChat.value)
+      return
+    if (!content)
+      return
 
     const systemPromptMessage: Message = {
       chatId: activeChat.value.id!,
@@ -203,10 +213,11 @@ export function useChats() {
         messages.value,
         systemPrompt.value,
         historyMessageLength.value,
-        (data) => handleAiPartialResponse(data, currentChatId),
-        (data) => handleAiCompletion(data, currentChatId),
+        data => handleAiPartialResponse(data, currentChatId),
+        data => handleAiCompletion(data, currentChatId),
       )
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -219,11 +230,13 @@ export function useChats() {
   }
 
   const regenerateResponse = async () => {
-    if (!activeChat.value) return
+    if (!activeChat.value)
+      return
     const currentChatId = activeChat.value.id!
     const message = messages.value[messages.value.length - 1]
     if (message && message.role === 'assistant') {
-      if (message.id) db.messages.delete(message.id)
+      if (message.id)
+        db.messages.delete(message.id)
       messages.value.pop()
     }
     try {
@@ -232,10 +245,11 @@ export function useChats() {
         messages.value,
         systemPrompt.value,
         historyMessageLength.value,
-        (data) => handleAiPartialResponse(data, currentChatId),
-        (data) => handleAiCompletion(data, currentChatId),
+        data => handleAiPartialResponse(data, currentChatId),
+        data => handleAiCompletion(data, currentChatId),
       )
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -245,18 +259,19 @@ export function useChats() {
       console.error('Failed to regenerate response:', error)
     }
   }
-const firstMessage = ref(false)
+  const firstMessage = ref(false)
   const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
-    console.log(toRaw(ongoingAiMessages.value))
-      // 检查是否已经有正在进行的 AI 消息
+    // console.log(toRaw(ongoingAiMessages.value))
+    // 检查是否已经有正在进行的 AI 消息
     if (firstMessage.value) {
       // 如果有，则将新内容追加到现有消息
       appendToAiMessage(data.message.content, chatId)
-    } else {
+    }
+    else {
       // 如果没有，则创建一个新的 AI 消息
       startAiMessage(data.message.content, chatId)
       firstMessage.value = true
-    }    
+    }
   }
 
   const handleAiCompletion = async (data: ChatCompletedResponse, chatId: number) => {
@@ -265,10 +280,12 @@ const firstMessage = ref(false)
     if (aiMessage) {
       try {
         ongoingAiMessages.value.delete(chatId)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Failed to finalize AI message:', error)
       }
-    } else {
+    }
+    else {
       console.error('no ongoing message to finalize:')
       // debugger
     }
@@ -286,7 +303,8 @@ const firstMessage = ref(false)
       ongoingAiMessages.value.clear()
 
       await startNewChat('New chat')
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to wipe the database:', error)
     }
   }
@@ -296,38 +314,41 @@ const firstMessage = ref(false)
       await dbLayer.deleteChat(chatId)
       await dbLayer.deleteMessagesOfChat(chatId)
 
-      chats.value = chats.value.filter((chat) => chat.id !== chatId)
+      chats.value = chats.value.filter(chat => chat.id !== chatId)
 
       if (activeChat.value?.id === chatId) {
         if (sortedChats.value.length) {
           await switchChat(sortedChats.value[0].id!)
-        } else {
+        }
+        else {
           await startNewChat('New chat')
         }
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Failed to delete chat with ID ${chatId}:`, error)
     }
   }
 
   const startAiMessage = async (initialContent: string, chatId: number) => {
     const message: Message = {
-      chatId: chatId,
+      chatId,
       role: 'assistant',
       content: initialContent,
       createdAt: new Date(),
     }
-  
+
     try {
       // 添加到数据库并获取 ID
       message.id = await dbLayer.addMessage(message)
-      
+
       // 存储到正在进行的消息映射中
       ongoingAiMessages.value.set(chatId, message)
-      
+
       // 添加到当前消息列表（仅添加一次）
       messages.value.push(message)
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to start AI message:', error)
     }
   }
@@ -337,18 +358,19 @@ const firstMessage = ref(false)
     if (aiMessage) {
       // 追加内容
       aiMessage.content += content
-      
+
       try {
         // 更新数据库中的消息
         await dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
-        
+
         // 确保界面更新
         // 注意：Vue 应该自动检测到引用对象的变化，但有时可能需要额外的更新
         if (activeChat.value?.id === chatId) {
           // 如果需要，这里可以触发强制刷新
           // 在 Vue 3 中通常不需要，因为响应式系统应该能处理
         }
-      } catch (error) {
+      }
+      catch (error) {
         console.error('Failed to append to AI message:', error)
       }
     }
@@ -357,8 +379,9 @@ const firstMessage = ref(false)
   const exportChats = async () => {
     const chats = await dbLayer.getAllChats()
     const exportData: ChatExport[] = []
-    await Promise.all(chats.map(async chat => {
-      if (!chat?.id) return
+    await Promise.all(chats.map(async (chat) => {
+      if (!chat?.id)
+        return
       const messages = await dbLayer.getMessages(chat.id)
       exportData.push(Object.assign({ messages }, chat))
     }))
@@ -366,7 +389,7 @@ const firstMessage = ref(false)
   }
 
   const importChats = async (jsonData: ChatExport[]) => {
-    jsonData.forEach(async chatData => {
+    jsonData.forEach(async (chatData) => {
       const chat: Chat = {
         name: chatData?.name,
         model: chatData?.model,
@@ -374,7 +397,7 @@ const firstMessage = ref(false)
       }
       chat.id = await dbLayer.addChat(chat)
       chats.value.push(chat)
-      chatData.messages.forEach(async messageData => {
+      chatData.messages.forEach(async (messageData) => {
         const message: Message = {
           chatId: chat.id!,
           role: messageData.role,
