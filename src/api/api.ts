@@ -1,6 +1,6 @@
-import type { Message } from './database.ts'
+import type { Message } from '../services/database.ts'
 import { ref } from 'vue'
-import { apiKey, baseUrl } from './appConfig.ts'
+import { apiKey, baseUrl } from '../services/appConfig.ts'
 
 export interface ChatRequest {
   model: string

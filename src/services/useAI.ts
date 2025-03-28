@@ -3,13 +3,13 @@ import type {
   ChatPartResponse,
   ChatResponse,
   Model,
-} from './api.ts'
+} from '../api/api.ts'
 import type { Message } from './database'
 
 import { ref } from 'vue'
 import {
   useApi,
-} from './api.ts'
+} from '../api/api.ts'
 
 // Define availableModels outside the function to ensure a shared state.
 const availableModels = ref<Model[]>([])

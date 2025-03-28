@@ -5,7 +5,7 @@ import {
 import { ref } from 'vue'
 import { baseUrl, apiKey } from '../../services/appConfig'
 import { useAuthStore } from '../../stores/auth'
-import { getApiUrl, getHeaders } from '../../services/api'
+import { getApiUrl, getHeaders } from '../../api/api'
 import { get } from '@vueuse/core'
 // import { useAppStore } from '../../stores/app'
 export interface ChatResponse {

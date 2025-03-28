@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import Sidebar from './components/Sidebar.vue'
+import { nextTick, onMounted, ref } from 'vue'
+import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
 import ChatInput from './components/ChatInput.vue'
 import ChatMessages from './components/ChatMessages.vue'
-import SystemPrompt from './components/SystemPrompt.vue'
+import TextInput from './components/Inputs/TextInput.vue'
 import ModelSelector from './components/ModelSelector.vue'
-import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
 import NavHeader from './components/NavHeader.vue'
+import Settings from './components/Settings.vue'
+import Sidebar from './components/Sidebar.vue'
+import SystemPrompt from './components/SystemPrompt.vue'
 import {
   currentModel,
+  currentScene,
   isDarkMode,
   isSettingsOpen,
   isSystemPromptOpen,
-  currentScene,
-  SCENES
+  SCENES,
 } from './services/appConfig.ts'
-import { nextTick, onMounted, ref } from 'vue'
-import { useAI } from './services/useAI.ts'
 import { useChats } from './services/chat.ts'
-import TextInput from './components/Inputs/TextInput.vue'
-import Settings from './components/Settings.vue'
+import { useAI } from './services/useAI.ts'
 
 const { refreshModels, availableModels } = useAI()
 const { activeChat, renameChat, switchModel, initialize } = useChats()
@@ -26,23 +26,24 @@ const isEditingChatName = ref(false)
 const editedChatName = ref('')
 const chatNameInput = ref()
 
-const startEditing = () => {
+function startEditing() {
   isEditingChatName.value = true
   editedChatName.value = activeChat.value?.name || ''
   nextTick(() => {
-    if (!chatNameInput.value) return
+    if (!chatNameInput.value)
+      return
     const input = chatNameInput.value.$el.querySelector('input')
     input.focus()
     input.select()
   })
 }
 
-const cancelEditing = () => {
+function cancelEditing() {
   isEditingChatName.value = false
   editedChatName.value = ''
 }
 
-const confirmRename = () => {
+function confirmRename() {
   if (activeChat.value && editedChatName.value) {
     renameChat(editedChatName.value)
     isEditingChatName.value = false
@@ -70,13 +71,13 @@ onMounted(() => {
 
         <div v-else class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
           <div class="flex w-full flex-row items-center justify-center gap-4 rounded-b-xl bg-gray-100 px-4 py-2 dark:bg-gray-800">
-            <div class="mr-auto flex h-full items-center" v-if="activeChat">
+            <div v-if="activeChat" class="mr-auto flex h-full items-center">
               <div>
                 <div v-if="isEditingChatName">
                   <TextInput
                     id="chat-name"
-                    v-model="editedChatName"
                     ref="chatNameInput"
+                    v-model="editedChatName"
                     @keyup.enter="confirmRename"
                     @keyup.esc="cancelEditing"
                     @blur="cancelEditing"
@@ -84,9 +85,9 @@ onMounted(() => {
                 </div>
 
                 <button
+                  v-else
                   type="button"
                   class="block h-full rounded border-none p-2 text-gray-900 decoration-gray-400 decoration-dashed outline-none hover:underline focus:ring-2 focus:ring-blue-600 dark:text-gray-100 dark:focus:ring-blue-600"
-                  v-else
                   @click.prevent="startEditing"
                 >
                   {{ activeChat.name }}
