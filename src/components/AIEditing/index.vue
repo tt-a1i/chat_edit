@@ -853,9 +853,9 @@ function initQuillEditor() {
             e.preventDefault() // 阻止/字符的输入
 
             // 如果还没有session，先初始化
-            if (!currentSession.value?.id) {
-              initSession()
-            }
+            // if (!currentSession.value?.id) {
+            //   initSession()
+            // }
 
             currentRange = showAIMenu({
               quill,
