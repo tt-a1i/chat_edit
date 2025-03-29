@@ -2,7 +2,8 @@
 import { useAI } from '../../services/useAI.ts'
 import ModelSelector from '../ModelSelector.vue'
 import NavHeader from '../NavHeader.vue'
-import AIEditingComponent from './index.vue' 
+import AIEditingComponent from './index.vue'
+
 const { currentModel } = useAI()
 </script>
 
@@ -17,7 +18,7 @@ const { currentModel } = useAI()
     <div class="flex flex-1 overflow-hidden">
       <!-- Main content area for AI Editing -->
       <div class="w-full h-full p-4">
-        <AIEditingComponent/>
+        <AIEditingComponent />
       </div>
     </div>
   </div>
