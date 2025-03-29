@@ -1,15 +1,16 @@
 <script setup>
-import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import Quill from 'quill'
-import 'quill/dist/quill.snow.css'
-import * as QuillTableUI from 'quill-table-ui'
-import 'quill-table-ui/dist/index.css'
 import { NButton, NCard, NInput, NModal, NSpace, NText, NTooltip, NUpload, NUploadDragger } from 'naive-ui'
+import Quill from 'quill'
+import * as QuillTableUI from 'quill-table-ui'
+import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as AIEditingAPI from './api.ts'
+import { createExporter } from './export'
 import { createImporter } from './import'
 import { renderMarkdown } from './markdown'
-import 'katex/dist/katex.min.css'
-import 'github-markdown-css/github-markdown.css'
+import {
+  initMonaco,
+} from './monacoConfig'
 import { loadEditorContent, saveEditorContent } from './storage'
 import {
   checkEmptyLine,
@@ -32,11 +33,10 @@ import {
   updateCreationTimeDisplay,
   updateWordCountDisplay,
 } from './util.ts'
-import { createExporter } from './export'
-import * as AIEditingAPI from './api.ts'
-import {
-  initMonaco,
-} from './monacoConfig'
+import 'quill/dist/quill.snow.css'
+import 'quill-table-ui/dist/index.css'
+import 'katex/dist/katex.min.css'
+import 'github-markdown-css/github-markdown.css'
 // 组件状态
 let quill = null
 // eslint-disable-next-line unused-imports/no-unused-vars
@@ -77,44 +77,44 @@ const promptsData = ref({
       name: '翻译为中文',
       name_en: 'Translate to Chinese',
       template: '将以下文本翻译为中文，保持原文的意思、格式和语气：',
-      en_name: '🇨🇳'
+      en_name: '🇨🇳',
     },
     {
       id: '2',
       name: '翻译为英文',
       name_en: 'Translate to English',
       template: '将以下文本翻译为英文，保持原文的意思、格式和语气：',
-      en_name: '🇬🇧'
+      en_name: '🇬🇧',
     },
     {
       id: '3',
       name: '润色文本',
       name_en: 'Polish Text',
       template: '请对以下文本进行润色，提升语言表达质量，但保持原意不变：',
-      en_name: '✨'
+      en_name: '✨',
     },
     {
       id: '4',
       name: '扩写内容',
       name_en: 'Expand Content',
       template: '请扩展以下文本，添加更多细节、例子或解释，使其更加全面：',
-      en_name: '📈'
+      en_name: '📈',
     },
     {
       id: '5',
       name: '缩写内容',
       name_en: 'Condense Content',
       template: '请将以下文本精简，保留关键信息但使其更加简洁：',
-      en_name: '📉'
+      en_name: '📉',
     },
     {
       id: '6',
       name: '总结要点',
       name_en: 'Summarize',
       template: '请总结以下文本的主要观点和要点：',
-      en_name: '📋'
-    }
-  ]
+      en_name: '📋',
+    },
+  ],
 })
 
 const isGenerating = ref(false)
@@ -633,7 +633,7 @@ function initQuillEditor() {
       quill.root.innerHTML = ''
 
       // 只有在会话已初始化且有ID时才尝试加载内容
-     /*  if (currentSession.value?.id) {
+      /*  if (currentSession.value?.id) {
         const savedContent = await loadEditorContent(currentSession.value.id)
 
         if (savedContent !== null && savedContent !== undefined) {
@@ -642,7 +642,7 @@ function initQuillEditor() {
       } */
 
       // 初始化时设置暗黑模式
-/*       if (appStore.isDark) {
+      /*       if (appStore.isDark) {
         editorElement.closest('.editor-container')?.classList.add('dark-mode')
       } */
       const fixPlaceholderWithIME = () => {
@@ -975,14 +975,14 @@ function updateEditorPlaceholder() {
 
     const placeholderElement = container.querySelector('.ql-editor[data-placeholder]')
     if (placeholderElement) {
-      const newPlaceholder = "在这里输入内容，或者使用 / 唤起AI"
+      const newPlaceholder = '在这里输入内容，或者使用 / 唤起AI'
       placeholderElement.setAttribute('data-placeholder', newPlaceholder)
     }
 
     // AI提示输入框的placeholder
     const promptInput = document.getElementById('promptInput')
     if (promptInput) {
-      promptInput.setAttribute('placeholder', "请输入内容")
+      promptInput.setAttribute('placeholder', '请输入内容')
     }
 
     // 更新字数统计显示
@@ -1003,21 +1003,21 @@ function updateToolbarTooltips() {
       return
 
     const toolbarButtons = {
-      '.ql-header': "标题",
-      '.ql-bold': "加粗",
-      '.ql-italic': "斜体",
-      '.ql-underline': "下划线",
-      '.ql-align': "对齐",
-      '.ql-link': "插入链接",
-      '.ql-list[value="ordered"]': "有序列表",
-      '.ql-list[value="bullet"]': "无序列表",
-      '.ql-table': "插入表格",
-      '.ql-export': "导出",
-      '.ql-import': "导入",
-      '.ql-copy-content': "复制内容",
-      '.ql-undo': "撤销",
-      '.ql-redo': "重做",
-      '.ql-color': "文字颜色",
+      '.ql-header': '标题',
+      '.ql-bold': '加粗',
+      '.ql-italic': '斜体',
+      '.ql-underline': '下划线',
+      '.ql-align': '对齐',
+      '.ql-link': '插入链接',
+      '.ql-list[value="ordered"]': '有序列表',
+      '.ql-list[value="bullet"]': '无序列表',
+      '.ql-table': '插入表格',
+      '.ql-export': '导出',
+      '.ql-import': '导入',
+      '.ql-copy-content': '复制内容',
+      '.ql-undo': '撤销',
+      '.ql-redo': '重做',
+      '.ql-color': '文字颜色',
     }
 
     Object.entries(toolbarButtons).forEach(([selector, tooltip]) => {
@@ -1154,7 +1154,7 @@ onBeforeUnmount(() => {
     <NModal v-model:show="showUploadModal">
       <NCard
         style="width: 500px"
-        :title="t('ai_editing.import.title')"
+        :title="导入文件"
         :bordered="false"
         size="huge"
         role="dialog"
@@ -1173,10 +1173,10 @@ onBeforeUnmount(() => {
               </n-icon>
             </div>
             <NText style="font-size: 16px">
-              {{ t('ai_editing.import.drag') }}
+              点击或拖拽文件到此区域进行上传
             </NText>
             <n-p depth="3" style="margin: 8px 0 0">
-              {{ t('ai_editing.import.support') }}
+              支持 .doc 和 .docx 格式的文件
             </n-p>
           </NUploadDragger>
         </NUpload>
@@ -1187,7 +1187,7 @@ onBeforeUnmount(() => {
               :disabled="uploading"
               @click="showUploadModal = false"
             >
-              {{ t('ai_editing.import.cancel') }}
+              取消
             </NButton>
           </NSpace>
         </template>
