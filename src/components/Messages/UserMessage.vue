@@ -50,11 +50,11 @@ function copyToClipboard() {
       </div>
       <button
         title="复制"
-        class="absolute -bottom-1 -right-1 p-0.5 rounded bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+        class="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 active:scale-95"
         @click="copyToClipboard"
       >
-        <CheckIcon v-if="copied" class="w-3 h-3 text-green-600 dark:text-green-400" />
-        <ClipboardDocumentIcon v-else class="w-3 h-3" />
+        <CheckIcon v-if="copied" class="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+        <ClipboardDocumentIcon v-else class="w-3.5 h-3.5" />
       </button>
     </div>
   </div>

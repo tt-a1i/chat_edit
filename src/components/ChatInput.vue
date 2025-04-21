@@ -86,7 +86,7 @@ function handleCompositionEnd() {
 <template>
   <form @submit.prevent="onSubmit">
     <div class="flex px-2 flex-col sm:flex-row items-center">
-      <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
+      <!-- <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
         <label class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
           <input v-model="isSystemMessage" type="radio" :value="false" class="mr-1">
           用户
@@ -95,7 +95,7 @@ function handleCompositionEnd() {
           <input v-model="isSystemMessage" type="radio" :value="true" class="mr-1">
           系统
         </label>
-      </div>
+      </div> -->
       <div v-if="hasMessages" class="ml-auto">
         <button
           type="button"
