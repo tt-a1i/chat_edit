@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Message } from '../../services/database.ts'
-import { computed } from 'vue'
+import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
+import { computed, ref } from 'vue'
 import { enableMarkdown } from '../../services/appConfig.ts'
 import Markdown from '../Markdown.ts'
 import 'highlight.js/styles/github-dark.css'
@@ -24,17 +25,30 @@ const thought = computed(() => {
     return [null, message.content]
   }
 })
+
+const copied = ref(false)
+
+function copyToClipboard() {
+  if (thought.value[1]) {
+    navigator.clipboard.writeText(thought.value[1]).then(() => {
+      copied.value = true
+      setTimeout(() => {
+        copied.value = false
+      }, 1500)
+    })
+  }
+}
 </script>
 
 <template>
-  <div class="group flex items-start px-2 py-1 sm:px-3 sm:py-1.5 mb-2">
+  <div class="group flex items-start px-2 py-1 sm:px-3 sm:py-1.5 mb-2 relative">
     <img
       :src="logo"
       alt="AI"
       class="w-8 h-8 mr-2 sm:mr-3 rounded-full shadow-sm ring-1 ring-offset-1 ring-gray-200 dark:ring-gray-600 object-contain"
     >
 
-    <div class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-2 max-w-3xl">
+    <div class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-2 max-w-3xl relative">
       <code v-if="!enableMarkdown" class="whitespace-pre-line">{{ message.content }}</code>
       <div
         v-else
@@ -53,6 +67,15 @@ const thought = computed(() => {
           <Markdown :source="thought[1]" />
         </div>
       </div>
+      <button
+        v-if="!isStreaming"
+        title="复制"
+        class="absolute -bottom-1 -right-1 p-0.5 rounded bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+        @click="copyToClipboard"
+      >
+        <CheckIcon v-if="copied" class="w-3 h-3 text-green-600 dark:text-green-400" />
+        <ClipboardDocumentIcon v-else class="w-3 h-3" />
+      </button>
     </div>
   </div>
 </template>

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.7.2",
+    "@heroicons/vue": "^2.2.0",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@tabler/icons-vue": "^2.38.0",
     "@tailwindcss/typography": "^0.5.10",
