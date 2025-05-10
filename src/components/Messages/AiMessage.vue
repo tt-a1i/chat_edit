@@ -63,12 +63,12 @@ function copyToClipboard() {
           </summary>
           {{ thought[0] }}
         </details>
-        <div :class="{ 'animate-pulse': isStreaming }">
+        <div :class="{ 'animate-pulse': message.isStreaming || isStreaming }">
           <Markdown :source="thought[1]" />
         </div>
       </div>
       <button
-        v-if="!isStreaming"
+        v-if="!message.isStreaming && !isStreaming"
         title="复制"
         class="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 active:scale-95"
         @click="copyToClipboard"

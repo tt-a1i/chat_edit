@@ -25,6 +25,7 @@ export interface Message {
   imageUrl?: string // 新增：存储图片URL或Base64数据
   meta?: any
   context?: number[]
+  isStreaming?: boolean // 新增：表示是否正在流式加载响应
   createdAt: Date
 }
 

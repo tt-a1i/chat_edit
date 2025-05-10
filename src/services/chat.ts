@@ -131,12 +131,15 @@ export function useChats() {
   const firstMessage = ref(false)
 
   const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
-    if (firstMessage.value) {
-      appendToAiMessage(data.message.content, chatId)
-    }
-    else {
-      startAiMessage(data.message.content, chatId)
-      firstMessage.value = true
+    const aiMessage = ongoingAiMessages.value.get(chatId)
+    if (aiMessage) {
+      aiMessage.content += data.message.content
+      try {
+        dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
+      }
+      catch (error) {
+        console.error('Failed to update AI message:', error)
+      }
     }
   }
 
@@ -145,6 +148,12 @@ export function useChats() {
     const aiMessage = ongoingAiMessages.value.get(chatId)
     if (aiMessage) {
       try {
+        // 更新消息，移除isStreaming状态
+        aiMessage.isStreaming = false
+        await dbLayer.updateMessage(aiMessage.id!, {
+          content: aiMessage.content,
+          isStreaming: false,
+        })
         ongoingAiMessages.value.delete(chatId)
       }
       catch (error) {
@@ -259,9 +268,24 @@ export function useChats() {
       message.id = await dbLayer.addMessage(message)
       messages.value.push(message)
 
+      // 创建一个带有加载状态的AI消息
+      const aiMessage: Message = {
+        chatId: currentChatId,
+        role: 'assistant',
+        content: '', // 初始内容为空
+        createdAt: new Date(),
+        isStreaming: true, // 标记为正在加载状态
+      }
+      aiMessage.id = await dbLayer.addMessage(aiMessage)
+      messages.value.push(aiMessage)
+      ongoingAiMessages.value.set(currentChatId, aiMessage)
+
+      // 重置firstMessage标志，因为我们已经创建了消息
+      firstMessage.value = true
+
       await generate(
         currentModel.value,
-        messages.value,
+        messages.value.slice(0, -1), // 去掉最后一个空的AI消息，避免影响上下文
         systemPrompt.value,
         historyMessageLength.value,
         data => handleAiPartialResponse(data, currentChatId),
