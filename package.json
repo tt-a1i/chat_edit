@@ -1,5 +1,5 @@
 {
-  "name": "ollama-gui",
+  "name": "chat-edit",
   "type": "module",
   "version": "0.0.0",
   "private": true,

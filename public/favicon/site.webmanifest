@@ -1,6 +1,6 @@
 {
-    "name": "Ollama GUI",
-    "short_name": "Ollama GUI",
+    "name": "Chat & Edit",
+    "short_name": "Chat & Edit",
     "icons": [
         {
             "src": "/favicon/android-chrome-192x192.png",
