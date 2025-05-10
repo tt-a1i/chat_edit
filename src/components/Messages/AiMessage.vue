@@ -49,9 +49,20 @@ function copyToClipboard() {
     >
 
     <div class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-2 max-w-3xl relative">
-      <code v-if="!enableMarkdown" class="whitespace-pre-line">{{ message.content }}</code>
+      <!-- 当 isStreaming 为 true 时显示加载动画 -->
+      <div v-if="message.isStreaming || isStreaming" class="min-h-10 min-w-20 flex items-center">
+        <div class="flex space-x-2 justify-center items-center">
+          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" />
+          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s" />
+          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s" />
+        </div>
+        <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">AI 思考中...</span>
+      </div>
+
+      <!-- 当有内容时显示内容 -->
+      <code v-if="!enableMarkdown && message.content" class="whitespace-pre-line">{{ message.content }}</code>
       <div
-        v-else
+        v-else-if="message.content"
         class="prose prose-xs sm:prose-sm dark:prose-invert prose-headings:font-medium prose-headings:my-1.5 prose-p:text-gray-700 dark:prose-p:text-gray-200 prose-p:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400 hover:prose-a:underline prose-code:bg-gray-200 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:p-2"
       >
         <details
@@ -68,7 +79,7 @@ function copyToClipboard() {
         </div>
       </div>
       <button
-        v-if="!message.isStreaming && !isStreaming"
+        v-if="!message.isStreaming && !isStreaming && message.content"
         title="复制"
         class="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 active:scale-95"
         @click="copyToClipboard"
