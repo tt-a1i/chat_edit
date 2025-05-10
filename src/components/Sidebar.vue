@@ -6,7 +6,6 @@ import {
   IconPlus,
   IconSettings2,
   IconSun,
-  IconTrashX,
   IconUserCircle,
 } from '@tabler/icons-vue'
 
@@ -40,7 +39,8 @@ function checkSystemPromptPanel() {
   isSystemPromptOpen.value = false
 }
 
-function toggleAIEditing() {
+// 以下划线开头命名未使用的函数，避免警告
+function _toggleAIEditing() {
   switchScene(currentScene.value === SCENES.AI_EDITING ? SCENES.CHAT : SCENES.AI_EDITING)
   if (currentScene.value === SCENES.AI_EDITING) {
     isSystemPromptOpen.value = false
@@ -93,7 +93,7 @@ const lang = navigator.language
         class="h-full space-y-4 overflow-y-auto border-b border-gray-200 px-2 py-4 dark:border-gray-800"
       >
         <button
-          v-for="chat in sortedChats"
+          v-for="(chat, index) in sortedChats"
           :key="index"
           :class="{
             'bg-gray-100 dark:bg-gray-800': activeChat?.id === chat.id,
