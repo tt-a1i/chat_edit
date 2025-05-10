@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { IconPlayerStopFilled, IconSend, IconWhirl } from '@tabler/icons-vue'
+import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from '@tabler/icons-vue' // Corrected Icon Import Order
 import { useTextareaAutosize } from '@vueuse/core'
 import { computed, ref } from 'vue'
-import { currentModel, showSystem } from '../services/appConfig.ts'
+import { currentModel } from '../services/appConfig.ts' // Removed unused showSystem
 import { useChats } from '../services/chat.ts'
 import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
-const { addSystemMessage, addUserMessage, abort, hasActiveChat, hasMessages, regenerateResponse, switchModel } = useChats()
+const { addSystemMessage, addUserMessage, abort, hasMessages, regenerateResponse, switchModel } = useChats() // Removed unused hasActiveChat
 const { availableModels } = useAI()
 
+const selectedImage = ref<string | null>(null) // To store the base64 image string. Defined before isInputValid
 const isSystemMessage = ref(false)
-const isInputValid = computed<boolean>(() => !!userInput.value.trim())
+const isInputValid = computed<boolean>(() => !!userInput.value.trim() || !!selectedImage.value) // Input is valid if text or image is present
 const isAiResponding = ref(false)
 const flag = ref(true)
 const showModelWarning = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null) // Ref for file input
 
 function checkModelSelected(): boolean {
   // 检查是否已选择模型
@@ -44,14 +46,19 @@ function onSubmit() {
 
   if (isInputValid.value) {
     if (isSystemMessage.value) {
+      // System messages typically don't have images, but you could adapt if needed
       addSystemMessage(userInput.value.trim())
     }
     else {
-      addUserMessage(userInput.value.trim()).then(() => {
+      addUserMessage(userInput.value.trim(), selectedImage.value).then(() => { // Pass selectedImage
         isAiResponding.value = false
       })
     }
     userInput.value = ''
+    selectedImage.value = null // Clear image after sending
+    if (fileInput.value) {
+      fileInput.value.value = '' // Reset file input
+    }
     if (!isSystemMessage.value) {
       isAiResponding.value = true
     }
@@ -64,11 +71,9 @@ function shouldSubmit({ key, shiftKey }: KeyboardEvent): boolean {
 
 function onKeydown(event: KeyboardEvent) {
   if (shouldSubmit(event) && flag.value) {
-    // Pressing enter while the ai is responding should not abort the request
     if (isAiResponding.value) {
       return
     }
-
     event.preventDefault()
     onSubmit()
   }
@@ -81,21 +86,44 @@ function handleCompositionStart() {
 function handleCompositionEnd() {
   flag.value = true
 }
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function handleFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    // Basic validation for image type (optional, but good practice)
+    if (!file.type.startsWith('image/')) {
+      // Handle non-image file selection (e.g., show an error message)
+      console.warn('Selected file is not an image:', file.type)
+      if (fileInput.value) {
+        fileInput.value.value = '' // Reset file input
+      }
+      selectedImage.value = null
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      selectedImage.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+function clearImage() {
+  selectedImage.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
 </script>
 
 <template>
   <form @submit.prevent="onSubmit">
     <div class="flex px-2 flex-col sm:flex-row items-center">
-      <!-- <div v-if="showSystem" class="text-gray-900 dark:text-gray-100 space-x-2 text-sm font-medium mb-2">
-        <label class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-          <input v-model="isSystemMessage" type="radio" :value="false" class="mr-1">
-          用户
-        </label>
-        <label class="cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
-          <input v-model="isSystemMessage" type="radio" :value="true" class="mr-1">
-          系统
-        </label>
-      </div> -->
       <div v-if="hasMessages" class="ml-auto">
         <button
           type="button"
@@ -107,6 +135,18 @@ function handleCompositionEnd() {
       </div>
     </div>
     <div class="relative">
+      <!-- Image Preview -->
+      <div v-if="selectedImage" class="mb-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg relative max-w-xs">
+        <img :src="selectedImage" alt="Selected image preview" class="max-w-full max-h-40 rounded object-contain">
+        <button
+          type="button"
+          title="移除图片"
+          class="absolute top-1 right-1 p-0.5 bg-gray-700/50 hover:bg-gray-700/80 text-white rounded-full"
+          @click="clearImage"
+        >
+          <IconX :size="16" />
+        </button>
+      </div>
       <!-- 添加模型警告提示 -->
       <div
         v-if="showModelWarning"
@@ -123,9 +163,24 @@ function handleCompositionEnd() {
         @compositionstart="handleCompositionStart"
         @compositionend="handleCompositionEnd"
       />
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        class="hidden"
+        @change="handleFileChange"
+      >
+      <button
+        type="button"
+        title="添加图片"
+        class="absolute bottom-2.5 left-2.5 flex size-10 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors duration-200"
+        @click="triggerFileInput"
+      >
+        <IconPhotoPlus :size="24" />
+      </button>
       <button
         type="submit"
-        :disabled="isInputValid == false && isAiResponding == false"
+        :disabled="!isInputValid && !isAiResponding"
         class="group absolute bottom-2 right-2.5 flex size-10 items-center justify-center rounded-lg bg-blue-700 text-sm font-medium text-white transition duration-200 ease-in-out hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-gray-400 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-500/70 dark:disabled:bg-gray-600 sm:text-base"
       >
         <IconPlayerStopFilled
@@ -138,7 +193,6 @@ function handleCompositionEnd() {
           class="absolute animate-spin opacity-50 transition duration-200 ease-in-out group-hover:opacity-0"
           :size="20"
         />
-
         <IconSend v-else :size="20" />
       </button>
     </div>

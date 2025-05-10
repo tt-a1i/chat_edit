@@ -24,11 +24,35 @@ export function useAI() {
     onMessage?: (data: ChatResponse | ChatPartResponse | ChatCompletedResponse) => void,
     onDone?: (data: ChatCompletedResponse) => void,
   ) => {
-    let chatHistory = messages.slice(-(historyMessageLength ?? 0))
+    const chatHistory = messages.slice(-(historyMessageLength ?? 0))
     if (system) {
       chatHistory.unshift(system)
     }
-    await generateChat({ model, messages: chatHistory }, (data: ChatResponse) => {
+
+    const apiMessages = chatHistory.map((msg) => {
+      if (msg.role === 'user' && msg.imageUrl) {
+        const contentPayload: any[] = [
+          {
+            type: 'image_url',
+            image_url: { url: msg.imageUrl },
+          },
+          {
+            type: 'text',
+            text: msg.content || '', // Ensure text part is always present, even if empty
+          },
+        ]
+        return {
+          role: msg.role,
+          content: contentPayload,
+        }
+      }
+      return {
+        role: msg.role,
+        content: msg.content,
+      }
+    })
+
+    await generateChat({ model, messages: apiMessages }, (data: ChatResponse) => {
       if (!data.done && onMessage) {
         onMessage(data as ChatPartResponse)
       }

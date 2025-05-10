@@ -22,6 +22,7 @@ export interface Message {
   chatId: number
   role: ChatRole
   content: string
+  imageUrl?: string // 新增：存储图片URL或Base64数据
   meta?: any
   context?: number[]
   createdAt: Date
@@ -36,7 +37,7 @@ class ChatDatabase extends Dexie {
     super('ChatDatabase')
     this.version(10).stores({
       chats: '++id,name,model,createdAt',
-      messages: '++id,chatId,role,content,meta,context,createdAt',
+      messages: '++id,chatId,role,content,imageUrl,meta,context,createdAt', // 新增 imageUrl 到索引（可选，但有助于查询）
       config: '++id,model,systemPrompt,createdAt',
     })
 

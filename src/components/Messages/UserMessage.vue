@@ -2,7 +2,7 @@
 import type { Message } from '../../services/database.ts'
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
-import { avatarUrl, enableMarkdown, isDarkMode } from '../../services/appConfig.ts'
+import { avatarUrl, enableMarkdown } from '../../services/appConfig.ts'
 import Markdown from '../Markdown.ts'
 
 interface Props {
@@ -47,6 +47,10 @@ function copyToClipboard() {
         class="prose prose-xs sm:prose-sm dark:prose-invert prose-headings:font-medium prose-headings:my-1 prose-p:text-white prose-p:my-0.5 prose-a:text-blue-200 hover:prose-a:underline prose-code:bg-blue-500 prose-code:text-white prose-code:px-1 prose-code:rounded prose-pre:bg-blue-800 prose-pre:text-white prose-pre:p-2"
       >
         <Markdown :source="message.content" />
+      </div>
+      <!-- Display image if imageUrl exists -->
+      <div v-if="message.imageUrl" class="mt-2">
+        <img :src="message.imageUrl" alt="User uploaded image" class="max-w-xs max-h-64 rounded-md object-contain">
       </div>
       <button
         title="复制"
