@@ -6,6 +6,7 @@ import {
   IconPlus,
   IconSettings2,
   IconSun,
+  IconTrashX,
   IconUserCircle,
 } from '@tabler/icons-vue'
 
@@ -20,7 +21,7 @@ import {
 } from '../services/appConfig.ts'
 import { useChats } from '../services/chat.ts'
 
-const { sortedChats, activeChat, switchChat, deleteChat, startNewChat }
+const { sortedChats, activeChat, switchChat, deleteChat, startNewChat, wipeDatabase }
   = useChats()
 
 function onNewChat() {
@@ -121,9 +122,7 @@ const lang = navigator.language
             }}
           </span>
         </button>
-      </div>
-
-      <div class="mt-auto w-full space-y-2 px-2 py-4">
+      </div>      <div class="mt-auto w-full space-y-2 px-2 py-4">
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
           @click="isDarkMode = !isDarkMode"
@@ -155,6 +154,22 @@ const lang = navigator.language
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80" />
 
           Settings
+        </button>        <!-- 删除当前聊天按钮 -->
+        <button
+          v-if="activeChat"
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          @click="deleteChat(activeChat.id!)"
+        >
+          <IconTrashX class="size-4 opacity-50 group-hover:opacity-80" />
+          删除当前会话
+        </button>
+        <!-- 删除所有会话按钮 -->
+        <button
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          @click="wipeDatabase()"
+        >
+          <IconTrashX class="size-4 opacity-50 group-hover:opacity-80" />
+          删除所有会话
         </button>
       </div>
     </div>
