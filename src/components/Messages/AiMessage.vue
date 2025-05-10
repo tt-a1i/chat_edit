@@ -15,7 +15,7 @@ interface Props {
 const { message, isStreaming = false } = defineProps<Props>()
 const thought = computed(() => {
   const end = message.content.indexOf('</think>')
-  if (end != -1) {
+  if (end !== -1) {
     return [
       message.content.substring('<think>'.length, end),
       message.content.substring(end + '</think>'.length),
