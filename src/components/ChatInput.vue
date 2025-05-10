@@ -157,7 +157,7 @@ function clearImage() {
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-4 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-500 sm:text-base shadow-sm transition-all duration-300"
+        class="block max-h-[500px] w-full resize-none rounded-xl border-none bg-gray-50 p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-50 dark:placeholder-gray-300 dark:focus:ring-blue-500 sm:text-base shadow-sm transition-all duration-300"
         placeholder="输入内容"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
