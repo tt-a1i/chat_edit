@@ -45,7 +45,7 @@ function copyToClipboard() {
     <img
       :src="logo"
       alt="AI"
-      class="w-8 h-8 mr-2 sm:mr-3 rounded-full shadow-sm ring-1 ring-offset-1 ring-gray-200 dark:ring-gray-600 object-contain"
+      class="w-8 h-8 mr-2 sm:mr-3 rounded-full shadow-sm ring-1 ring-offset-1 ring-gray-200 dark:ring-gray-600 object-contain bg-white"
     >
 
     <div class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-2 max-w-3xl relative">

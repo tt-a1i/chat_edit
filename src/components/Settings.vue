@@ -56,7 +56,7 @@ function confirmWipe() {
         <TextInput id="base-url" v-model="baseUrl" label="Base URL" />
         <TextInput id="api-key" v-model="apiKey" label="API Key" />
 
-        <TextInput id="gravatar-email" v-model="gravatarEmail" label="Gravatar Email" />
+        <!-- <TextInput id="gravatar-email" v-model="gravatarEmail" label="Gravatar Email" /> -->
 
         <div>
           <label for="chat-history-length" class="mb-2 mt-4 block px-2 text-sm font-medium">

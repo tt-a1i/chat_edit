@@ -130,7 +130,7 @@ const lang = navigator.language
           <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80" />
           <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80" />
 
-          Toggle dark mode
+          切换夜间模式
         </button>
         <button
           v-if="false"
@@ -145,7 +145,7 @@ const lang = navigator.language
         >
           <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80" />
 
-          System prompt
+          系统提示词设置
         </button>
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
@@ -153,7 +153,7 @@ const lang = navigator.language
         >
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80" />
 
-          Settings
+          设置
         </button>        <!-- 删除当前聊天按钮 -->
         <button
           v-if="activeChat"
