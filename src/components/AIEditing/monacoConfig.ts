@@ -3,8 +3,7 @@ import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 export function initMonaco(): void {
   // 定义全局 MonacoEnvironment
   (globalThis as any).MonacoEnvironment = {
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    getWorker(_: string, label: string): Worker {
+    getWorker(_moduleId: string, _label: string): Worker {
       // eslint-disable-next-line new-cap
       return new editorWorker()
     },

@@ -43,9 +43,8 @@ export interface ChatEditingRequest {
   model?: string
 }
 let lastMessageWasEmpty = false
-// 创建abort controller和signal
+// 创建abort controller
 const abortController = ref<AbortController>(new AbortController())
-const signal = ref<AbortSignal>(abortController.value.signal)
 
 /**
  * 使用流式方式进行AI编辑会话
@@ -61,7 +60,7 @@ export async function streamChat(
   selected_text: string,
   callback: (data: ChatResponse) => void,
   controller?: AbortController,
-  model?: string,
+  _model?: string,
 ): Promise<ChatResponse> {
   const data: ChatResponse = {
     content: '',
@@ -163,7 +162,7 @@ export async function streamChat(
               _controller.abort()
             }
           }
-        } catch (e) {
+        } catch {
           // 如果不是JSON格式，按原始方式处理
           if (msg.data.trim() === '') {
             if (!lastMessageWasEmpty) {

@@ -18,7 +18,7 @@ function debounce(func: (...args: any[]) => void, wait: number) {
 }
 
 // 创建一个防抖的保存函数，500ms 内只执行一次
-const debouncedSaveToServer = debounce(async (sessionId: string, content: string) => {
+const debouncedSaveToServer = debounce(async (_sessionId: string, _content: string) => {
   try {
     // TODO: 实现 saveDraft API
     // await AIEditingAPI.saveDraft(sessionId, content)
@@ -55,8 +55,8 @@ export async function loadEditorContent(sessionId?: string): Promise<string | nu
       //   return serverContent
       // }
       // logger.debug('Load draft from server (not implemented):', sessionId)
-    } catch (error) {
-      // logger.debug('Failed to load content from server:', error)
+    } catch {
+      // logger.debug('Failed to load content from server')
     }
   }
   return null

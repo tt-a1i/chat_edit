@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IconBrush, IconCode, IconFileText, IconTerminal } from '@tabler/icons-vue'
 
-const props = defineProps({
+defineProps({
   selectedSection: {
     type: String,
     required: true,

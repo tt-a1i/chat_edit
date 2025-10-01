@@ -43,14 +43,10 @@ const { onElementClick, onDocumentEvent } = useEditorEventListeners()
 
 // 组件状态
 let quill = null
-// eslint-disable-next-line unused-imports/no-unused-vars
-const table = null
 let toolbar = null
 let diffEditor = null
 let currentRange = null
 let replacementRange = null
-// eslint-disable-next-line unused-imports/no-unused-vars
-let posCloseToBottom = false
 let creationTimeDisplay = null
 let wordCountDisplay = null
 
@@ -963,40 +959,6 @@ function handleMenuItemClick(prompt) {
 
     sendBtnRef.click()
   }
-}
-function updateEditorPlaceholder() {
-  setTimeout(() => {
-    if (!quill) {
-      return
-    }
-
-    const container = quill.container
-    if (!container) {
-      return
-    }
-
-    const placeholderElement = container.querySelector('.ql-editor[data-placeholder]')
-    if (placeholderElement) {
-      const newPlaceholder = '在这里输入内容，或者使用 / 唤起AI'
-      placeholderElement.setAttribute('data-placeholder', newPlaceholder)
-    }
-
-    // AI提示输入框的placeholder
-    const promptInput = document.getElementById('promptInput')
-    if (promptInput) {
-      promptInput.setAttribute('placeholder', '请输入内容')
-    }
-
-    // 更新字数统计显示
-    if (wordCountDisplay) {
-      updateWordCountDisplay(wordCountDisplay, quill)
-    }
-
-    // 更新创建时间显示
-    if (creationTimeDisplay) {
-      updateCreationTimeDisplay(creationTimeDisplay)
-    }
-  }, 100) // 增加延迟时间
 }
 function updateToolbarTooltips() {
   setTimeout(() => {

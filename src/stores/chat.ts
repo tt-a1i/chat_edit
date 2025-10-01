@@ -273,7 +273,6 @@ export const useChatStore = defineStore('chat', () => {
 
     const chatId = currentChatId.value
     const { generate } = useAI()
-    const { abort } = useApi()
     const appStore = useAppStore()
 
     const message: Omit<Message, 'id'> = {
@@ -287,7 +286,7 @@ export const useChatStore = defineStore('chat', () => {
     }
 
     try {
-      const id = await db.messages.add(message as Message)
+      await db.messages.add(message as Message)
       await loadMessages(chatId)
 
       // 创建 AI 响应消息

@@ -5,6 +5,8 @@
 declare module 'markdown-it' {
   import MarkdownItDefault from 'markdown-it'
 
+  // 扩展 markdown-it 的配置选项（预留）
+  // eslint-disable-next-line unused-imports/no-unused-vars
   interface Options {
     /**
      * 列表缩进级别
