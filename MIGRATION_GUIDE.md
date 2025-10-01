@@ -12,17 +12,17 @@
 
 #### Composables (4个)
 ```typescript
-// 1. Quill 编辑器管理
-import { useQuillEditor } from './composables/useQuillEditor'
-
 // 2. AI 交互逻辑
 import { useAIInteraction } from './composables/useAIInteraction'
+
+// 4. 事件监听管理
+import { useEditorEventListeners } from './composables/useEditorEventListeners'
 
 // 3. 文件操作
 import { useFileOperations } from './composables/useFileOperations'
 
-// 4. 事件监听管理
-import { useEditorEventListeners } from './composables/useEditorEventListeners'
+// 1. Quill 编辑器管理
+import { useQuillEditor } from './composables/useQuillEditor'
 ```
 
 #### UI 子组件 (5个)
@@ -56,22 +56,22 @@ import { useEditorEventListeners } from './composables/useEditorEventListeners'
 **当前代码 (index.vue, 第 40-60 行)**:
 ```javascript
 // 组件状态
-let quill = null
-let toolbar = null
-let diffEditor = null
-let currentRange = null
-let replacementRange = null
-let creationTimeDisplay = null
-let wordCountDisplay = null
+const quill = null
+const toolbar = null
+const diffEditor = null
+const currentRange = null
+const replacementRange = null
+const creationTimeDisplay = null
+const wordCountDisplay = null
 
-let monacoLoaded = false
+const monacoLoaded = false
 
-let floatingInputRef = null
-let verticalMenuRef = null
-let promptInputRef = null
-let sendBtnRef = null
-let aiResponseRef = null
-let actionButtonsRef = null
+const floatingInputRef = null
+const verticalMenuRef = null
+const promptInputRef = null
+const sendBtnRef = null
+const aiResponseRef = null
+const actionButtonsRef = null
 
 const isGenerating = ref(false)
 const abortController = ref(null)
@@ -141,12 +141,14 @@ const diffEditor = shallowRef(null)
       <i class="fas fa-paper-plane send-icon" />
     </button>
   </div>
+
 </div>
 <div id="aiResponse" class="ai-response">
   <div class="response-content" />
   <div id="actionButtons" class="action-buttons">
     <!-- 大量按钮代码... -->
   </div>
+
 </div>
 <div id="verticalMenu" class="vertical-menu" tabindex="0">
   <!-- 提示词列表... -->
@@ -430,7 +432,7 @@ cp src/components/AIEditing/index.vue.backup src/components/AIEditing/index.vue
 const { quillInstance, initQuillEditor } = useQuillEditor()
 
 // 保留原有的 let quill = null
-let quill = null
+const quill = null
 
 onMounted(() => {
   // 方案A: 使用新的 initQuillEditor
