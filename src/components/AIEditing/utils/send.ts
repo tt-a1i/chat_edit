@@ -8,7 +8,7 @@
 import type { ChatResponse } from '@/types/ai-editing'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
-import * as AIEditingAPI from '../api'
+import * as AIEditingAPI from '@/api/ai-editing'
 
 export interface HandleSendParams {
   promptInputRef: HTMLInputElement

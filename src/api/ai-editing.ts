@@ -4,7 +4,7 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
-import { getApiUrl, getHeaders } from '../../api/api'
+import { getApiUrl, getHeaders } from './api'
 
 /**
  * HTTP 错误类
