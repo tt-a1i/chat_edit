@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Message } from '../services/database.ts'
-import AiMessage from './Messages/AiMessage.vue'
-import SystemMessage from './Messages/SystemMessage.vue'
-import UserMessage from './Messages/UserMessage.vue'
+import type { Message } from '@/services/database.ts'
+import AiMessage from '../Messages/AiMessage.vue'
+import SystemMessage from '../Messages/SystemMessage.vue'
+import UserMessage from '../Messages/UserMessage.vue'
 
 interface Props {
   message: Message
