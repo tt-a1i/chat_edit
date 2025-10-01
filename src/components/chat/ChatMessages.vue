@@ -69,8 +69,8 @@ const streamingMessageId = computed(() => {
 <template>
   <div
     ref="chatElement"
-    class="flex-1 overflow-y-auto scroll-smooth rounded-xl text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7 chat-messages-container bg-gray-50/50 dark:bg-gray-900"
-    :class="visibleMessages.length > 0 ? 'p-4 space-y-2' : ''"
+    class="flex-1 overflow-y-auto scroll-smooth text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7 chat-messages-container"
+    :class="visibleMessages.length > 0 ? 'p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6' : ''"
   >
     <!-- 空状态 -->
     <ChatEmptyState v-if="visibleMessages.length === 0" />
