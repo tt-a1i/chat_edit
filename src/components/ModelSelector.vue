@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { IconRefresh } from '@tabler/icons-vue'
+import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { currentModel } from '../services/appConfig'
-import { useChats } from '../services/chat.ts'
+import { useAppStore, useChatStore } from '@/stores'
 import { useAI } from '../services/useAI.ts'
 
 const { disabled = false } = defineProps<Props>()
-const { activeChat, switchModel, hasMessages } = useChats()
+
+const appStore = useAppStore()
+const chatStore = useChatStore()
+const { currentModel } = storeToRefs(appStore)
+const { currentChat } = storeToRefs(chatStore)
+
 const { refreshModels, availableModels } = useAI()
 
 const refreshingModel = ref(false)
@@ -21,10 +26,15 @@ async function performRefreshModel() {
   })
 }
 
-function handleModelChange(event: Event) {
+async function handleModelChange(event: Event) {
   const wip = event.target as HTMLSelectElement
   console.log('switch', wip.value)
-  switchModel(wip.value)
+  appStore.currentModel = wip.value
+
+  // 如果有当前聊天，更新聊天的模型
+  if (currentChat.value && currentChat.value.id) {
+    await chatStore.updateChat(currentChat.value.id, { model: wip.value })
+  }
 }
 
 interface Props {
@@ -37,7 +47,7 @@ interface Props {
     <div class="inline-flex items-center gap-2">
       <select
         :disabled="disabled"
-        :value="activeChat?.model ?? currentModel"
+        :value="currentChat?.model ?? currentModel"
         class="w-full cursor-pointer rounded-lg bg-white py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 transition-colors duration-300"
         @change="handleModelChange"
       >

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { currentScene, SCENES, switchScene } from '../services/appConfig'
+import { storeToRefs } from 'pinia'
+import { useAppStore, SCENES } from '@/stores'
 
 defineProps({
   title: {
@@ -7,6 +8,10 @@ defineProps({
     default: '',
   },
 })
+
+const appStore = useAppStore()
+const { currentScene } = storeToRefs(appStore)
+const { switchScene } = appStore
 </script>
 
 <template>

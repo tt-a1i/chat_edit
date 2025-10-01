@@ -1,26 +1,28 @@
 import { watchEffect } from 'vue'
-import { isDarkMode } from '../services/appConfig'
+import { useAppStore } from '@/stores'
 
 // 监听系统暗色模式变化并同步应用设置
 export function syncSystemDarkMode() {
+  const appStore = useAppStore()
   // 检查系统是否支持暗色模式
   const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
   // 初始化时根据系统设置
   if (darkModeMediaQuery.matches) {
-    isDarkMode.value = true
+    appStore.isDarkMode = true
   }
 
   // 监听系统暗色模式变化
   darkModeMediaQuery.addEventListener('change', (e) => {
-    isDarkMode.value = e.matches
+    appStore.isDarkMode = e.matches
   })
 }
 
 // 应用暗色模式到HTML元素
 export function applyDarkModeToDocument() {
+  const appStore = useAppStore()
   watchEffect(() => {
-    if (isDarkMode.value) {
+    if (appStore.isDarkMode) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
@@ -30,12 +32,14 @@ export function applyDarkModeToDocument() {
 
 // 获取当前是否是暗色模式
 export function getCurrentDarkMode() {
-  return isDarkMode.value
+  const appStore = useAppStore()
+  return appStore.isDarkMode
 }
 
 // 切换暗色模式
 export function toggleDarkMode() {
-  isDarkMode.value = !isDarkMode.value
+  const appStore = useAppStore()
+  appStore.toggleDarkMode()
 }
 
 // 暗色模式变量

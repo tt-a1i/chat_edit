@@ -20,20 +20,22 @@ function renderKatex(latex: string, displayMode = false): string {
 }
 
 // 初始化 markdown-it 实例
-export function createMarkdownRenderer() {
+export function createMarkdownRenderer(): MarkdownIt {
   const md = new MarkdownIt({
     html: true,
     breaks: true,
     linkify: true,
-    listIndent: 2,
     typographer: true,
-    highlight(str, lang) {
+    highlight(str: string, lang: string): string {
       if (lang && hljs.getLanguage(lang)) {
         try {
           return `<pre class="hljs"><code class="language-${lang}">${
             hljs.highlight(str, { language: lang }).value
           }</code></pre>`
-        } catch {}
+        }
+        catch {
+          // 忽略高亮错误
+        }
       }
       return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
     },
@@ -52,9 +54,9 @@ export function createMarkdownRenderer() {
   } */
 
   // 添加数学公式支持
-  md.use((md) => {
+  md.use((md: MarkdownIt) => {
     // 行内公式
-    const inlineRule = (state: any, silent: boolean) => {
+    const inlineRule = (state: any, silent: boolean): boolean => {
       const start = state.pos
       const max = state.posMax
 
@@ -89,7 +91,7 @@ export function createMarkdownRenderer() {
     }
 
     // 块级公式
-    const blockRule = (state: any, startLine: number, endLine: number, silent: boolean) => {
+    const blockRule = (state: any, startLine: number, endLine: number, silent: boolean): boolean => {
       const start = state.bMarks[startLine] + state.tShift[startLine]
       const max = state.eMarks[startLine]
 
@@ -141,11 +143,11 @@ export function createMarkdownRenderer() {
       alt: ['paragraph', 'reference', 'blockquote', 'list'],
     })
 
-    md.renderer.rules.math_inline = (tokens, idx) => {
+    md.renderer.rules.math_inline = (tokens: any[], idx: number): string => {
       return renderKatex(tokens[idx].content, false)
     }
 
-    md.renderer.rules.math_block = (tokens, idx) => {
+    md.renderer.rules.math_block = (tokens: any[], idx: number): string => {
       return renderKatex(tokens[idx].content, true)
     }
   })

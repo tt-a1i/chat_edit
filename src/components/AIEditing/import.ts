@@ -32,7 +32,7 @@ class DocumentImporter {
           preserveEmptyParagraphs: true,
           includeDefaultStyleMap: true,
           ignoreEmptyParagraphs: false,
-          convertImage: mammoth.images.imgElement(() => ({})),
+          convertImage: mammoth.images.imgElement(() => ({}) as mammoth.ImageAttributes),
         },
       )
 

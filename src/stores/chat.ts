@@ -151,6 +151,17 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
+  async function updateChat(chatId: number, updates: Partial<Chat>) {
+    try {
+      await db.chats.update(chatId, updates)
+      await loadChats()
+    }
+    catch (err) {
+      error.value = err instanceof Error ? err : new Error(String(err))
+      console.error('更新聊天失败:', err)
+    }
+  }
+
   return {
     // State
     currentChatId,
@@ -171,6 +182,7 @@ export const useChatStore = defineStore('chat', () => {
     setCurrentChat,
     addMessage,
     updateMessage,
+    updateChat,
     deleteChat,
     deleteAllChats,
   }

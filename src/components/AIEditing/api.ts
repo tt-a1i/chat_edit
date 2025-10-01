@@ -4,11 +4,31 @@ import {
 } from '@microsoft/fetch-event-source'
 import { ref } from 'vue'
 import { getApiUrl, getHeaders } from '../../api/api'
-// import { useAppStore } from '../../stores/app'
-export interface ChatResponse {
-  text: string
-  error?: boolean
-  errorMessage?: string
+import type { ChatResponse } from '@/types/ai-editing'
+
+/**
+ * HTTP 错误类
+ */
+class HttpError extends Error {
+  status: number
+  statusText: string
+  code?: string
+  data?: any
+
+  constructor(options: {
+    status: number
+    statusText: string
+    code?: string
+    message?: string
+    data?: any
+  }) {
+    super(options.message || options.statusText)
+    this.name = 'HttpError'
+    this.status = options.status
+    this.statusText = options.statusText
+    this.code = options.code
+    this.data = options.data
+  }
 }
 export interface PromptHistory {
   id: string
@@ -41,10 +61,10 @@ export async function streamChat(
   callback: (data: ChatResponse) => void,
   controller?: AbortController,
   model?: string,
-) {
+): Promise<ChatResponse> {
   const data: ChatResponse = {
-    text: '',
-    error: false,
+    content: '',
+    done: false,
   }
 
   const _controller = controller || new AbortController()
@@ -81,7 +101,7 @@ export async function streamChat(
         const timeSpace = errorData.rate_limit.window / 3600
         const shuffle = errorData.rate_limit.limit
         if (window.$message) {
-          window.$message.error(i18n.global.t('ai_editing.dynamic_limit_message', { timeSpace, shuffle }))
+          window.$message.error(`API 限流: ${timeSpace}小时内限制${shuffle}次请求`)
         }
       }
       if (response.headers.get('content-type')?.includes('application/json')) {
@@ -125,10 +145,10 @@ export async function streamChat(
             // 处理内容增量
             if (jsonData.choices[0].delta && jsonData.choices[0].delta.content) {
               const content = jsonData.choices[0].delta.content
-              data.text += content
+              data.content += content
               callback({
                 ...data,
-                text: data.text,
+                content: data.content,
               })
             }
 
@@ -146,17 +166,17 @@ export async function streamChat(
           // 如果不是JSON格式，按原始方式处理
           if (msg.data.trim() === '') {
             if (!lastMessageWasEmpty) {
-              data.text += '\n' // 添加一个换行符
+              data.content += '\n' // 添加一个换行符
               lastMessageWasEmpty = true
             }
           } else {
-            data.text += msg.data
+            data.content += msg.data
             lastMessageWasEmpty = false
           }
 
           callback({
             ...data,
-            text: data.text,
+            content: data.content,
           })
         }
       } catch (err) {
@@ -165,8 +185,7 @@ export async function streamChat(
     },
 
     onerror(err) {
-      data.error = true
-      data.errorMessage = err.message
+      data.error = err.message
       callback(data)
       throw err // 停止重试
     },

@@ -22,12 +22,12 @@ class DocumentExporter {
     this.quill = quill
   }
 
-  private convertHtmlToDocxElements(html: string) {
+  private convertHtmlToDocxElements(html: string): Paragraph[] {
     // console.log("Input HTML:", html); // 打印输入的HTML
     const doc = this.parser.parseFromString(html, 'text/html')
-    const elements: any[] = []
+    const elements: Paragraph[] = []
 
-    const processNode = (node: Node) => {
+    const processNode = (node: Node): TextRun | Paragraph | Paragraph[] | null => {
       if (node.nodeType === Node.TEXT_NODE) {
         return new TextRun({
           text: node.textContent || '',
@@ -69,9 +69,9 @@ class DocumentExporter {
         }
 
         // 获取子节点处理结果
-        const children = Array.from(element.childNodes)
+        const children: (TextRun | Paragraph | Paragraph[])[] = Array.from(element.childNodes)
           .map(processNode)
-          .filter(Boolean)
+          .filter((item): item is TextRun | Paragraph | Paragraph[] => item !== null)
 
         // 处理代码块
         if (element.tagName.toLowerCase() === 'pre') {
@@ -188,22 +188,30 @@ class DocumentExporter {
           }
           case 'h1':
             return new Paragraph({
-              children: children.map(child => ({ ...child, size: 36 })),
+              children: children.flatMap(child =>
+                child instanceof TextRun ? [new TextRun({ ...child, size: 36 })] : []
+              ),
               heading: HeadingLevel.HEADING_1,
             })
           case 'h2':
             return new Paragraph({
-              children: children.map(child => ({ ...child, size: 32 })),
+              children: children.flatMap(child =>
+                child instanceof TextRun ? [new TextRun({ ...child, size: 32 })] : []
+              ),
               heading: HeadingLevel.HEADING_2,
             })
           case 'h3':
             return new Paragraph({
-              children: children.map(child => ({ ...child, size: 28 })),
+              children: children.flatMap(child =>
+                child instanceof TextRun ? [new TextRun({ ...child, size: 28 })] : []
+              ),
               heading: HeadingLevel.HEADING_3,
             })
           case 'p':
             return new Paragraph({
-              children,
+              children: children.flatMap(child =>
+                child instanceof TextRun ? [child] : []
+              ),
               spacing: { before: 200, after: 200 },
             })
           case 'strong':
@@ -235,7 +243,10 @@ class DocumentExporter {
             })
           case 'ol':
           case 'ul':
-            return Array.from(element.children).map(processNode)
+            return Array.from(element.children)
+              .map(child => processNode(child as Node))
+              .filter((item): item is Paragraph | Paragraph[] => item !== null && !(item instanceof TextRun))
+              .flat()
         }
       }
       return null
@@ -244,8 +255,9 @@ class DocumentExporter {
     Array.from(doc.body.childNodes).forEach((node) => {
       const processed = processNode(node)
       if (Array.isArray(processed)) {
-        elements.push(...processed)
-      } else if (processed) {
+        elements.push(...processed.filter((p): p is Paragraph => p instanceof Paragraph))
+      }
+      else if (processed instanceof Paragraph) {
         elements.push(processed)
       }
     })
@@ -331,17 +343,21 @@ class DocumentExporter {
         // 添加表格样式优化
         const tables = element.querySelectorAll('table')
         tables.forEach((table) => {
-          table.style.borderCollapse = 'collapse'
-          table.style.width = '100%'
+          if (table instanceof HTMLElement) {
+            table.style.borderCollapse = 'collapse'
+            table.style.width = '100%'
+          }
 
           const cells = table.querySelectorAll('td, th')
           cells.forEach((cell) => {
-            // 增加单元格内边距，防止内容压住边框
-            cell.style.padding = '8px'
-            cell.style.borderSpacing = '0'
-            cell.style.verticalAlign = 'top'
-            // 确保单元格有足够的下边距
-            cell.style.paddingBottom = '12px'
+            if (cell instanceof HTMLElement) {
+              // 增加单元格内边距，防止内容压住边框
+              cell.style.padding = '8px'
+              cell.style.borderSpacing = '0'
+              cell.style.verticalAlign = 'top'
+              // 确保单元格有足够的下边距
+              cell.style.paddingBottom = '12px'
+            }
           })
         })
 
@@ -368,16 +384,16 @@ class DocumentExporter {
 
         turndownService.addRule('table', {
           filter: 'table',
-          replacement(content, node) {
-            const rows = node.querySelectorAll('tr')
+          replacement(content: string, node: any): string {
+            const rows = (node as HTMLElement).querySelectorAll('tr')
             let markdownTable = ''
 
-            const headerRow = rows[0]
+            const headerRow = rows[0] as HTMLElement
             const headers = headerRow.querySelectorAll('th, td')
             markdownTable += `| ${
               Array.from(headers)
-                .map(header =>
-                  turndownService.turndown(header.innerHTML.trim()),
+                .map((header: Element) =>
+                  turndownService.turndown((header as HTMLElement).innerHTML.trim()),
                 )
                 .join(' | ')
             } |\n`
@@ -392,8 +408,8 @@ class DocumentExporter {
               const cells = rows[i].querySelectorAll('td')
               markdownTable += `| ${
                 Array.from(cells)
-                  .map(cell =>
-                    turndownService.turndown(cell.innerHTML.trim()),
+                  .map((cell: Element) =>
+                    turndownService.turndown((cell as HTMLElement).innerHTML.trim()),
                   )
                   .join(' | ')
               } |\n`
