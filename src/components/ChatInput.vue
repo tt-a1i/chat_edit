@@ -4,9 +4,6 @@ import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from 
 import { useTextareaAutosize } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-// 临时使用 services/chat 的方法，稍后会迁移到 store
-import { useChats } from '../services/chat.ts'
-
 import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
@@ -17,7 +14,7 @@ const { currentModel } = storeToRefs(appStore)
 const { currentMessages } = storeToRefs(chatStore)
 
 const { availableModels } = useAI()
-const { addSystemMessage, addUserMessage, abort, regenerateResponse } = useChats()
+const { addSystemMessage, addUserMessage, abort, regenerateResponse } = chatStore
 const hasMessages = computed(() => currentMessages.value.length > 0)
 
 const selectedImage = ref<string | null>(null) // To store the base64 image string. Defined before isInputValid

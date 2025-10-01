@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useChats } from '../../services/chat.ts'
+import { useChatStore } from '@/stores'
 
-const { importChats } = useChats()
+const chatStore = useChatStore()
+const { importChats } = chatStore
 
 const uploadChats = async (event: Event) => {
   const input = event.target as HTMLInputElement

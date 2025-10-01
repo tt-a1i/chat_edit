@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { SCENES, useAppStore, useChatStore } from '@/stores'
 import {
   IconEdit,
   IconMessageCode,
@@ -11,16 +10,14 @@ import {
   IconUserCircle,
 } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
-
-// 临时使用 services/chat 的方法
-import { useChats } from '../services/chat.ts'
+import { SCENES, useAppStore, useChatStore } from '@/stores'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
 const { currentScene, isDarkMode, isSystemPromptOpen } = storeToRefs(appStore)
 const { sortedChats, currentChat } = storeToRefs(chatStore)
 const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode } = appStore
-const { switchChat, deleteChat, startNewChat, wipeDatabase } = useChats()
+const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
 
 function onNewChat() {
   checkSystemPromptPanel()

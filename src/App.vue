@@ -9,11 +9,8 @@ import ModelSelector from './components/ModelSelector.vue'
 import Settings from './components/Settings.vue'
 import Sidebar from './components/Sidebar.vue'
 import SystemPrompt from './components/SystemPrompt.vue'
-// 临时使用 services/chat 的方法
-import { useChats } from './services/chat.ts'
-import { useAI } from './services/useAI.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
-
+import { useAI } from './services/useAI.ts'
 import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
 
 // Stores
@@ -24,7 +21,7 @@ const { currentChat } = storeToRefs(chatStore)
 
 // Services
 const { refreshModels, availableModels } = useAI()
-const { renameChat, switchModel, initialize } = useChats()
+const { renameChat, initialize } = chatStore
 const isEditingChatName = ref(false)
 const editedChatName = ref('')
 const chatNameInput = ref()
@@ -61,7 +58,9 @@ function confirmRename() {
 onMounted(() => {
   refreshModels().then(async () => {
     await initialize()
-    await switchModel(currentModel.value ?? availableModels.value[0].name)
+    if (!currentModel.value && availableModels.value.length > 0) {
+      appStore.currentModel = availableModels.value[0].name
+    }
   })
 })
 </script>

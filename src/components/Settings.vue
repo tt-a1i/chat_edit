@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
 import { ref } from 'vue'
-import { useChats } from '../services/chat.ts'
-import { useAppStore } from '../stores'
+import { useAppStore, useChatStore } from '../stores'
 import ExportButton from './History/ExportButton.vue'
 import ImportButton from './History/ImportButton.vue'
 import TextInput from './Inputs/TextInput.vue'
@@ -10,6 +9,7 @@ import ToggleInput from './Inputs/ToggleInput.vue'
 
 // Stores
 const appStore = useAppStore()
+const chatStore = useChatStore()
 const { toggleSettingsPanel } = appStore
 const {
   apiKey,
@@ -20,8 +20,7 @@ const {
   showSystem,
 } = appStore
 
-// Services
-const { wipeDatabase } = useChats()
+const { wipeDatabase } = chatStore
 
 const showConfirmDialog = ref(false)
 
