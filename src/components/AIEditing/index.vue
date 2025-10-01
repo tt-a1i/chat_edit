@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { PromptTemplate } from '@/constants/prompts'
 import type { editor } from 'monaco-editor'
-import type { PromptTemplate } from './constants/prompts'
+import { SYSTEM_PROMPTS } from '@/constants/prompts'
 import { createImporter } from '@/lib/export/import'
 import { initMonaco } from '@/lib/monaco/config'
 import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
@@ -11,7 +12,6 @@ import { useDOMRefs } from './composables/useDOMRefs'
 import { useEditorEventListeners } from './composables/useEditorEventListeners'
 import { useFileOperations } from './composables/useFileOperations'
 import { useQuillEditor } from './composables/useQuillEditor'
-import { SYSTEM_PROMPTS } from './constants/prompts'
 import {
   calculateMenuPosition,
   clearHighlight,
