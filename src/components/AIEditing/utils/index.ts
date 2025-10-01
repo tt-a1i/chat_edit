@@ -49,6 +49,25 @@ export {
   highlightSelection,
 } from './highlighting'
 
+// menuDisplay 模块
+export {
+  hideAllMenus,
+  isInMenuComponents,
+  showAndPositionMenus,
+} from './menuDisplay'
+export type { MenuElements } from './menuDisplay'
+
+// positioning 模块
+export {
+  applyMenuPosition,
+  applyMenuWidth,
+  calculateMenuPosition,
+} from './positioning'
+export type {
+  MenuPosition,
+  MenuPositionConfig,
+} from './positioning'
+
 // send 模块
 export {
   handleRegenerate,

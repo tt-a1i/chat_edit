@@ -13,9 +13,13 @@ import { SYSTEM_PROMPTS } from './constants/prompts'
 import { createImporter } from './import'
 import { initMonaco } from './monacoConfig'
 import {
+  calculateMenuPosition,
   clearHighlight,
   createTimeAndWordCountDisplay,
+  highlightSelection,
+  isInMenuComponents,
   showAIMenu,
+  showAndPositionMenus,
   updateCreationTimeDisplay,
   updateWordCountDisplay,
 } from './utils'
@@ -141,6 +145,49 @@ async function initQuillEditor() {
     }
   })
 
+  // 监听选区变化
+  quill.on('selection-change', (range, _oldRange, _source) => {
+    if (range && range.length > 0) {
+      // 清除旧的高亮（如果选区变化了）
+      if (currentRange.value) {
+        if (
+          currentRange.value.index !== range.index
+          || currentRange.value.length !== range.length
+        ) {
+          clearHighlight(quill, currentRange.value)
+        }
+      }
+
+      // 保存新的选区并高亮
+      currentRange.value = range
+      highlightSelection(quill, range)
+
+      // 计算菜单位置
+      const position = calculateMenuPosition(quill, range)
+      if (!position) return
+
+      // 显示并定位所有菜单元素
+      showAndPositionMenus({
+        floatingInputRef: floatingInputRef.value,
+        verticalMenuRef: verticalMenuRef.value,
+        aiResponseRef: aiResponseRef.value,
+      }, position)
+    } else if (!range) {
+      // 检查点击是否在相关组件内
+      const isInComponents = isInMenuComponents(document.activeElement as Node, {
+        floatingInputRef: floatingInputRef.value,
+        verticalMenuRef: verticalMenuRef.value,
+        aiResponseRef: aiResponseRef.value,
+      })
+
+      if (!isInComponents && currentRange.value) {
+        clearHighlight(quill, currentRange.value)
+        currentRange.value = null
+        hideAllAIUI()
+      }
+    }
+  })
+
   quill.root.addEventListener('keydown', async (e) => {
     if (e.key === '/') {
       const selection = quill.getSelection()
@@ -230,15 +277,22 @@ function setupEventListeners() {
  */
 function handleMenuItemClick(prompt: PromptTemplate) {
   const quill = quillInstance.value
-  if (!quill || !currentRange.value) return
+  if (!quill || !currentRange.value || !sendBtnRef.value) return
 
   hiddenPrompt.value = prompt.template
-  if (verticalMenuRef.value) verticalMenuRef.value.style.display = 'none'
-  if (floatingInputRef.value) floatingInputRef.value.style.display = 'block'
   if (promptInputRef.value) {
     promptInputRef.value.value = ''
-    promptInputRef.value.focus()
   }
+
+  // 检测是否是翻译提示
+  isTranslationPrompt.value
+    = prompt.name.includes('翻译')
+      || (!!prompt.name_en && prompt.name_en.toLowerCase().includes('translate'))
+      || prompt.name.includes('中文')
+      || (!!prompt.name_en && prompt.name_en.toLowerCase().includes('english'))
+
+  // 自动触发发送
+  sendBtnRef.value.click()
 }
 
 /**
