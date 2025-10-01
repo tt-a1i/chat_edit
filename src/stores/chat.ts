@@ -1,11 +1,13 @@
-import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 /**
  * 聊天状态管理 Store
  */
 import type { Chat, Message } from '@/services/database'
+import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 import { useApi } from '@/api/api'
 import { db } from '@/services/database'
 import { useAI } from '@/services/useAI'
+import { logger } from '@/utils/logger'
+import { showError } from '@/utils/toast'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAppStore } from './app'
@@ -51,7 +53,7 @@ export const useChatStore = defineStore('chat', () => {
       chats.value = await db.chats.toArray()
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('加载聊天列表失败:', err)
+      logger.error('加载聊天列表失败', err); showError('加载聊天列表失败')
     } finally {
       isLoading.value = false
     }
@@ -66,7 +68,7 @@ export const useChatStore = defineStore('chat', () => {
         .sortBy('createdAt')
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('加载消息失败:', err)
+      logger.error('加载消息失败', err); showError('加载消息失败')
     } finally {
       isLoading.value = false
     }
@@ -84,7 +86,7 @@ export const useChatStore = defineStore('chat', () => {
       return id
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('创建聊天失败:', err)
+      logger.error('创建聊天失败', err); showError('创建聊天失败')
       throw err
     }
   }
@@ -107,7 +109,7 @@ export const useChatStore = defineStore('chat', () => {
       return id
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('添加消息失败:', err)
+      logger.error('添加消息失败', err); showError('添加消息失败')
       throw err
     }
   }
@@ -120,7 +122,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('更新消息失败:', err)
+      logger.error('更新消息失败', err); showError('更新消息失败')
     }
   }
 
@@ -135,7 +137,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('删除聊天失败:', err)
+      logger.error('删除聊天失败', err); showError('删除聊天失败')
     }
   }
 
@@ -148,7 +150,7 @@ export const useChatStore = defineStore('chat', () => {
       currentChatId.value = null
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('删除所有聊天失败:', err)
+      logger.error('删除所有聊天失败', err); showError('删除所有聊天失败')
     }
   }
 
@@ -158,7 +160,7 @@ export const useChatStore = defineStore('chat', () => {
       await loadChats()
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('更新聊天失败:', err)
+      logger.error('更新聊天失败', err); showError('更新聊天失败')
     }
   }
 
@@ -170,7 +172,7 @@ export const useChatStore = defineStore('chat', () => {
       await loadChats()
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('重命名聊天失败:', err)
+      logger.error('重命名聊天失败', err); showError('重命名聊天失败')
     }
   }
 
@@ -189,7 +191,7 @@ export const useChatStore = defineStore('chat', () => {
       return id
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('创建新聊天失败:', err)
+      logger.error('创建新聊天失败', err); showError('创建新聊天失败')
       throw err
     }
   }
@@ -204,7 +206,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('切换聊天失败:', err)
+      logger.error('切换聊天失败', err); showError('切换聊天失败')
     }
   }
 
@@ -224,7 +226,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('初始化聊天失败:', err)
+      logger.error('初始化聊天失败', err); showError('初始化聊天失败')
       await startNewChat('New Chat')
     }
   }
@@ -246,7 +248,7 @@ export const useChatStore = defineStore('chat', () => {
       await loadMessages(currentChatId.value)
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('添加系统消息失败:', err)
+      logger.error('添加系统消息失败', err); showError('添加系统消息失败')
     }
   }
 
@@ -303,7 +305,7 @@ export const useChatStore = defineStore('chat', () => {
         return
       }
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('添加用户消息失败:', err)
+      logger.error('添加用户消息失败', err); showError('添加用户消息失败')
     }
   }
 
@@ -312,7 +314,7 @@ export const useChatStore = defineStore('chat', () => {
     if (aiMessage) {
       aiMessage.content += data.message.content
       db.messages.update(aiMessage.id!, { content: aiMessage.content }).catch((err) => {
-        console.error('更新AI消息失败:', err)
+        logger.error('更新AI消息失败', err); showError('更新AI消息失败')
       })
     }
   }
@@ -330,7 +332,7 @@ export const useChatStore = defineStore('chat', () => {
         await loadMessages(chatId)
       } catch (err) {
         error.value = err instanceof Error ? err : new Error(String(err))
-        console.error('完成AI消息失败:', err)
+        logger.error('完成AI消息失败', err); showError('完成AI消息失败')
       }
     }
   }
@@ -365,7 +367,7 @@ export const useChatStore = defineStore('chat', () => {
         return
       }
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('重新生成响应失败:', err)
+      logger.error('重新生成响应失败', err); showError('重新生成响应失败')
     }
   }
 
@@ -380,7 +382,7 @@ export const useChatStore = defineStore('chat', () => {
       await startNewChat('New Chat')
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      console.error('清空数据库失败:', err)
+      logger.error('清空数据库失败', err); showError('清空数据库失败')
     }
   }
 
