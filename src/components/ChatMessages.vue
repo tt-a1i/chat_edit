@@ -4,7 +4,7 @@ import { showSystem } from '../services/appConfig.ts'
 import { useChats } from '../services/chat.ts'
 import ChatMessage from './ChatMessage.vue'
 
-const { messages, isStreaming } = useChats()
+const { messages } = useChats()
 const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 
@@ -52,18 +52,11 @@ const visibleMessages = computed(() =>
   showSystem.value ? messages?.value : messages?.value.filter(m => m.role !== 'system'),
 )
 
-// Reset userInterferedWithScroll when streaming starts
-watch(isStreaming, (newVal) => {
-  if (newVal) {
-    userInterferedWithScroll.value = false
-    scrollToBottom()
-  }
-})
-
 // Ensure we scroll during streaming
 const streamingMessageId = computed(() => {
-  if (isStreaming.value && visibleMessages.value.length > 0) {
-    return visibleMessages.value[visibleMessages.value.length - 1].id
+  const lastMessage = visibleMessages.value[visibleMessages.value.length - 1]
+  if (lastMessage?.isStreaming) {
+    return lastMessage.id
   }
   return null
 })
@@ -78,7 +71,7 @@ const streamingMessageId = computed(() => {
       v-for="message in visibleMessages"
       :key="message.id"
       :message="message"
-      :is-streaming="isStreaming && message.id === streamingMessageId"
+      :is-streaming="message.id === streamingMessageId"
     />
   </div>
 </template>
