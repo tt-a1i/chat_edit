@@ -160,6 +160,19 @@ class DocumentExporter {
                           },
                         }),
                       ],
+                      margins: {
+                        top: 80,
+                        bottom: 80,
+                        left: 100,
+                        right: 100,
+                      },
+                      borders: {
+                        top: { style: 'single', size: 1 },
+                        bottom: { style: 'single', size: 1 },
+                        left: { style: 'single', size: 1 },
+                        right: { style: 'single', size: 1 },
+                      },
+                      verticalAlign: 'center',
                     }),
                 ),
               })
@@ -176,21 +189,21 @@ class DocumentExporter {
           case 'h1':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [child] : [],
+                child instanceof TextRun ? [new TextRun({ ...child, size: 36 } as any)] : [],
               ),
               heading: HeadingLevel.HEADING_1,
             })
           case 'h2':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [child] : [],
+                child instanceof TextRun ? [new TextRun({ ...child, size: 32 } as any)] : [],
               ),
               heading: HeadingLevel.HEADING_2,
             })
           case 'h3':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [child] : [],
+                child instanceof TextRun ? [new TextRun({ ...child, size: 28 } as any)] : [],
               ),
               heading: HeadingLevel.HEADING_3,
             })

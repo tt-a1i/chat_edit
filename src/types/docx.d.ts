@@ -44,6 +44,7 @@ declare module 'docx' {
     size?: number
     font?: string
     color?: string
+    [key: string]: any  // 允许其他属性
   }
 
   export class Table {
@@ -69,6 +70,20 @@ declare module 'docx' {
 
   export interface TableCellOptions {
     children: Paragraph[]
+    margins?: {
+      top?: number
+      bottom?: number
+      left?: number
+      right?: number
+    }
+    borders?: {
+      top?: { style: string, size: number, color?: string }
+      bottom?: { style: string, size: number, color?: string }
+      left?: { style: string, size: number, color?: string }
+      right?: { style: string, size: number, color?: string }
+    }
+    verticalAlign?: 'top' | 'center' | 'bottom'
+    shading?: { fill?: string, type?: string, color?: string }
   }
 
   export enum HeadingLevel {
