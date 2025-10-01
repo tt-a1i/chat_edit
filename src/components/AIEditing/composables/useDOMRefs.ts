@@ -1,4 +1,4 @@
-import { onMounted, shallowRef } from 'vue'
+import { shallowRef } from 'vue'
 
 /**
  * DOM 引用管理 Composable

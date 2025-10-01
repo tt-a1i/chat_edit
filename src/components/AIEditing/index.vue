@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import type { editor } from 'monaco-editor'
+import type { PromptTemplate } from './constants/prompts'
+import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAIEditorActions } from './composables/useAIEditorActions'
 import { useAIInteraction } from './composables/useAIInteraction'
@@ -227,7 +228,7 @@ function setupEventListeners() {
 /**
  * 处理菜单项点击
  */
-function handleMenuItemClick(prompt: any) {
+function handleMenuItemClick(prompt: PromptTemplate) {
   const quill = quillInstance.value
   if (!quill || !currentRange.value) return
 
@@ -268,8 +269,7 @@ async function handleExport(format: 'markdown' | 'docx' | 'pdf') {
     if (exportMenuRef.value) {
       exportMenuRef.value.style.display = 'none'
     }
-  }
-  catch (error) {
+  } catch (error) {
     const { AppError, ErrorCode } = await import('@/utils/errors')
     const { ErrorHandler } = await import('@/utils/errorHandler')
     ErrorHandler.handle(new AppError(
@@ -288,8 +288,7 @@ function autoResize(event: Event) {
   if (textarea.value.includes('\n')) {
     textarea.style.height = 'auto'
     textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`
-  }
-  else {
+  } else {
     textarea.style.height = '2.5rem'
   }
 }
@@ -307,9 +306,9 @@ function handlePromptKeydown(event: KeyboardEvent) {
 /**
  * 处理文件上传
  */
-async function handleFileUpload(options: any) {
+async function handleFileUpload(options: { file: any }) {
   const { file } = options
-  const actualFile = file.file || file
+  const actualFile = (file as any).file || file
 
   const quill = quillInstance.value
   if (!quill) return
@@ -323,8 +322,7 @@ async function handleFileUpload(options: any) {
 
     showUploadModal.value = false
     window.$message?.success('文件导入成功')
-  }
-  catch {
+  } catch {
     // 错误已在 import.ts 中处理
   }
 }

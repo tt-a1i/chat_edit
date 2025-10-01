@@ -227,9 +227,9 @@ export function useAIEditorActions(
       const prompt = (aiState.hiddenPrompt.value || domRefs.promptInputRef.value?.value || '').toLowerCase()
       aiState.isTranslationPrompt.value
         = prompt.includes('翻译')
-        || prompt.includes('translate')
-        || prompt.includes('中文')
-        || prompt.includes('english')
+          || prompt.includes('translate')
+          || prompt.includes('中文')
+          || prompt.includes('english')
     }
 
     // 如果正在生成，则中止

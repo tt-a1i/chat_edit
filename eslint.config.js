@@ -17,6 +17,10 @@ export default antfu({
     'ollama_data',
     'pnpm-lock.yaml',
     'claudedocs/**', // 忽略文档目录
+    'MIGRATION_GUIDE.md', // 忽略迁移指南
+    'REFACTORING_PROGRESS.md', // 忽略重构进度报告
+    'TODAY_REFACTORING_SUMMARY.md', // 忽略今日总结
+    '*.md', // 忽略所有 markdown 文件
   ],
 
   // 自定义规则

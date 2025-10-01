@@ -4,7 +4,6 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
-import { ref } from 'vue'
 import { getApiUrl, getHeaders } from '../../api/api'
 
 /**
@@ -43,8 +42,6 @@ export interface ChatEditingRequest {
   model?: string
 }
 let lastMessageWasEmpty = false
-// 创建abort controller
-const abortController = ref<AbortController>(new AbortController())
 
 /**
  * 使用流式方式进行AI编辑会话
