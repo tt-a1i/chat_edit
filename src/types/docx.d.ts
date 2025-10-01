@@ -97,6 +97,6 @@ declare module 'docx' {
 
   export class Packer {
     static toBlob(doc: Document): Promise<Blob>
-    static toBuffer(doc: Document): Promise<Buffer>
+    static toBuffer(doc: Document): Promise<ArrayBuffer>
   }
 }
