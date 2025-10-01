@@ -5,6 +5,7 @@ import {
 } from '@microsoft/fetch-event-source'
 import { ref } from 'vue'
 import { getApiUrl, getHeaders } from '../../api/api'
+import { logger } from '@/utils/logger'
 
 /**
  * HTTP 错误类
@@ -180,7 +181,7 @@ export async function streamChat(
           })
         }
       } catch (err) {
-        console.error('处理消息失败:', err)
+        logger.error('处理消息失败:', err)
       }
     },
 

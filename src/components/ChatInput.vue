@@ -4,6 +4,7 @@ import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from 
 import { useTextareaAutosize } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
+import { logger } from '@/utils/logger'
 import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
@@ -104,7 +105,7 @@ function handleFileChange(event: Event) {
     // Basic validation for image type (optional, but good practice)
     if (!file.type.startsWith('image/')) {
       // Handle non-image file selection (e.g., show an error message)
-      console.warn('Selected file is not an image:', file.type)
+      logger.warn('Selected file is not an image:', file.type)
       if (fileInput.value) {
         fileInput.value.value = '' // Reset file input
       }

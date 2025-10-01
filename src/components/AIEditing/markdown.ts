@@ -3,6 +3,7 @@ import katex from 'katex'
 import MarkdownIt from 'markdown-it'
 import mdLinkAttrs from 'markdown-it-link-attributes'
 import mdKatex from 'markdown-it-texmath'
+import { logger } from '@/utils/logger'
 import 'highlight.js/styles/github.css'
 
 // 配置数学公式渲染规则
@@ -14,7 +15,7 @@ function renderKatex(latex: string, displayMode = false): string {
       strict: false,
     })
   } catch (error) {
-    console.error('KaTeX error:', error)
+    logger.error('KaTeX error:', error)
     return latex
   }
 }

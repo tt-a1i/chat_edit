@@ -254,7 +254,7 @@ export const useChatStore = defineStore('chat', () => {
 
   async function addUserMessage(content: string, imageUrl?: string | null) {
     if (!currentChatId.value) {
-      console.warn('没有活动的聊天')
+      logger.warn('没有活动的聊天')
       return
     }
 

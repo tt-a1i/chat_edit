@@ -28,7 +28,6 @@ async function performRefreshModel() {
 
 async function handleModelChange(event: Event) {
   const wip = event.target as HTMLSelectElement
-  console.log('switch', wip.value)
   appStore.currentModel = wip.value
 
   // 如果有当前聊天，更新聊天的模型

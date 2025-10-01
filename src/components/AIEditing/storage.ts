@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger'
+
 // 防抖函数
 function debounce(func: (...args: any[]) => void, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null
@@ -20,9 +22,9 @@ const debouncedSaveToServer = debounce(async (sessionId: string, content: string
   try {
     // TODO: 实现 saveDraft API
     // await AIEditingAPI.saveDraft(sessionId, content)
-    console.log('Save draft to server (not implemented):', sessionId, content.substring(0, 50))
+    // logger.debug('Save draft to server (not implemented):', sessionId, content.substring(0, 50))
   } catch (error) {
-    console.error('Failed to save content to server:', error)
+    logger.error('Failed to save content to server:', error)
   }
 }, 500)
 
@@ -52,9 +54,9 @@ export async function loadEditorContent(sessionId?: string): Promise<string | nu
       // if (serverContent) {
       //   return serverContent
       // }
-      console.log('Load draft from server (not implemented):', sessionId)
+      // logger.debug('Load draft from server (not implemented):', sessionId)
     } catch (error) {
-      console.log('Failed to load content from server:', error)
+      // logger.debug('Failed to load content from server:', error)
     }
   }
   return null

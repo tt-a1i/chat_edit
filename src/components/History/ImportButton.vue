@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useChatStore } from '@/stores'
+import { logger } from '@/utils/logger'
+import { showError } from '@/utils/toast'
 
 const chatStore = useChatStore()
 const { importChats } = chatStore
@@ -14,8 +16,10 @@ const uploadChats = async (event: Event) => {
     try {
       const jsonData = JSON.parse(e.target.result as string)
       importChats(jsonData)
-    } catch (error) {
-      console.error('Failed to parse JSON:', error)
+    }
+    catch (error) {
+      logger.error('解析导入文件失败', error)
+      showError('导入失败：文件格式不正确')
     }
   }
   reader.readAsText(file)

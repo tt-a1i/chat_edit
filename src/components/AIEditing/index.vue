@@ -3,6 +3,7 @@ import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from '
 import Quill from 'quill'
 import * as QuillTableUI from 'quill-table-ui'
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { logger } from '@/utils/logger'
 import { createExporter } from './export'
 import { createImporter } from './import'
 import { renderMarkdown } from './markdown'
@@ -163,7 +164,7 @@ async function handleFileUpload(options) {
     // 如果编辑器为空，直接处理导入
     await processImport(file.file)
   } catch (error) {
-    console.error('导入过程中发生错误:', error)
+    logger.error('导入过程中发生错误:', error)
     window.$message.error('导入失败')
     uploading.value = false
   }
@@ -182,7 +183,7 @@ async function processImport(fileObj) {
     window.$message.success('导入成功')
     showUploadModal.value = false
   } catch (error) {
-    console.error('导入失败:', error)
+    logger.error('导入失败:', error)
     window.$message.error('导入失败')
   } finally {
     uploading.value = false
@@ -231,7 +232,7 @@ onMounted(() => {
   // 在 onMounted 中添加新按钮的事件监听
   document.getElementById('insertAfterDiff')?.addEventListener('click', () => {
     if (!diffEditor || !replacementRange) {
-      console.error('No diff editor or replacement range available')
+      logger.error('No diff editor or replacement range available')
       return
     }
 
@@ -357,7 +358,7 @@ onMounted(() => {
     const aiResponseText = responseContent?.getAttribute('data-original-text')
 
     if (!currentRange || !aiResponseText) {
-      console.log('No selection range or AI response')
+      // logger.debug('No selection range or AI response')
       return
     }
 
@@ -410,7 +411,7 @@ onMounted(() => {
   })
   document.getElementById('compare')?.addEventListener('click', () => {
     if (!monacoLoaded) {
-      console.log('Monaco Editor is still loading...')
+      // logger.debug('Monaco Editor is still loading...')
       return
     }
 
@@ -421,7 +422,7 @@ onMounted(() => {
       .querySelector('.response-content')
       ?.getAttribute('data-original-text') || ''
     if (!selectedText || !aiResponseText) {
-      console.log('No selected text or AI response')
+      // logger.debug('No selected text or AI response')
       return
     }
 
@@ -436,7 +437,7 @@ onMounted(() => {
 
   document.getElementById('confirmReplace')?.addEventListener('click', () => {
     if (!diffEditor || !replacementRange) {
-      console.error('No diff editor or replacement range available')
+      logger.error('No diff editor or replacement range available')
       return
     }
 
@@ -520,7 +521,7 @@ onMounted(() => {
       try {
         const format = item.dataset.format
         if (!format) {
-          console.error('No format specified for export')
+          logger.error('No format specified for export')
           return
         }
 
@@ -533,7 +534,7 @@ onMounted(() => {
       } catch (error) {
         const format = item.dataset.format
 
-        console.log(format)
+        // logger.debug(format)
         console.error(`Export to ${format} failed:`, error)
       }
     })
@@ -560,7 +561,7 @@ function initQuillEditor() {
     nextTick(async () => {
       const editorElement = document.getElementById('editor')
       if (!editorElement) {
-        console.error('Editor element not found')
+        logger.error('Editor element not found')
         return
       }
       const options = {
@@ -794,7 +795,7 @@ function initQuillEditor() {
         if (source === 'user') {
           // 使用 setTimeout 确保在渲染完成后再清除高亮
           setTimeout(() => {
-            // console.log("text-change的样式重置执行了");
+            // // logger.debug("text-change的样式重置执行了");
             // 清除所有背景色样式
             const length = quill.getLength()
             quill.formatText(0, length, 'background', false, 'api')
@@ -867,7 +868,7 @@ function initQuillEditor() {
       })
     })
   } catch (error) {
-    console.error('Error initializing Quill editor:', error)
+    logger.error('Error initializing Quill editor:', error)
   }
 }
 
@@ -922,7 +923,7 @@ function handleResponseUpdate(text, responseContent) {
   text = text.replace(/(\w+)\s+(\d+)/g, '$1 $2') // 修复"Source 1"类型的断开
   // 保存原始的 markdown 文本（确保在渲染之前保存）
   responseContent.setAttribute('data-original-text', text)
-  // console.log('responseContent', responseContent)
+  // // logger.debug('responseContent', responseContent)
   // 处理 LaTeX 数学公式的特殊字符
   const processedText = text
     .replace(/^(\d+)\.\s/gm, '$1\\. ') // 保护有序列表的数字
