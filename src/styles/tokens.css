@@ -57,10 +57,10 @@
   --border-dark: var(--gray-400);
 
   /* 消息气泡颜色 */
-  --message-user-bg: var(--primary-50);
-  --message-user-border: var(--primary-200);
-  --message-ai-bg: #ffffff;
-  --message-ai-border: var(--gray-200);
+  --message-user-bg: #f2f2f2;
+  --message-user-border: var(--gray-200);
+  --message-ai-bg: transparent;
+  --message-ai-border: transparent;
   --message-system-bg: var(--warning-50);
   --message-system-border: var(--warning-200);
 
@@ -164,10 +164,10 @@
   --border-dark: var(--dark-border-dark);
 
   /* 暗色模式消息气泡 */
-  --message-user-bg: rgba(59, 130, 246, 0.15);
-  --message-user-border: rgba(59, 130, 246, 0.3);
-  --message-ai-bg: var(--dark-bg-secondary);
-  --message-ai-border: var(--dark-border-light);
+  --message-user-bg: #2c2e33;
+  --message-user-border: var(--dark-border-light);
+  --message-ai-bg: transparent;
+  --message-ai-border: transparent;
   --message-system-bg: rgba(245, 158, 11, 0.15);
   --message-system-border: rgba(245, 158, 11, 0.3);
 

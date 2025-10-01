@@ -73,7 +73,7 @@ const streamingMessageId = computed(() => {
   >
     <!-- 内容容器 - 居中且有最大宽度 -->
     <div
-      class="mx-auto max-w-5xl text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
+      class="mx-auto max-w-7xl text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
       :class="visibleMessages.length > 0 ? 'p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6' : ''"
     >
       <!-- 空状态 -->

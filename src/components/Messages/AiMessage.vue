@@ -45,13 +45,12 @@ function copyToClipboard() {
 <template>
   <div class="group flex items-start gap-3 sm:gap-4 py-1">
     <!-- AI 头像 -->
-    <AIAvatar :size="32" variant="default" class="flex-shrink-0 mt-1 sm:w-9 sm:h-9" />
+    <AIAvatar :size="32" variant="default" class="flex-shrink-0 sm:w-9 sm:h-9" />
 
     <!-- 消息卡片 -->
     <div class="relative flex-1 min-w-0">
       <div
-        class="rounded-2xl px-4 sm:px-5 py-3 sm:py-4 shadow-sm transition-all duration-200 hover:shadow-md"
-        style="background-color: var(--message-ai-bg); border: 1px solid var(--message-ai-border);"
+        class="rounded-2xl px-4 sm:px-5 pb-3 sm:pb-4 transition-all duration-200"
       >
         <!-- 加载动画 -->
         <div v-if="message.isStreaming || isStreaming" class="flex min-h-10 min-w-20 items-center">
