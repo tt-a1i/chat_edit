@@ -35,14 +35,18 @@ function handleConfirmWipe() {
 </script>
 
 <template>
-  <aside>
+  <!-- 设置模态窗口 -->
+  <div
+    class="relative mx-4 w-full max-w-2xl rounded-xl bg-white shadow-2xl dark:bg-gray-800 overflow-hidden"
+    @click.stop
+  >
     <!-- 确认删除对话框 -->
     <div
       v-if="showConfirmDialog"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="absolute inset-0 z-50 flex items-center justify-center bg-black/50 rounded-xl"
       @click.self="showConfirmDialog = false"
     >
-      <div class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800">
+      <div class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-700">
         <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
           确认删除
         </h3>
@@ -51,13 +55,13 @@ function handleConfirmWipe() {
         </p>
         <div class="flex justify-end gap-2">
           <button
-            class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
             @click="showConfirmDialog = false"
           >
             取消
           </button>
           <button
-            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+            class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
             @click="handleConfirmWipe"
           >
             确认删除
@@ -67,7 +71,7 @@ function handleConfirmWipe() {
     </div>
 
     <div
-      class="relative h-screen w-60 flex flex-col overflow-y-auto border-l border-gray-200 bg-white py-4 dark:border-gray-700 dark:bg-gray-900 sm:w-64"
+      class="relative max-h-[85vh] flex flex-col overflow-y-auto py-6 px-8"
     >
       <div class="mb-4 flex items-center gap-x-2 px-2 text-gray-900 dark:text-gray-100">
         <button
@@ -181,5 +185,5 @@ function handleConfirmWipe() {
         </button>
       </div>
     </div>
-  </aside>
+  </div>
 </template>

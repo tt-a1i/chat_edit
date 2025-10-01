@@ -43,51 +43,66 @@ function copyToClipboard() {
 </script>
 
 <template>
-  <div class="group flex items-start px-2 py-1 sm:px-3 sm:py-1.5 mb-2 relative">
+  <div class="group flex items-start gap-3 px-2 py-2 sm:px-4">
+    <!-- AI Logo -->
     <img
       :src="logo"
       alt="AI"
-      class="w-8 h-8 mr-2 sm:mr-3 rounded-full shadow-sm ring-1 ring-offset-1 ring-gray-200 dark:ring-gray-600 object-contain"
+      class="h-8 w-8 flex-shrink-0 rounded-full object-contain shadow-sm ring-2 ring-white dark:ring-gray-700"
     >
 
-    <div class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg shadow-sm p-2 max-w-3xl relative">
-      <!-- 当 isStreaming 为 true 时显示加载动画 -->
-      <div v-if="message.isStreaming || isStreaming" class="min-h-10 min-w-20 flex items-center">
-        <div class="flex space-x-2 justify-center items-center">
-          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" />
-          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.2s" />
-          <div class="w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full animate-bounce" style="animation-delay: 0.4s" />
+    <!-- 消息卡片 -->
+    <div class="relative max-w-[85%] sm:max-w-3xl">
+      <div
+        class="rounded-2xl px-4 py-3 shadow-sm"
+        style="background-color: var(--message-ai-bg); border: 1px solid var(--message-ai-border);"
+      >
+        <!-- 加载动画 -->
+        <div v-if="message.isStreaming || isStreaming" class="flex min-h-10 min-w-20 items-center">
+          <div class="flex items-center justify-center space-x-2">
+            <div class="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400" />
+            <div class="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400" style="animation-delay: 0.2s" />
+            <div class="h-2 w-2 animate-bounce rounded-full bg-blue-600 dark:bg-blue-400" style="animation-delay: 0.4s" />
+          </div>
+          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400">AI 思考中...</span>
         </div>
-        <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">AI 思考中...</span>
+
+        <!-- 消息内容 -->
+        <code
+          v-if="!enableMarkdown && message.content"
+          class="whitespace-pre-line text-sm leading-relaxed text-gray-800 dark:text-gray-200"
+        >{{ message.content }}</code>
+        <div
+          v-else-if="message.content"
+          class="prose prose-sm dark:prose-invert prose-p:my-1.5 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-xs prose-pre:text-sm"
+        >
+          <!-- 思考过程 -->
+          <details
+            v-if="thought[0]"
+            class="mb-3 whitespace-pre-wrap rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-100"
+          >
+            <summary class="mb-1.5 cursor-pointer font-medium">
+              💭 思考过程
+            </summary>
+            {{ thought[0] }}
+          </details>
+
+          <!-- AI 响应 -->
+          <div :class="{ 'animate-pulse': message.isStreaming || isStreaming }">
+            <Markdown :source="thought[1] || ''" />
+          </div>
+        </div>
       </div>
 
-      <!-- 当有内容时显示内容 -->
-      <code v-if="!enableMarkdown && message.content" class="whitespace-pre-line">{{ message.content }}</code>
-      <div
-        v-else-if="message.content"
-        class="prose prose-xs sm:prose-sm dark:prose-invert prose-headings:font-medium prose-headings:my-1.5 prose-p:text-gray-700 dark:prose-p:text-gray-200 prose-p:my-1 prose-a:text-blue-600 dark:prose-a:text-blue-400 hover:prose-a:underline prose-code:bg-gray-200 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:rounded prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950 prose-pre:p-2"
-      >
-        <details
-          v-if="thought[0]"
-          class="whitespace-pre-wrap mb-1.5 rounded border border-blue-200 bg-blue-50 p-1.5 text-xs text-blue-800 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-100"
-        >
-          <summary class="cursor-pointer font-medium mb-1">
-            思考过程
-          </summary>
-          {{ thought[0] }}
-        </details>
-        <div :class="{ 'animate-pulse': message.isStreaming || isStreaming }">
-          <Markdown :source="thought[1] || ''" />
-        </div>
-      </div>
+      <!-- 复制按钮 -->
       <button
         v-if="!message.isStreaming && !isStreaming && message.content"
         title="复制"
-        class="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 active:scale-95"
+        class="absolute -bottom-2 -left-2 rounded-full bg-white p-1.5 text-gray-500 opacity-0 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-50 active:scale-95 group-hover:opacity-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
         @click="copyToClipboard"
       >
-        <CheckIcon v-if="copied" class="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
-        <ClipboardDocumentIcon v-else class="w-3.5 h-3.5" />
+        <CheckIcon v-if="copied" class="h-4 w-4 text-green-600 dark:text-green-400" />
+        <ClipboardDocumentIcon v-else class="h-4 w-4" />
       </button>
     </div>
   </div>
