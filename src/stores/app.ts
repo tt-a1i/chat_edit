@@ -1,11 +1,11 @@
+import { env } from '@/config/env'
+import { useLocalStorage } from '@vueuse/core'
+import gravatarUrl from 'gravatar-url'
 /**
  * 应用配置状态管理 Store
  */
 import { defineStore } from 'pinia'
-import { useLocalStorage } from '@vueuse/core'
-import gravatarUrl from 'gravatar-url'
 import { computed, ref } from 'vue'
-import { env } from '@/config/env'
 
 // Scene 常量
 export const SCENES = {

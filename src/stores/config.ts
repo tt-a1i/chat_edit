@@ -1,10 +1,10 @@
+import type { Config } from '@/services/database'
+import { db } from '@/services/database'
 /**
  * 配置管理 Store（系统提示词等）
  */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Config } from '@/services/database'
-import { db } from '@/services/database'
 
 export const useConfigStore = defineStore('config', () => {
   // State
@@ -20,8 +20,7 @@ export const useConfigStore = defineStore('config', () => {
         .equals(model)
         .first()
       return config
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('获取配置失败:', err)
       return undefined
@@ -50,13 +49,11 @@ export const useConfigStore = defineStore('config', () => {
       }
 
       await db.config.put(config)
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('保存配置失败:', err)
       throw err
-    }
-    finally {
+    } finally {
       isLoading.value = false
     }
   }
@@ -65,8 +62,7 @@ export const useConfigStore = defineStore('config', () => {
     try {
       await db.config.clear()
       configs.value = []
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('清除配置失败:', err)
     }
@@ -82,8 +78,7 @@ export const useConfigStore = defineStore('config', () => {
       const modelConfig = await getConfig(model)
       const defaultConfig = await getConfig('default')
       return { modelConfig, defaultConfig }
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('初始化配置失败:', err)
       return null

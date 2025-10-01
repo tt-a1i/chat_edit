@@ -1,19 +1,16 @@
-import { watchEffect } from 'vue'
 import { useAppStore } from '@/stores'
+import { watchEffect } from 'vue'
 
 // 监听系统暗色模式变化并同步应用设置
 export function syncSystemDarkMode() {
-  const appStore = useAppStore()
-  // 检查系统是否支持暗色模式
+  // 延迟到组件内部调用，确保 Pinia 已初始化
+  // 这个函数现在只设置监听器，不立即访问 store
   const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-  // 初始化时根据系统设置
-  if (darkModeMediaQuery.matches) {
-    appStore.isDarkMode = true
-  }
 
   // 监听系统暗色模式变化
   darkModeMediaQuery.addEventListener('change', (e) => {
+    // 在回调中访问 store 是安全的
+    const appStore = useAppStore()
     appStore.isDarkMode = e.matches
   })
 }
@@ -24,7 +21,8 @@ export function applyDarkModeToDocument() {
   watchEffect(() => {
     if (appStore.isDarkMode) {
       document.documentElement.classList.add('dark')
-    } else {
+    }
+    else {
       document.documentElement.classList.remove('dark')
     }
   })

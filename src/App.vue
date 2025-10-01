@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
 import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
 import ChatInput from './components/ChatInput.vue'
@@ -8,18 +9,22 @@ import ModelSelector from './components/ModelSelector.vue'
 import Settings from './components/Settings.vue'
 import Sidebar from './components/Sidebar.vue'
 import SystemPrompt from './components/SystemPrompt.vue'
+// 临时使用 services/chat 的方法
 import { useChats } from './services/chat.ts'
 import { useAI } from './services/useAI.ts'
-import { SCENES, useAppStore } from './stores'
+import { SCENES, useAppStore, useChatStore } from './stores'
+
 import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
 
 // Stores
 const appStore = useAppStore()
-const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = appStore
+const chatStore = useChatStore()
+const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = storeToRefs(appStore)
+const { currentChat } = storeToRefs(chatStore)
 
 // Services
 const { refreshModels, availableModels } = useAI()
-const { activeChat, renameChat, switchModel, initialize } = useChats()
+const { renameChat, switchModel, initialize } = useChats()
 const isEditingChatName = ref(false)
 const editedChatName = ref('')
 const chatNameInput = ref()
@@ -30,7 +35,7 @@ applyDarkModeToDocument()
 
 function startEditing() {
   isEditingChatName.value = true
-  editedChatName.value = activeChat.value?.name || ''
+  editedChatName.value = currentChat.value?.name || ''
   nextTick(() => {
     if (!chatNameInput.value) {
       return
@@ -47,7 +52,7 @@ function cancelEditing() {
 }
 
 function confirmRename() {
-  if (activeChat.value && editedChatName.value) {
+  if (currentChat.value && editedChatName.value) {
     renameChat(editedChatName.value)
     isEditingChatName.value = false
   }
@@ -74,7 +79,7 @@ onMounted(() => {
 
         <div v-else class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
           <div class="flex w-full flex-row items-center justify-center gap-4 rounded-b-xl bg-gray-100 px-4 py-2 dark:bg-gray-800/95 border-b dark:border-gray-700">
-            <div v-if="activeChat" class="mr-auto flex h-full items-center">
+            <div v-if="currentChat" class="mr-auto flex h-full items-center">
               <div>
                 <div v-if="isEditingChatName">
                   <TextInput
@@ -93,7 +98,7 @@ onMounted(() => {
                   class="block h-full rounded border-none p-2 text-gray-900 decoration-gray-400 decoration-dashed outline-none hover:underline focus:ring-2 focus:ring-blue-600 dark:text-gray-100 dark:focus:ring-blue-600"
                   @click.prevent="startEditing"
                 >
-                  {{ activeChat.name }}
+                  {{ currentChat.name }}
                 </button>
               </div>
             </div>

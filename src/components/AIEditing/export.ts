@@ -189,28 +189,28 @@ class DocumentExporter {
           case 'h1':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 36 })] : []
+                child instanceof TextRun ? [new TextRun({ ...child, size: 36 })] : [],
               ),
               heading: HeadingLevel.HEADING_1,
             })
           case 'h2':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 32 })] : []
+                child instanceof TextRun ? [new TextRun({ ...child, size: 32 })] : [],
               ),
               heading: HeadingLevel.HEADING_2,
             })
           case 'h3':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 28 })] : []
+                child instanceof TextRun ? [new TextRun({ ...child, size: 28 })] : [],
               ),
               heading: HeadingLevel.HEADING_3,
             })
           case 'p':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [child] : []
+                child instanceof TextRun ? [child] : [],
               ),
               spacing: { before: 200, after: 200 },
             })
@@ -256,8 +256,7 @@ class DocumentExporter {
       const processed = processNode(node)
       if (Array.isArray(processed)) {
         elements.push(...processed.filter((p): p is Paragraph => p instanceof Paragraph))
-      }
-      else if (processed instanceof Paragraph) {
+      } else if (processed instanceof Paragraph) {
         elements.push(processed)
       }
     })

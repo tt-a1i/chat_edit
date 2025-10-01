@@ -1,10 +1,10 @@
+import type { Chat, Message } from '@/services/database'
+import { db } from '@/services/database'
 /**
  * 聊天状态管理 Store
  */
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { Chat, Message } from '@/services/database'
-import { db } from '@/services/database'
 
 export const useChatStore = defineStore('chat', () => {
   // State
@@ -20,8 +20,9 @@ export const useChatStore = defineStore('chat', () => {
   })
 
   const currentMessages = computed(() => {
-    if (!currentChatId.value)
+    if (!currentChatId.value) {
       return []
+    }
     return messages.value.filter(msg => msg.chatId === currentChatId.value)
   })
 
@@ -38,12 +39,10 @@ export const useChatStore = defineStore('chat', () => {
     try {
       isLoading.value = true
       chats.value = await db.chats.toArray()
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('加载聊天列表失败:', err)
-    }
-    finally {
+    } finally {
       isLoading.value = false
     }
   }
@@ -55,12 +54,10 @@ export const useChatStore = defineStore('chat', () => {
         .where('chatId')
         .equals(chatId)
         .sortBy('createdAt')
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('加载消息失败:', err)
-    }
-    finally {
+    } finally {
       isLoading.value = false
     }
   }
@@ -75,8 +72,7 @@ export const useChatStore = defineStore('chat', () => {
       const id = await db.chats.add(chat as Chat)
       await loadChats()
       return id
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('创建聊天失败:', err)
       throw err
@@ -87,8 +83,7 @@ export const useChatStore = defineStore('chat', () => {
     currentChatId.value = chatId
     if (chatId) {
       await loadMessages(chatId)
-    }
-    else {
+    } else {
       messages.value = []
     }
   }
@@ -100,8 +95,7 @@ export const useChatStore = defineStore('chat', () => {
         await loadMessages(message.chatId)
       }
       return id
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('添加消息失败:', err)
       throw err
@@ -114,8 +108,7 @@ export const useChatStore = defineStore('chat', () => {
       if (currentChatId.value) {
         await loadMessages(currentChatId.value)
       }
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('更新消息失败:', err)
     }
@@ -130,8 +123,7 @@ export const useChatStore = defineStore('chat', () => {
         currentChatId.value = null
         messages.value = []
       }
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('删除聊天失败:', err)
     }
@@ -144,8 +136,7 @@ export const useChatStore = defineStore('chat', () => {
       chats.value = []
       messages.value = []
       currentChatId.value = null
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('删除所有聊天失败:', err)
     }
@@ -155,8 +146,7 @@ export const useChatStore = defineStore('chat', () => {
     try {
       await db.chats.update(chatId, updates)
       await loadChats()
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('更新聊天失败:', err)
     }

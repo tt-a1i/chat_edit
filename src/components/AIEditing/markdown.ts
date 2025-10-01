@@ -32,8 +32,7 @@ export function createMarkdownRenderer(): MarkdownIt {
           return `<pre class="hljs"><code class="language-${lang}">${
             hljs.highlight(str, { language: lang }).value
           }</code></pre>`
-        }
-        catch {
+        } catch {
           // 忽略高亮错误
         }
       }

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { useAppStore, useChatStore } from '@/stores'
 import { IconRefresh } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useAppStore, useChatStore } from '@/stores'
 import { useAI } from '../services/useAI.ts'
 
 const { disabled = false } = defineProps<Props>()

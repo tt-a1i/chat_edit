@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Message } from '../../services/database.ts'
+import { useAppStore } from '@/stores'
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
+import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { enableMarkdown } from '../../services/appConfig.ts'
 import Markdown from '../Markdown.ts'
 import 'highlight.js/styles/github-dark.css'
 import logo from '/logo.png'
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const { message, isStreaming = false } = defineProps<Props>()
+const appStore = useAppStore()
+const { enableMarkdown } = storeToRefs(appStore)
 const thought = computed(() => {
   const end = message.content.indexOf('</think>')
   if (end !== -1) {

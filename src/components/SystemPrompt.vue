@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { useAppStore, useConfigStore } from '@/stores'
 import { IconWritingSign } from '@tabler/icons-vue'
 import { useTextareaAutosize } from '@vueuse/core'
 import { createDiscreteApi } from 'naive-ui'
+import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
-import { currentModel, useConfig } from '../services/appConfig'
 import ModelSelector from './ModelSelector.vue'
 
-const { setConfig, initializeConfig } = useConfig()
+const appStore = useAppStore()
+const configStore = useConfigStore()
+const { currentModel } = storeToRefs(appStore)
 const { textarea } = useTextareaAutosize()
 const configInput = ref('')
 const defaultConfigInput = ref('')
@@ -17,22 +20,21 @@ onMounted(() => {
   initialize()
 })
 
-function initialize() {
-  initializeConfig(currentModel.value).then((configs) => {
-    configInput.value = configs?.modelConfig?.systemPrompt ?? ''
-    defaultConfigInput.value = configs?.defaultConfig?.systemPrompt ?? ''
-  })
+async function initialize() {
+  const configs = await configStore.initializeConfig(currentModel.value)
+  configInput.value = configs?.modelConfig?.systemPrompt ?? ''
+  defaultConfigInput.value = configs?.defaultConfig?.systemPrompt ?? ''
 }
 
-function onSubmit() {
+async function onSubmit() {
   const model = currentModel.value
-  setConfig({
+  await configStore.setConfig({
     model: 'default',
     systemPrompt: defaultConfigInput.value.trim(),
     createdAt: new Date(),
   })
   if (model) {
-    setConfig({
+    await configStore.setConfig({
       model,
       systemPrompt: configInput.value.trim(),
       createdAt: new Date(),

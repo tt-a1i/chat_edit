@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SCENES, useAppStore, useChatStore } from '@/stores'
 import {
   IconEdit,
   IconMessageCode,
@@ -9,20 +10,17 @@ import {
   IconTrashX,
   IconUserCircle,
 } from '@tabler/icons-vue'
+import { storeToRefs } from 'pinia'
 
-import {
-  currentScene,
-  isDarkMode,
-  isSystemPromptOpen,
-  SCENES,
-  switchScene,
-  toggleSettingsPanel,
-  toggleSystemPromptPanel,
-} from '../services/appConfig.ts'
+// 临时使用 services/chat 的方法
 import { useChats } from '../services/chat.ts'
 
-const { sortedChats, activeChat, switchChat, deleteChat, startNewChat, wipeDatabase }
-  = useChats()
+const appStore = useAppStore()
+const chatStore = useChatStore()
+const { currentScene, isDarkMode, isSystemPromptOpen } = storeToRefs(appStore)
+const { sortedChats, currentChat } = storeToRefs(chatStore)
+const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode } = appStore
+const { switchChat, deleteChat, startNewChat, wipeDatabase } = useChats()
 
 function onNewChat() {
   checkSystemPromptPanel()
@@ -37,7 +35,7 @@ function onSwitchChat(chatId: number) {
 }
 
 function checkSystemPromptPanel() {
-  isSystemPromptOpen.value = false
+  appStore.isSystemPromptOpen = false
 }
 
 // 以下划线开头命名未使用的函数，避免警告
@@ -97,7 +95,7 @@ const lang = navigator.language
           v-for="(chat, index) in sortedChats"
           :key="index"
           :class="{
-            'bg-gray-100 dark:bg-gray-800': activeChat?.id === chat.id,
+            'bg-gray-100 dark:bg-gray-800': currentChat?.id === chat.id,
           }"
           class="flex w-full flex-col gap-y-1 rounded-md px-3 py-2 text-left transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
           @click="onSwitchChat(chat.id!)"
@@ -125,7 +123,7 @@ const lang = navigator.language
       </div>      <div class="mt-auto w-full space-y-2 px-2 py-4">
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
-          @click="isDarkMode = !isDarkMode"
+          @click="toggleDarkMode"
         >
           <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80" />
           <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80" />
@@ -156,9 +154,9 @@ const lang = navigator.language
           Settings
         </button>        <!-- 删除当前聊天按钮 -->
         <button
-          v-if="activeChat"
+          v-if="currentChat"
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
-          @click="deleteChat(activeChat.id!)"
+          @click="deleteChat(currentChat.id!)"
         >
           <IconTrashX class="size-4 opacity-50 group-hover:opacity-80" />
           删除当前会话

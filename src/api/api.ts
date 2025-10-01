@@ -1,5 +1,4 @@
 import type {
-  ChatCompletedResponse,
   ChatPartResponse,
   ChatRequest,
   ChatResponse,
@@ -12,7 +11,6 @@ import type {
   GenerateEmbeddingsRequest,
   GenerateEmbeddingsResponse,
   ListLocalModelsResponse,
-  Model,
   PullModelRequest,
   PullModelResponse,
   PushModelRequest,
@@ -20,9 +18,9 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
-import { ref } from 'vue'
-import { apiKey, baseUrl } from '../services/appConfig.ts'
+import { useAppStore } from '@/stores'
 import { toError } from '@/utils/error'
+import { ref } from 'vue'
 
 export type {
   ChatCompletedResponse,
@@ -32,13 +30,17 @@ export type {
 } from './types.ts'
 
 // 定义获取完整 API URL 的方法
-export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
+export function getApiUrl(path: string): string {
+  const appStore = useAppStore()
+  return `${appStore.baseUrl}${path}`
+}
 
 // 定义获取请求头的方法
-export function getHeaders() {
+export function getHeaders(): Record<string, string> {
+  const appStore = useAppStore()
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey.value}`,
+    'Authorization': `Bearer ${appStore.apiKey}`,
   }
 }
 

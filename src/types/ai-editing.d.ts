@@ -2,8 +2,8 @@
  * AI 编辑相关类型定义
  */
 
-import type Quill from 'quill'
 import type * as Monaco from 'monaco-editor'
+import type Quill from 'quill'
 
 /**
  * AI 对话响应类型

@@ -77,7 +77,7 @@ const { currentModel } = storeToRefs(appStore)
 
 **当前使用**:
 ```typescript
-import { currentScene, switchScene, SCENES } from '../services/appConfig.ts'
+import { currentScene, SCENES, switchScene } from '../services/appConfig.ts'
 ```
 
 **迁移后**:
@@ -218,22 +218,22 @@ ESLint 要求按字母顺序导入：
 ```typescript
 // ✅ 正确
 import { useChats } from './services/chat.ts'
-import { SCENES, useAppStore } from './stores'
-
-// ❌ 错误
-import { useAppStore, SCENES } from './stores'
 import { useChats } from './services/chat.ts'
+
+import { SCENES, useAppStore } from './stores'
+// ❌ 错误
+import { SCENES, useAppStore } from './stores'
 ```
 
 ### 2. 响应性丢失
 
 ```typescript
 // ❌ 错误: 解构后失去响应性
-const { currentModel } = appStore
-currentModel.value = 'new-model' // 不会更新 UI!
+// 不会更新 UI!
 
 // ✅ 正确: 使用 storeToRefs
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia' const { currentModel } = appStore
+currentModel.value = 'new-model'
 const { currentModel } = storeToRefs(appStore)
 currentModel.value = 'new-model' // 会更新 UI ✅
 ```

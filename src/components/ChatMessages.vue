@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { useAppStore, useChatStore } from '@/stores'
+import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
-import { showSystem } from '../services/appConfig.ts'
-import { useChats } from '../services/chat.ts'
 import ChatMessage from './ChatMessage.vue'
 
-const { messages } = useChats()
+const appStore = useAppStore()
+const chatStore = useChatStore()
+const { showSystem } = storeToRefs(appStore)
+const { messages } = storeToRefs(chatStore)
 const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 

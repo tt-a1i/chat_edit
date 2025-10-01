@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
 import { ref } from 'vue'
-import { useAppStore } from '../stores'
 import { useChats } from '../services/chat.ts'
+import { useAppStore } from '../stores'
 import ExportButton from './History/ExportButton.vue'
 import ImportButton from './History/ImportButton.vue'
 import TextInput from './Inputs/TextInput.vue'
