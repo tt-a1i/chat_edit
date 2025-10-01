@@ -1,0 +1,131 @@
+/* 暗色模式下的Markdown样式 */
+
+/* 代码块样式 */
+.dark .markdown-content pre,
+.dark .markdown-content code {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-radius: 0.25rem;
+}
+
+.dark .markdown-content pre {
+  padding: 1rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  border: 1px solid #4b5563;
+}
+
+/* 行内代码样式 */
+.dark .markdown-content :not(pre) > code {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* 标题样式 */
+.dark .markdown-content h1,
+.dark .markdown-content h2,
+.dark .markdown-content h3,
+.dark .markdown-content h4,
+.dark .markdown-content h5,
+.dark .markdown-content h6 {
+  color: #f8fafc !important;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 段落样式 */
+.dark .markdown-content p {
+  color: #e2e8f0 !important;
+  margin-bottom: 1rem;
+}
+
+/* 列表样式 */
+.dark .markdown-content ul,
+.dark .markdown-content ol {
+  color: #e2e8f0 !important;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 引用样式 */
+.dark .markdown-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1rem;
+  color: #cbd5e1 !important;
+  margin-bottom: 1rem;
+  background-color: rgba(30, 41, 59, 0.5);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+/* 链接样式 */
+.dark .markdown-content a {
+  color: #60a5fa !important;
+  text-decoration: underline;
+}
+
+/* 表格样式 */
+.dark .markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  border: 1px solid #4b5563;
+}
+
+.dark .markdown-content th,
+.dark .markdown-content td {
+  padding: 0.5rem;
+  border: 1px solid #4b5563;
+  color: #e2e8f0 !important;
+}
+
+.dark .markdown-content th {
+  background-color: #374151;
+  font-weight: bold;
+}
+
+.dark .markdown-content tbody tr:nth-child(even) {
+  background-color: rgba(30, 41, 59, 0.5);
+}
+
+/* 水平线样式 */
+.dark .markdown-content hr {
+  border: 0;
+  height: 1px;
+  background-color: #4b5563;
+  margin: 1.5rem 0;
+}
+
+/* 高亮显示的代码行 */
+.dark .markdown-content .hljs-comment,
+.dark .markdown-content .hljs-quote {
+  color: #8b949e;
+}
+
+.dark .markdown-content .hljs-keyword,
+.dark .markdown-content .hljs-selector-tag {
+  color: #ff7b72;
+}
+
+.dark .markdown-content .hljs-string,
+.dark .markdown-content .hljs-attr {
+  color: #a5d6ff;
+}
+
+.dark .markdown-content .hljs-number,
+.dark .markdown-content .hljs-literal {
+  color: #79c0ff;
+}
+
+.dark .markdown-content .hljs-title,
+.dark .markdown-content .hljs-function {
+  color: #d2a8ff;
+}
+
+.dark .markdown-content .hljs-built_in,
+.dark .markdown-content .hljs-type {
+  color: #ffa657;
+}

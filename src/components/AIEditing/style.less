@@ -1,0 +1,1508 @@
+.writing-editor{
+	.ql-toolbar {
+		display: flex;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+	}
+	/* *,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	} */
+	.editor-container {
+		width: 100%;
+		margin: 0 auto;
+		background-color: #f9fafd;
+		height: 100%;
+		overflow: auto;
+		position: relative; 
+		scroll-behavior: smooth; /* 使容器滚动更平滑 */
+	}
+
+	.ql-container {
+		height: calc(100% - 42px);
+		overflow: auto;
+		scroll-behavior: auto; /* 改回 auto 确保滚动行为正常 */
+		transition: none;
+	}
+	/* 行高， 字间距， 字体大小调整部分 */
+	.ql-editor {
+		font-size: 16px;  /* 基础字体大小 */
+		line-height: 1.6;  /* 行高 */
+		letter-spacing: 0.5px;  /* 字间距 */
+		max-width: 100%;
+		margin: 0 auto;
+		padding: 30px;
+		height: 100vh;
+		/* 确保滚动条样式不会影响功能 */
+		&::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		&::-webkit-scrollbar-track {
+			background: #f1f1f1;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #c1c1c1;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: #a8a8a8;
+		}
+	}
+
+	.ql-editor.ql-blank::before{
+		left: 30px;
+		right: 30px;
+	}
+
+	/* 针对不同级别标题的字体大小调整 */
+	.ql-editor h1 {
+		font-size: 2em;
+		line-height: 1.4;
+		margin-bottom: 1em;
+	}
+
+	.ql-editor h2 {
+		font-size: 1.5em;
+		line-height: 1.4;
+		margin-bottom: 0.8em;
+	}
+
+	.ql-editor h3 {
+		font-size: 1.17em;
+		line-height: 1.4;
+		margin-bottom: 0.6em;
+	}
+
+	.ql-editor p {
+		margin-bottom: 0.8em;  /* 段落间距 */
+	}
+
+	.ql-toolbar {
+		text-align: center;
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background-color: #ffffff;
+	}
+
+	.ql-container .ql-editor::selection,
+	.ql-container .ql-editor *::selection {
+		background-color: #b4d5fe;
+	}
+
+	.floating-input {
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: none;
+		background: white;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		border-radius: 4px;
+		padding: 0.625rem;
+		z-index: 9999;
+		width: calc(100% - 40px); 
+		max-width: 920px; 
+		min-width: 560px; 
+		transition: none;
+	}
+
+	.input-container {
+		display: flex;
+		align-items: flex-start; 
+		gap: 0.5rem;
+		position: relative;
+		min-height: 2.5rem; /* 设置最小高度 */
+	}
+
+	.input-container textarea {
+		flex: 1;
+		padding: 0.75rem; /* 调整内边距使文本居中 */
+		padding-right: 2.5rem;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+		transition: border-color 0.2s;
+		min-height: 2.5rem; 
+		max-height: 10rem; 
+		height: 2.5rem; /* 改为固定高度 */
+		resize: none; /* 禁用手动调整大小 */
+		overflow-y: hidden; 
+		line-height: 1;    /* 改为更小的行高 */
+		font-size: 0.9375rem;
+	}
+
+	/* 当内容超出最大高度时显示滚动条 */
+	.input-container textarea.expanded {
+		overflow-y: auto;
+	}
+
+	.input-container textarea::-webkit-scrollbar {
+		width: 4px;
+	}
+
+	.input-container textarea::-webkit-scrollbar-track {
+		background: #f1f1f1;
+		border-radius: 2px;
+	}
+
+	.input-container textarea::-webkit-scrollbar-thumb {
+		background: #888;
+		border-radius: 2px;
+	}
+
+	.input-container textarea::-webkit-scrollbar-thumb:hover {
+		background: #666;
+	}
+
+	.input-container textarea:focus {
+		outline: none;
+		border-color: #409eff;
+	}
+
+	.send-btn {
+		position: absolute;
+		right: 0.5rem;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 2rem;
+		height: 2rem;
+		border: none;
+		border-radius: 50%;
+		background: transparent;
+		color: #409eff;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+		padding: 0;
+	}
+
+	.send-btn::before {
+		display: none; /* 添加这行，确保默认状态下不显示停止图标 */
+	}
+
+	.send-btn:hover {
+		color: #66b1ff;
+		transform: translateY(-50%) scale(1.05);
+	}
+
+	.send-btn i {
+		font-size: 1rem;
+	}
+
+	.send-btn.loading {
+		background: #ff4d4f;
+		color: white;
+	}
+
+	.send-btn.loading::before {
+		content: "\f04d"; /* Font Awesome的停止图标 */
+		font-family: "Font Awesome 5 Free";
+		font-weight: 900;
+		font-size: 0.625rem; /* 从 0.75rem 改小到 0.625rem */
+		transform: scale(0.9); /* 额外添加一点缩放效果 */
+		display: block; /* 只在 loading 状态显示停止图标 */
+	}
+
+	.send-btn.loading:hover {
+		background: #ff7875;
+		transform: translateY(-50%) scale(1.05);
+	}
+
+	.send-btn .send-icon {
+		display: block; /* 修改为 block，确保默认显示 */
+	}
+
+	.send-btn.loading .send-icon {
+		display: none;
+	}
+
+	.ai-response {
+		background: #ffffff;
+		padding: 0.625rem;
+		border-radius: 4px;
+		margin-top: 0.625rem;
+		display: none;
+		border: 1px solid #e2e8f0;
+		font-size: 0.9375rem;
+		line-height: 1.6;
+		color: #1a202c;
+		position: absolute; /* 改为绝对定位 */
+		min-height: 3rem;
+		max-height: min(40vh, 400px);
+		overflow-y: auto;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+			0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		left: 0; /* 添加这行确保左对齐 */
+		right: 0; /* 添加这行确保宽度与父元素相同 */
+		z-index: 9997;
+	}
+
+	.ai-response::-webkit-scrollbar {
+		width: 0.375rem;
+	}
+
+	.ai-response::-webkit-scrollbar-track {
+		background: #f8fafc;
+		border-radius: 0.25rem;
+	}
+
+	.ai-response::-webkit-scrollbar-thumb {
+		background: #cbd5e0;
+		border-radius: 0.25rem;
+	}
+
+	.ai-response::-webkit-scrollbar-thumb:hover {
+		background: #a0aec0;
+	}
+
+	.response-content {
+		white-space: pre-wrap;
+		word-break: break-word;
+		overflow-wrap: break-word;
+		font-family: system-ui, -apple-system, sans-serif;
+		min-height: 1.5rem;
+		display: block; /* 修改为 block */
+		transition: opacity 0.3s ease;
+		padding: 0.375rem 0.625rem;
+	}
+
+	.response-content.loading {
+		display: flex; /* 仅在加载时使用 flex */
+		justify-content: center;
+		align-items: center;
+		color: #718096;
+		font-style: italic;
+		opacity: 0.8;
+	}
+
+	@keyframes dotAnimation {
+		0% {
+			content: "";
+		}
+		25% {
+			content: ".";
+		}
+		50% {
+			content: "..";
+		}
+		75% {
+			content: "...";
+		}
+		100% {
+			content: "";
+		}
+	}
+
+	/* AI 响应区域的 Markdown 样式 */
+	.response-content.markdown {
+		font-size: 0.9375rem;
+		line-height: 1.6;
+		color: #1a202c;
+	}
+
+	.response-content.markdown h1,
+	.response-content.markdown h2,
+	response-content.markdown h3 {
+		margin-top: 1.5em;
+		margin-bottom: 0.75em;
+		/* font-weight: 600; */
+	}
+
+	.response-content.markdown h1 {
+		font-size: 1.5em;
+	}
+	.response-content.markdown h2 {
+		font-size: 1.3em;
+	}
+	.response-content.markdown h3 {
+		font-size: 1.1em;
+	}
+
+	.response-content.markdown code {
+		background: #f5f7f9;
+		padding: 0.2em 0.4em;
+		border-radius: 3px;
+		font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+		font-size: 0.875em;
+	}
+
+	.response-content.markdown pre {
+		background: #282c34;
+		color: #abb2bf;
+		padding: 1em;
+		border-radius: 0.5em;
+		overflow-x: auto;
+		margin: 1em 0;
+	}
+
+	.response-content.markdown pre code {
+		background: none;
+		padding: 0;
+		font-size: 0.875em;
+	}
+
+	.response-content.markdown table {
+		border-collapse: collapse;
+		width: 100%;
+		margin: 1em 0;
+	}
+
+	.response-content.markdown th,
+	.response-content.markdown td {
+		border: 1px solid #e2e8f0;
+		padding: 0.5em;
+		text-align: left;
+	}
+
+	.response-content.markdown th {
+		background: #f7fafc;
+		font-weight: 600;
+	}
+
+	.response-content.markdown blockquote {
+		border-left: 4px solid #e2e8f0;
+		margin: 1em 0;
+		padding-left: 1em;
+		color: #4a5568;
+	}
+
+	.response-content.markdown strong {
+		font-weight: 600;
+	}
+
+	.response-content.markdown em {
+		font-style: italic;
+	}
+
+	.response-content.markdown ul,
+	.response-content.markdown ol {
+		padding-left: 1.5em;
+		margin: 1em 0;
+	}
+
+	/* 调整 Markdown 内容区域的样式 */
+	.response-content.markdown-body {
+		padding: 0;
+		background: transparent;
+		font-size: 0.9375rem;
+		line-height: 1.6;
+	}
+
+	.response-content.markdown-body pre {
+		background: #282c34;
+		margin: 1em 0;
+	}
+
+	.response-content.markdown-body code {
+		font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+	}
+
+	.response-content.markdown-body table {
+		display: table;
+		width: 100%;
+	}
+
+	/* 增强代码块样式 */
+	.response-content.markdown-body pre {
+		position: relative;
+		background: #f6f8fa;
+		border-radius: 6px;
+		padding: 16px;
+		margin: 8px 0;
+	}
+
+	.response-content.markdown-body pre code {
+		background: transparent;
+		padding: 0;
+		white-space: pre;
+		font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+			Liberation Mono, monospace;
+		font-size: 0.875em;
+		line-height: 1.5;
+	}
+
+	.response-content.markdown-body .hljs {
+		color: #24292e;
+		background: #f6f8fa;
+	}
+
+	/* 内联代码样式 */
+	.response-content.markdown-body code:not(pre code) {
+		padding: 0.2em 0.4em;
+		margin: 0;
+		background-color: rgba(175, 184, 193, 0.2);
+		border-radius: 6px;
+		font-size: 0.85em;
+	}
+
+	.action-buttons {
+		display: none;
+		margin-top: 0.875rem; /* 减小上边距 */
+		padding-top: 0.875rem; /* 减小上内边距 */
+		border-top: 1px solid #e2e8f0;
+		gap: 0.5rem; /* 减小按钮之间的间距 */
+	}
+
+	.left-buttons,
+	.right-buttons {
+		display: flex;
+		gap: 0.5rem; /* 减小按钮之间的间距 */
+		flex-wrap: wrap; /* 允许按钮换行 */
+	}
+
+	.left-buttons {
+		flex: 2; /* 左侧按钮组占更多空间 */
+	}
+
+	.right-buttons {
+		flex: 1;
+	}
+
+	.action-buttons button {
+		padding: 0.375rem 0.625rem; /* 减小按钮内边距 */
+		border: 1px solid #e2e8f0;
+		border-radius: 0.375rem; /* 稍微减小圆角 */
+		cursor: pointer;
+		background: #ffffff;
+		color: #3182ce;
+		font-size: 0.8125rem; /* 减小字体大小 */
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		gap: 0.25rem; /* 减小图标和文字之间的间距 */
+		font-weight: 500;
+	}
+
+	.action-buttons button:hover {
+		background: #ebf8ff;
+		border-color: #3182ce;
+		transform: translateY(-1px);
+	}
+
+	.action-buttons button:active {
+		transform: translateY(0);
+	}
+
+	.action-buttons button i {
+		font-size: 0.8125rem; /* 减小图标大小 */
+	}
+
+	.highlight-selection {
+		background-color: #b4d5fe !important;
+	}
+
+	.vertical-menu {
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: none;
+		background: white;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		border-radius: 4px;
+		width: min(220px, 16vw); /* 增加一点宽度以适应更多内容 */
+		min-width: 200px; /* 增加最小宽度 */
+		font-size: clamp(0.75rem, 3vw, 0.875rem);
+		transform-origin: top left;
+		transform: scale(clamp(0.8, 0.8 + (100vw - 800px) * 0.001, 1));
+		z-index: 9998;
+		max-height: min(500px, 40vh); /* 增加一点高度 */
+		min-height: min(300px, 25vh); /* 增加一点高度 */
+		overflow-y: auto;
+		transition: none;
+        padding-top: 0; /* 移除顶部内边距，为标签腾出空间 */
+	}
+
+	/* 标签切换样式 */
+    .menu-tabs {
+        display: flex;
+        border-bottom: 1px solid #eee;
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .menu-tab {
+        flex: 1;
+        padding: 8px;
+        text-align: center;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .menu-tab.active {
+        border-bottom: 2px solid #0078d4;
+        color: #0078d4;
+        font-weight: 500;
+    }
+
+    .menu-tab:hover:not(.active) {
+        background-color: #f5f5f5;
+    }
+	/* 暗黑模式下的标签栏 */
+	.dark-mode .menu-tabs {
+		background: #3a3a3a;
+		border-bottom-color: #505050;
+	}
+
+    /* 内容区域样式 */
+    .menu-content {
+        max-height: calc(100% - 40px);
+        overflow-y: auto;
+    }
+
+	.menu-item {
+		padding: 8px 12px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		white-space: nowrap;
+		line-height: 24px;
+	}
+
+	.menu-item:hover {
+		background-color: #f5f5f5;
+	}
+
+	.menu-item + .menu-item {
+		border-top: 1px solid #eee;
+	}
+
+    /* 自定义提示词面板样式 */
+    .custom-prompts-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        position: sticky;
+        /* top: 37px; 标签高度 */
+        background: white;
+        z-index: 1;
+    }
+
+    .add-prompt-btn, .sort-prompt-btn {
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.2s ease;
+    }
+
+    .add-prompt-btn:hover, .sort-prompt-btn:hover {
+        background: #106ebe;
+    }
+    .empty-prompts {
+        padding: 12px;
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+
+    .custom-prompt-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 8px; /* 为操作按钮留出空间 */
+    }
+
+    .prompt-content {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .prompt-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .prompt-action {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .prompt-action:hover {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+	.ql-customButton::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f1c5"; /* 表格图标的 Unicode */
+		margin-right: 0.5rem;
+	}
+
+	.ql-exportMd::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f56d";
+		margin-right: 0.5rem;
+	}
+
+	.export-menu {
+		position: absolute;
+		display: none;
+		background: white;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		border-radius: 0.25rem;
+		z-index: 1000;
+	}
+	
+	.export-menu-item {
+		padding: 0.5rem 1rem;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	.export-menu-item + .export-menu-item {
+		border-top: 1px solid #eee;
+	}
+
+	.ql-export {
+		position: relative;
+		width: 1.75rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ql-export::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f56e"; /* 导出图标的 Unicode */
+		font-weight: 900;
+		font-size: 0.875rem;
+	}
+
+	.ql-export:hover {
+		color: #06c;
+	}
+
+	/* 表格按钮样式 */
+	.ql-table {
+		position: relative;
+		width: 1.75rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.ql-table:hover {
+		color: #06c;
+	}
+
+	.test-markdown-btn:hover {
+		background: #66b1ff;
+	}
+
+	/* 编辑器背景色 */
+	.ql-container.ql-snow {
+		background-color: #ffffff;
+		border: 0 none;
+	}
+
+	.ql-toolbar.ql-snow {
+		background-color: #ffffff;
+	}
+
+	/* body背景色 */
+	body {
+		margin: 0;
+		padding: 0;
+		background-color: #f9fafd;
+	}
+
+	.ql-undo,
+	.ql-redo {
+		position: relative;
+		width: 1.75rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ql-undo::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f0e2"; /* undo 图标 */
+		font-weight: 900;
+		font-size: 0.875rem;
+	}
+
+	.ql-redo::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f01e"; /* redo 图标 */
+		font-weight: 900;
+		font-size: 0.875rem;
+	}
+
+	.ql-undo:hover,
+	.ql-redo:hover {
+		color: #06c;
+	}
+	.ql-editor td[data-header="true"] {
+		font-weight: bold;
+		background: #f3f4f6;
+	}
+
+	#diffContainer {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 9999;
+		display: none;
+		align-items: center;
+		justify-content: center;
+	}
+
+	#diffWrapper {
+		width: 90%;
+		height: 80vh;
+		background: #fffffe;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		border: 2px solid #4a8eff; /* Add border to the diff editor wrapper */
+	}
+
+	#diffEditor {
+		flex: 1;
+	}
+
+	.diff-actions {
+		padding: 1rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		background: #fffffe;
+		border-top: 2px solid #0078d4;
+
+	}
+
+	.diff-btn {
+		padding: 0.5rem 1rem;
+		border: none;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		font-size: 0.875rem;
+		transition: all 0.2s;
+	}
+
+	.diff-btn.confirm {
+		background: #0078d4;
+		color: white;
+	}
+	.diff-btn.insert {
+		background: #0078d4;
+		color: white;
+	}
+	.diff-btn.confirm:hover {
+		background: #106ebe;
+	}
+	.diff-btn.insert:hover {
+		background: #106ebe;
+	}
+	.diff-btn.cancel {
+		background: #4c4c4c;
+		color: white;
+	}
+
+	.diff-btn.cancel:hover {
+		background: #3c3c3c;
+	}
+	.ql-copy-content {
+		position: relative;
+		width: 1.75rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ql-copy-content::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f0c5";
+		font-weight: 900;
+		font-size: 0.875rem;
+	}
+
+	.ql-copy-content:hover {
+		color: #06c;
+	}
+	.ql-creation-time,
+	.ql-word-count {
+		flex:1;
+		display: flex;
+		justify-content: flex-end;
+		font-size: 0.875rem;
+		color: #777;
+		line-height: 1.5rem;
+	}
+
+	.ai-response-copy-btn,
+	.ai-response-regenerate-btn,
+	.ai-response-header {
+		display: none;
+	}
+	.ql-import {
+		position: relative;
+		width: 1.75rem;
+		height: 1.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.ql-import::before {
+		font-family: "Font Awesome 5 Free";
+		content: "\f574"; /* 使用 file-upload 图标替换原来的 file-import */
+		font-weight: 900;
+		font-size: 0.875rem;
+	}
+
+	.ql-import:hover {
+		color: #06c;
+	}
+	.ql-editor .ql-code-block-container {
+		background: white !important;
+		color: #2d3748 !important;
+		padding: 1rem;
+		margin: 1rem 0;
+	}
+
+	/* 增加代码块样式的优先级 */
+	.ql-editor pre.ql-syntax,
+	.ql-editor .ql-code-block-container {
+		background: #f6f8fa !important; /* 使用 !important 确保背景色不被覆盖 */
+		color: #24292e !important;
+	}
+
+	/* 确保代码块内的文本颜色不受影响 */
+	.ql-editor pre.ql-syntax *,
+	.ql-editor .ql-code-block-container * {
+		color: inherit !important;
+	}
+
+	/* 修改代码块样式 */
+	.ql-editor pre.ql-syntax,
+	.ql-editor .ql-code-block-container {
+		background: #f6f8fa;
+		color: #24292e;
+		padding: 1rem;
+		margin: 1rem 0;
+	}
+
+	/* 确保选中背景色在代码块中也能显示 */
+	.ql-editor [style*="background-color: rgb(180, 213, 254)"] {
+		background-color: #b4d5fe !important;
+	}
+
+	/* Dark Mode Styles */
+	.dark-mode .editor-container {
+	background-color: #1e1e1e;
+	scroll-behavior: smooth;
+	}
+
+	.dark-mode .ql-toolbar.ql-snow {
+	background-color: #252526;
+	border-color: #404040;
+	}
+
+	.dark-mode .ql-container.ql-snow {
+	background-color: #1e1e1e;
+	}
+
+	.dark-mode .ql-editor {
+	color: #d4d4d4;
+	}
+
+	.dark-mode .ql-editor h1,
+	.dark-mode .ql-editor h2,
+	.dark-mode .ql-editor h3 {
+	color: #e0e0e0;
+	}
+
+	.dark-mode .ql-snow .ql-stroke {
+	stroke: #d4d4d4;
+	}
+
+	.dark-mode .ql-snow .ql-fill {
+	fill: #d4d4d4;
+	}
+
+	.dark-mode .ql-snow .ql-picker {
+	color: #d4d4d4;
+	}
+	.ql-picker-options {
+        z-index: 20; /* 确保下拉菜单在tooltip上方 */
+    }
+    
+    /* 当下拉框打开时隐藏tooltip */
+    .ql-picker.ql-expanded:hover::after {
+        display: none;
+    }
+    
+    /* 当悬浮在下拉选项上时也隐藏tooltip */
+    .ql-picker.ql-expanded .ql-picker-options:hover + .tooltip::after {
+        display: none;
+    }
+    
+    /* 确保下拉选项悬浮时不显示父元素的tooltip */
+    .ql-picker-item:hover + .tooltip::after,
+    .ql-picker-item:hover ~ .tooltip::after {
+        display: none;
+    }
+	.dark-mode .floating-input {
+	background: #252526;
+	}
+
+	.dark-mode .input-container textarea {
+	background: #1e1e1e;
+	border-color: #404040;
+	color: #d4d4d4;
+	}
+
+	.dark-mode .ai-response {
+	background: #252526;
+	border-color: #404040;
+	}
+
+	.dark-mode .vertical-menu {
+	background: #4b5563;
+	border-color: #404040;
+	}
+
+    /* 暗黑模式下的标签栏 */
+    .dark-mode .menu-tabs {
+        background: #3a3a3a;
+        border-bottom-color: #505050;
+    }
+
+    .dark-mode .menu-tab {
+        color: #d4d4d4;
+    }
+
+    .dark-mode .menu-tab.active {
+        color: #0078d4;
+        border-bottom-color: #0078d4;
+    }
+
+    .dark-mode .menu-tab:hover:not(.active) {
+        background-color: #4b5563;
+    }
+
+    .dark-mode .custom-prompts-header {
+        background: #4b5563;
+    }
+
+    .dark-mode .empty-prompts {
+        color: #a0a0a0;
+    }
+
+    .dark-mode .prompt-action {
+        color: #a0a0a0;
+    }
+
+    .dark-mode .prompt-action:hover {
+        background-color: #505050;
+        color: #d4d4d4;
+    }
+
+	.dark-mode .menu-item {
+	color: #d4d4d4;
+	}
+
+	.dark-mode .menu-item:hover {
+	background-color: #323233;
+	}
+
+	.dark-mode .ql-editor pre.ql-syntax,
+	.dark-mode .ql-editor .ql-code-block-container {
+	background: #2d2d2d !important;
+	color: #d4d4d4 !important;
+	}
+
+	.dark-mode .action-buttons button {
+	background: #2d2d2d;
+	border-color: #404040;
+	color: #d4d4d4;
+	}
+
+	.dark-mode .action-buttons button:hover {
+	background: #3e3e3e;
+	}
+
+	/* 修改暗黑模式下的选中高亮颜色 */
+	.dark-mode .highlight-selection {
+	background-color: rgba(38, 79, 120, 0.4) !important;
+	}
+
+	.dark-mode .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
+	background-color: rgba(38, 79, 120, 0.4) !important;
+	}
+
+	.dark-mode .ql-container .ql-editor::selection,
+	.dark-mode .ql-container .ql-editor *::selection {
+	background-color: #264f78;
+	}
+
+	/* 修改暗黑模式下 AI 回答区域的文本颜色 */
+	.dark-mode .response-content {
+	color: #d4d4d4;
+	}
+
+	.dark-mode .response-content.markdown {
+	color: #d4d4d4;
+	}
+
+	.dark-mode .response-content.markdown code {
+	background: #2d2d2d;
+	color: #d4d4d4;
+	}
+
+	.dark-mode .response-content.markdown blockquote {
+	color: #a0aec0;
+	}
+
+	/* 确保代码块在暗黑模式下也保持正确的颜色 */
+	.dark-mode .response-content.markdown-body pre code {
+	color: #d4d4d4;
+	background: transparent !important;
+	}
+
+	/* 确保暗黑模式下内联代码的背景色和文字颜色 */
+	.dark-mode .response-content.markdown-body code:not(pre code) {
+	background-color: rgba(255, 255, 255, 0.1);
+	color: #d4d4d4;
+	}
+
+	/* 修改暗黑模式下 AI 回答区域的代码块样式 */
+	.dark-mode .response-content.markdown pre,
+	.dark-mode .response-content.markdown-body pre {
+	background: #1e1e1e !important;
+	border: 1px solid #404040;
+	}
+
+	.dark-mode .response-content.markdown pre code,
+	.dark-mode .response-content.markdown-body pre code {
+	color: #d4d4d4 !important;
+	background: transparent !important;
+	}
+
+	/* 修改代码块内的语法高亮颜色 */
+	.dark-mode .response-content.markdown-body .hljs {
+	color: #d4d4d4;
+	background: #1e1e1e;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-keyword {
+	color: #569cd6;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-string {
+	color: #ce9178;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-comment {
+	color: #6a9955;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-function {
+	color: #dcdcaa;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-number {
+	color: #b5cea8;
+	}
+
+	.dark-mode .response-content.markdown-body .hljs-literal {
+	color: #569cd6;
+	}
+
+	/* 自定义标题样式，去除加粗效果 */
+	.markdown-body .md-heading-no-bold {
+		font-weight: normal;
+		color: inherit;
+	}
+	
+	/* 为标题提供适当的区分度 */
+/* 	.markdown-body h1.md-heading-no-bold {
+		font-size: 2em;
+		margin-top: 1em;
+		margin-bottom: 0.5em;
+		border-bottom: 1px solid #eaecef;
+		padding-bottom: 0.3em;
+	}
+	
+	.markdown-body h2.md-heading-no-bold {
+		font-size: 1.5em;
+		margin-top: 1em;
+		margin-bottom: 0.5em;
+		border-bottom: 1px solid #eaecef;
+		padding-bottom: 0.3em;
+	}
+	
+	.markdown-body h3.md-heading-no-bold {
+		font-size: 1.25em;
+		margin-top: 1em;
+		margin-bottom: 0.5em;
+	}
+	
+	.markdown-body h4.md-heading-no-bold {
+		font-size: 1em;
+		margin-top: 1em;
+		margin-bottom: 0.5em;
+	} */
+	.dark-mode .editor-container {
+		&::-webkit-scrollbar-track {
+			background: #2d2d2d;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #505050;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: #666;
+		}
+	}
+	/* Dark Mode Table Styles */
+	.dark-mode .ql-editor table {
+		border-collapse: collapse;
+		width: 100%;
+		margin-bottom: 1em;
+	}
+
+	.dark-mode .ql-editor table td,
+	.dark-mode .ql-editor table th {
+		border: 1px solid #d4d4d4;
+		padding: 8px;
+	}
+
+	.dark-mode .ql-editor table th {
+		background-color: #2d2d2d;
+		color: #d4d4d4;
+	}
+
+	.dark-mode .ql-editor table tr:nth-child(even) {
+		background-color: #252526;
+	}
+
+	.dark-mode .ql-editor table tr:hover {
+		background-color: #323233;
+	}
+	.dark-mode .ql-table-menu {
+		background-color: #252526;
+		border: 1px solid #404040;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	.dark-mode .ql-table-menu__item {
+		color: #d4d4d4;
+	}
+
+	.dark-mode .ql-table-menu__item:hover {
+		background-color: #323233;
+	}
+
+	.dark-mode .ql-table-menu__item-text {
+		color: #d4d4d4;
+	}
+
+	.dark-mode .ql-table-menu__item-icon svg path[fill="#595959"] {
+		fill: #d4d4d4;
+	}
+	/* Tooltip */
+	.tooltip {
+		position: relative;
+	}
+
+	.tooltip:hover::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		top: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 4px 8px;
+		background: rgba(0, 0, 0, 0.75);
+		color: white;
+		font-size: 12px;
+		white-space: nowrap;
+		border-radius: 4px;
+		z-index: 1000;
+	}
+
+	.dark-mode .tooltip:hover::after {
+		background: rgba(255, 255, 255, 0.9);
+		color: black;
+	}
+
+	/* 修复 Font Awesome 图标在工具栏中的垂直对齐问题 */
+	.ql-copy-content::before,
+	.ql-import::before,
+	.ql-export::before {
+		position: relative;
+		bottom: 3px; 
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		vertical-align: middle;
+	}
+
+	/* 保证图标容器不被挤压 */
+	.ql-copy-content,
+	.ql-import,
+	.ql-export {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	/* 颜色选择器的样式 */
+	.ql-color .ql-picker-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.75rem;
+        height: 1.5rem;
+    }
+
+    .ql-color .ql-picker-label svg {
+        width: 18px;
+        height: 18px;
+        transform: scale(1.1); 
+    }
+
+    .dark-mode .ql-color .ql-picker-label svg .ql-stroke {
+        stroke: #d4d4d4;
+    }
+    
+    .dark-mode .ql-color .ql-picker-options {
+        background-color: #252526;
+        border-color: #404040;
+    }
+    
+    .ql-picker-label::before,
+    .ql-copy-content::before,
+    .ql-import::before,
+    .ql-export::before,
+    .ql-color .ql-picker-label svg {
+        position: relative;
+        /* bottom: 0; */
+        vertical-align: middle;
+    }
+	/* 在 header 按钮前添加分隔线 */
+	.ql-header:before {
+		content: "";
+		position: absolute;
+		left: 0.1rem; /* 调整分隔线与按钮的距离 */
+		top: 50%;
+		transform: translateY(-50%);
+		height: 1.5rem;
+		width: 1px;
+		background-color: #e8e8e8;
+		z-index: 0;
+		pointer-events: none; /* 防止分隔线干扰鼠标事件 */
+	}
+
+	/* 暗黑模式下的分隔线颜色 */
+	.dark-mode .ql-header:before {
+		background-color: #404040;
+	}
+	 /* 所有下拉菜单在暗黑模式下的样式 */
+	.dark-mode .ql-picker.ql-expanded .ql-picker-label {
+        color: #d4d4d4;
+    }
+
+    /* 暗黑模式下拉菜单样式统一处理 */
+    .dark-mode .ql-picker-options {
+        background-color: #252526;
+        border-color: #404040;
+    }
+    
+    .dark-mode .ql-picker-item {
+        color: #d4d4d4;
+    }
+    
+    .dark-mode .ql-picker-item:hover {
+        color: #ffffff;
+    }
+    
+    .dark-mode .ql-picker-item.ql-selected {
+        color: #409eff;
+    }
+    
+    /* 标题选择器特别处理 */
+    .dark-mode .ql-header .ql-picker-label,
+    .dark-mode .ql-header .ql-picker-item {
+        color: #d4d4d4;
+    }
+    
+    .dark-mode .ql-header .ql-picker-label::before,
+    .dark-mode .ql-header .ql-picker-item::before {
+        color: #d4d4d4;
+    }
+    
+    .dark-mode .ql-header .ql-picker-item:hover {
+        color: #ffffff;
+    }
+    
+    .dark-mode .ql-header .ql-picker-item.ql-selected,
+    .dark-mode .ql-header .ql-picker-label.ql-selected {
+        color: #409eff;
+    }
+    
+    /* 确保下拉箭头颜色在暗黑模式下能看清 */
+    .dark-mode .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
+        fill: #d4d4d4;
+    }
+    
+	/* 针对颜色选择器本身的悬停效果 */
+	.ql-color.ql-picker:hover .ql-picker-label .ql-stroke {
+		stroke: #06c;
+	}
+
+	.ql-color.ql-picker:hover .ql-picker-label .ql-fill {
+		fill: #06c;
+	}
+
+	/* 针对颜色选择器中的SVG路径元素 */
+	.ql-color.ql-picker:hover .ql-picker-label svg polyline.ql-stroke {
+		stroke: #06c;
+	}
+	
+	.ql-color.ql-picker:hover .ql-picker-label svg line.ql-stroke {
+		stroke: #06c;
+	}
+
+	/* 颜色选择器展开时隐藏工具提示 */
+	.ql-color.ql-expanded.tooltip::after {
+		display: none;
+	}
+
+	/* 当颜色选择器展开时，阻止工具提示显示 */
+	.ql-color.ql-expanded.tooltip:hover::after {
+		display: none;
+	}
+	/* 针对暗色模式下的占位符颜色 */
+	.dark-mode .ql-editor.ql-blank::before {
+		color: rgba(255, 255, 255, 0.6);
+	}
+	.writing-editor.dark-mode,
+	.editor-container.dark-mode {
+		background-color: #1e1e1e;
+	}
+	.dark-mode .input-container textarea {
+		background: #1e1e1e;
+		border-color: #0078d4;
+		box-shadow: 0 0 0 1px #0078d4;
+		color: #d4d4d4;
+		border-width: 1px;
+		border-style: solid;
+		outline: none;
+		
+		// Add subtle transition
+		transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		
+		&:hover {
+		  border-color: #606060;
+		}
+	}
+	.dark-mode .input-container textarea::placeholder {
+		color: #666;
+	}
+	.highlight-overlay {
+		pointer-events: none;
+		border-radius: 2px;
+		transition: opacity 0.2s ease;
+	}
+	.dark-mode .ql-header .ql-picker-options {
+    	background-color: #4b5563;
+	}
+
+	/* 解决链接编辑框被侧边栏遮挡的问题 */
+	.ql-editing[data-mode="link"] {
+		left: 0 !important; /* 确保不被侧边栏遮挡 */
+	}
+  
+	/* 确保暗黑模式下的样式一致 */
+	&.dark-mode .ql-tooltip.ql-editing[data-mode="link"] {
+		background-color: #252526;
+		border-color: #404040;
+		color: #d4d4d4;
+		input[type="text"] {
+		background-color: #1e1e1e;
+		color: #d4d4d4;
+		border-color: #404040;
+		}
+	}
+	.ql-editor.hiding-placeholder::before {
+		display: none !important;
+	}
+	.dark-mode .menu-tab {
+		color: #d4d4d4;
+	}
+
+	.dark-mode .menu-tab.active {
+		color: #0078d4;
+		border-bottom-color: #0078d4;
+	}
+
+	.dark-mode .menu-tab:hover:not(.active) {
+		background-color: #4b5563;
+	}
+
+	.dark-mode .empty-prompts {
+		color: #a0a0a0;
+	}
+	.prompt-divider {
+		height: 1px;
+		background-color: #eee;
+		margin: 0;
+		width: 100%;
+	}
+
+	/* 暗黑模式下的分隔线 */
+	.dark-mode .prompt-divider {
+		background-color: #404040;
+	}
+}
+.n-modal-container {
+    z-index: 10001 !important; 
+}
+
+.n-modal-mask {
+    z-index: 10000 !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.n-card-header {
+    z-index: 10002 !important; 
+}
+
+.n-modal {
+    z-index: 10001 !important;
+}
+.n-message-container {
+    z-index: 10003 !important; 
+}

@@ -1,8 +1,10 @@
+import type { ChatCompletedResponse, ChatPartResponse } from '../api/api.ts'
+import type { Chat, Message } from './database'
 import { computed, ref } from 'vue'
-import { Chat, db, Message } from './database'
-import { historyMessageLength, currentModel, useConfig } from './appConfig'
+import { useApi } from '../api/api.ts'
+import { currentModel, historyMessageLength } from './appConfig'
+import { db } from './database'
 import { useAI } from './useAI.ts'
-import { ChatCompletedResponse, ChatPartResponse, useApi } from './api.ts'
 
 interface ChatExport extends Chat {
   messages: Message[]
@@ -81,16 +83,100 @@ export function useChats() {
   const setActiveChat = (chat: Chat) => (activeChat.value = chat)
   const setMessages = (newMessages: Message[]) => (messages.value = newMessages)
 
-  const initialize = async () => {
+  const switchModel = async (model: string) => {
+    currentModel.value = model
+    if (!activeChat.value)
+      return
+
     try {
-      chats.value = await dbLayer.getAllChats()
-      if (chats.value.length > 0) {
-        await switchChat(sortedChats.value[0].id!)
-      } else {
-        await startNewChat('New chat')
+      await dbLayer.updateChat(activeChat.value.id!, { model })
+      activeChat.value.model = model
+    }
+    catch (error) {
+      console.error(`Failed to switch model to ${model}:`, error)
+    }
+  }
+
+  const startAiMessage = async (initialContent: string, chatId: number) => {
+    const message: Message = {
+      chatId,
+      role: 'assistant',
+      content: initialContent,
+      createdAt: new Date(),
+    }
+
+    try {
+      message.id = await dbLayer.addMessage(message)
+      ongoingAiMessages.value.set(chatId, message)
+      messages.value.push(message)
+    }
+    catch (error) {
+      console.error('Failed to start AI message:', error)
+    }
+  }
+
+  const appendToAiMessage = async (content: string, chatId: number) => {
+    const aiMessage = ongoingAiMessages.value.get(chatId)
+    if (aiMessage) {
+      aiMessage.content += content
+      try {
+        await dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
       }
-    } catch (error) {
-      console.error('Failed to initialize chats:', error)
+      catch (error) {
+        console.error('Failed to append to AI message:', error)
+      }
+    }
+  }
+
+  const firstMessage = ref(false)
+
+  const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
+    const aiMessage = ongoingAiMessages.value.get(chatId)
+    if (aiMessage) {
+      aiMessage.content += data.message.content
+      try {
+        dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
+      }
+      catch (error) {
+        console.error('Failed to update AI message:', error)
+      }
+    }
+  }
+
+  const handleAiCompletion = async (data: ChatCompletedResponse, chatId: number) => {
+    firstMessage.value = false
+    const aiMessage = ongoingAiMessages.value.get(chatId)
+    if (aiMessage) {
+      try {
+        // 更新消息，移除isStreaming状态
+        aiMessage.isStreaming = false
+        await dbLayer.updateMessage(aiMessage.id!, {
+          content: aiMessage.content,
+          isStreaming: false,
+        })
+        ongoingAiMessages.value.delete(chatId)
+      }
+      catch (error) {
+        console.error('Failed to finalize AI message:', error)
+      }
+    }
+  }
+
+  const startNewChat = async (name: string) => {
+    const newChat: Chat = {
+      name,
+      model: currentModel.value || 'moonshot-v1-8k',
+      createdAt: new Date(),
+    }
+
+    try {
+      newChat.id = await dbLayer.addChat(newChat)
+      chats.value.push(newChat)
+      setActiveChat(newChat)
+      setMessages([])
+    }
+    catch (error) {
+      console.error('Failed to start a new chat:', error)
     }
   }
 
@@ -105,52 +191,47 @@ export function useChats() {
           await switchModel(activeChat.value.model)
         }
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Failed to switch to chat with ID ${chatId}:`, error)
     }
   }
 
-  const switchModel = async (model: string) => {
-    currentModel.value = model
-    if (!activeChat.value) return
-
+  const initialize = async () => {
     try {
-      await dbLayer.updateChat(activeChat.value.id!, { model })
-      activeChat.value.model = model
-    } catch (error) {
-      console.error(`Failed to switch model to ${model}:`, error)
+      chats.value = await dbLayer.getAllChats()
+
+      if (chats.value.length === 0) {
+        await startNewChat('New Chat')
+      }
+      else {
+        await switchChat(sortedChats.value[0].id!)
+      }
+
+      if (!currentModel.value || currentModel.value === 'none') {
+        currentModel.value = 'moonshot-v1-8k'
+      }
+    }
+    catch (error) {
+      console.error('Failed to initialize chats:', error)
+      await startNewChat('New Chat')
     }
   }
 
   const renameChat = async (newName: string) => {
-    if (!activeChat.value) return
+    if (!activeChat.value)
+      return
 
     activeChat.value.name = newName
     await dbLayer.updateChat(activeChat.value.id!, { name: newName })
     chats.value = await dbLayer.getAllChats()
   }
 
-  const startNewChat = async (name: string) => {
-    const newChat: Chat = {
-      name,
-      model: currentModel.value,
-      createdAt: new Date(),
-    }
-
-    try {
-      newChat.id = await dbLayer.addChat(newChat)
-      chats.value.push(newChat)
-      setActiveChat(newChat)
-      setMessages([])
-      await addSystemMessage(await useConfig().getCurrentSystemMessage())
-    } catch (error) {
-      console.error('Failed to start a new chat:', error)
-    }
-  }
-
   const addSystemMessage = async (content: string | null, meta?: any) => {
-    if (!activeChat.value) return
-    if (!content) return
+    if (!activeChat.value)
+      return
+    if (!content)
+      return
 
     const systemPromptMessage: Message = {
       chatId: activeChat.value.id!,
@@ -166,7 +247,7 @@ export function useChats() {
     systemPrompt.value = systemPromptMessage
   }
 
-  const addUserMessage = async (content: string) => {
+  const addUserMessage = async (content: string, imageUrl?: string | null) => {
     if (!activeChat.value) {
       console.warn('There was no active chat.')
       return
@@ -179,20 +260,39 @@ export function useChats() {
       content,
       createdAt: new Date(),
     }
+    if (imageUrl) {
+      message.imageUrl = imageUrl
+    }
 
     try {
       message.id = await dbLayer.addMessage(message)
       messages.value.push(message)
 
+      // 创建一个带有加载状态的AI消息
+      const aiMessage: Message = {
+        chatId: currentChatId,
+        role: 'assistant',
+        content: '', // 初始内容为空
+        createdAt: new Date(),
+        isStreaming: true, // 标记为正在加载状态
+      }
+      aiMessage.id = await dbLayer.addMessage(aiMessage)
+      messages.value.push(aiMessage)
+      ongoingAiMessages.value.set(currentChatId, aiMessage)
+
+      // 重置firstMessage标志，因为我们已经创建了消息
+      firstMessage.value = true
+
       await generate(
         currentModel.value,
-        messages.value,
+        messages.value.slice(0, -1), // 去掉最后一个空的AI消息，避免影响上下文
         systemPrompt.value,
         historyMessageLength.value,
-        (data) => handleAiPartialResponse(data, currentChatId),
-        (data) => handleAiCompletion(data, currentChatId),
+        data => handleAiPartialResponse(data, currentChatId),
+        data => handleAiCompletion(data, currentChatId),
       )
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -205,11 +305,13 @@ export function useChats() {
   }
 
   const regenerateResponse = async () => {
-    if (!activeChat.value) return
+    if (!activeChat.value)
+      return
     const currentChatId = activeChat.value.id!
     const message = messages.value[messages.value.length - 1]
     if (message && message.role === 'assistant') {
-      if (message.id) db.messages.delete(message.id)
+      if (message.id)
+        db.messages.delete(message.id)
       messages.value.pop()
     }
     try {
@@ -218,10 +320,11 @@ export function useChats() {
         messages.value,
         systemPrompt.value,
         historyMessageLength.value,
-        (data) => handleAiPartialResponse(data, currentChatId),
-        (data) => handleAiCompletion(data, currentChatId),
+        data => handleAiPartialResponse(data, currentChatId),
+        data => handleAiCompletion(data, currentChatId),
       )
-    } catch (error) {
+    }
+    catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -229,26 +332,6 @@ export function useChats() {
         }
       }
       console.error('Failed to regenerate response:', error)
-    }
-  }
-
-  const handleAiPartialResponse = (data: ChatPartResponse, chatId: number) => {
-    ongoingAiMessages.value.has(chatId)
-      ? appendToAiMessage(data.message.content, chatId)
-      : startAiMessage(data.message.content, chatId)
-  }
-
-  const handleAiCompletion = async (data: ChatCompletedResponse, chatId: number) => {
-    const aiMessage = ongoingAiMessages.value.get(chatId)
-    if (aiMessage) {
-      try {
-        ongoingAiMessages.value.delete(chatId)
-      } catch (error) {
-        console.error('Failed to finalize AI message:', error)
-      }
-    } else {
-      console.error('no ongoing message to finalize:')
-      debugger
     }
   }
 
@@ -264,7 +347,8 @@ export function useChats() {
       ongoingAiMessages.value.clear()
 
       await startNewChat('New chat')
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Failed to wipe the database:', error)
     }
   }
@@ -274,61 +358,28 @@ export function useChats() {
       await dbLayer.deleteChat(chatId)
       await dbLayer.deleteMessagesOfChat(chatId)
 
-      chats.value = chats.value.filter((chat) => chat.id !== chatId)
+      chats.value = chats.value.filter(chat => chat.id !== chatId)
 
       if (activeChat.value?.id === chatId) {
         if (sortedChats.value.length) {
           await switchChat(sortedChats.value[0].id!)
-        } else {
+        }
+        else {
           await startNewChat('New chat')
         }
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error(`Failed to delete chat with ID ${chatId}:`, error)
-    }
-  }
-
-  const startAiMessage = async (initialContent: string, chatId: number) => {
-    const message: Message = {
-      chatId: chatId,
-      role: 'assistant',
-      content: initialContent,
-      createdAt: new Date(),
-    }
-
-    try {
-      message.id = await dbLayer.addMessage(message)
-      ongoingAiMessages.value.set(chatId, message)
-      messages.value.push(message)
-    } catch (error) {
-      console.error('Failed to start AI message:', error)
-    }
-  }
-
-  const appendToAiMessage = async (content: string, chatId: number) => {
-    const aiMessage = ongoingAiMessages.value.get(chatId)
-    if (aiMessage) {
-      aiMessage.content += content
-      try {
-        await dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
-
-        // Only "load the messages" if we are on this chat atm.
-        if (chatId == activeChat.value?.id) {
-          setMessages(await dbLayer.getMessages(chatId))
-        }
-      } catch (error) {
-        console.error('Failed to append to AI message:', error)
-      }
-    } else {
-      console.log('No ongoing AI message?')
     }
   }
 
   const exportChats = async () => {
     const chats = await dbLayer.getAllChats()
     const exportData: ChatExport[] = []
-    await Promise.all(chats.map(async chat => {
-      if (!chat?.id) return
+    await Promise.all(chats.map(async (chat) => {
+      if (!chat?.id)
+        return
       const messages = await dbLayer.getMessages(chat.id)
       exportData.push(Object.assign({ messages }, chat))
     }))
@@ -336,23 +387,26 @@ export function useChats() {
   }
 
   const importChats = async (jsonData: ChatExport[]) => {
-    jsonData.forEach(async chatData => {
+    jsonData.forEach(async (chatData) => {
       const chat: Chat = {
         name: chatData?.name,
         model: chatData?.model,
-        createdAt: new Date(chatData?.createdAt || chatData.messages[0].createdAt),
+        createdAt: new Date(chatData?.createdAt || (chatData.messages && chatData.messages.length > 0 ? chatData.messages[0].createdAt : Date.now())),
       }
       chat.id = await dbLayer.addChat(chat)
       chats.value.push(chat)
-      chatData.messages.forEach(async messageData => {
-        const message: Message = {
-          chatId: chat.id!,
-          role: messageData.role,
-          content: messageData.content,
-          createdAt: new Date(messageData.createdAt),
-        }
-        await dbLayer.addMessage(message)
-      })
+      if (chatData.messages) {
+        chatData.messages.forEach(async (messageData) => {
+          const message: Message = {
+            chatId: chat.id!,
+            role: messageData.role,
+            content: messageData.content,
+            imageUrl: messageData.imageUrl,
+            createdAt: new Date(messageData.createdAt),
+          }
+          await dbLayer.addMessage(message)
+        })
+      }
     })
   }
 

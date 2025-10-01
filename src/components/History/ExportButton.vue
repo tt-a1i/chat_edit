@@ -3,13 +3,13 @@ import { useChats } from '../../services/chat.ts'
 
 const { exportChats } = useChats()
 
-const downloadChats = async () => {
+async function downloadChats() {
   const exportData = await exportChats()
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `ollama-chats-${Date.now()}.json`
+  a.download = `chats-${Date.now()}.json`
   document.body.appendChild(a)
   a.click()
   URL.revokeObjectURL(url)

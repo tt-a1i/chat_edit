@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import { IconFileExport, IconUpload, IconLayoutSidebarRightCollapse, IconTrashX } from '@tabler/icons-vue'
-import ToggleInput from './Inputs/ToggleInput.vue'
-import TextInput from './Inputs/TextInput.vue'
-import ExportButton from './History/ExportButton.vue'
-import ImportButton from './History/ImportButton.vue'
+import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
 import {
+  apiKey,
   baseUrl,
-  historyMessageLength,
   enableMarkdown,
-  showSystem,
   gravatarEmail,
+  historyMessageLength,
+  showSystem,
   toggleSettingsPanel,
 } from '../services/appConfig.ts'
 import { useChats } from '../services/chat.ts'
+import ExportButton from './History/ExportButton.vue'
+import ImportButton from './History/ImportButton.vue'
+import TextInput from './Inputs/TextInput.vue'
+import ToggleInput from './Inputs/ToggleInput.vue'
 
-const { wipeDatabase } =
-  useChats()
+const { wipeDatabase }
+  = useChats()
 
-const confirmWipe = () => {
+function confirmWipe() {
   if (confirm('Delete all chat history?')) {
     wipeDatabase()
   }
@@ -31,14 +32,16 @@ const confirmWipe = () => {
     >
       <div class="mb-4 flex items-center gap-x-2 px-2 text-gray-900 dark:text-gray-100">
         <button
-          @click="toggleSettingsPanel()"
           class="inline-flex rounded-lg p-1 hover:bg-gray-100 hover:dark:bg-gray-700"
+          @click="toggleSettingsPanel()"
         >
           <IconLayoutSidebarRightCollapse class="h-6 w-6" />
 
           <span class="sr-only">Close settings sidebar</span>
         </button>
-        <h2 class="text-lg font-medium">Settings</h2>
+        <h2 class="text-lg font-medium">
+          Settings
+        </h2>
       </div>
 
       <!-- More Settings -->
@@ -46,27 +49,28 @@ const confirmWipe = () => {
         class="mb-4 border-t border-gray-200 px-2 py-4 text-gray-900 dark:border-gray-700 dark:text-gray-100"
       >
         <div>
-          <ToggleInput label="Enable Markdown" v-model="enableMarkdown" />
-          <ToggleInput label="Show System messages" v-model="showSystem" />
+          <ToggleInput v-model="enableMarkdown" label="Enable Markdown" />
+          <ToggleInput v-model="showSystem" label="Show System messages" />
         </div>
 
-        <TextInput id="base-url" label="Base URL" v-model="baseUrl" />
+        <TextInput id="base-url" v-model="baseUrl" label="Base URL" />
+        <TextInput id="api-key" v-model="apiKey" label="API Key" />
 
-        <TextInput id="gravatar-email" label="Gravatar Email" v-model="gravatarEmail" />
+        <TextInput id="gravatar-email" v-model="gravatarEmail" label="Gravatar Email" />
 
         <div>
           <label for="chat-history-length" class="mb-2 mt-4 block px-2 text-sm font-medium">
             Conversation History Size
           </label>
           <input
+            id="chat-history-length"
+            v-model="historyMessageLength"
             type="number"
             min="0"
             max="100"
-            id="chat-history-length"
-            v-model="historyMessageLength"
             class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
             placeholder="2048"
-          />
+          >
         </div>
 
         <div v-if="false">
@@ -75,12 +79,12 @@ const confirmWipe = () => {
               Max tokens
             </label>
             <input
+              id="max-tokens"
               type="number"
               disabled
-              id="max-tokens"
               class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
               placeholder="2048"
-            />
+            >
           </div>
 
           <div>
@@ -88,12 +92,12 @@ const confirmWipe = () => {
               Temperature
             </label>
             <input
+              id="temperature"
               type="number"
               disabled
-              id="temperature"
               class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
               placeholder="0.7"
-            />
+            >
           </div>
 
           <div>
@@ -101,16 +105,15 @@ const confirmWipe = () => {
               Top P
             </label>
             <input
+              id="top-p"
               type="number"
               disabled
-              id="top-p"
               class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
               placeholder="1"
-            />
+            >
           </div>
         </div>
       </div>
-
 
       <div
         class="mt-auto px-2 space-y-2 text-gray-900 dark:text-gray-100"
@@ -130,8 +133,8 @@ const confirmWipe = () => {
           Export chats
         </ExportButton>
         <button
-          @click="confirmWipe"
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          @click="confirmWipe"
         >
           <IconTrashX class="size-4 opacity-50 group-hover:opacity-80" />
 
