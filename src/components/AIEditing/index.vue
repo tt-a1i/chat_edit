@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
 import type { PromptTemplate } from './constants/prompts'
+import { createImporter } from '@/lib/export/import'
+import { initMonaco } from '@/lib/monaco/config'
 import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAIEditorActions } from './composables/useAIEditorActions'
@@ -10,8 +12,6 @@ import { useEditorEventListeners } from './composables/useEditorEventListeners'
 import { useFileOperations } from './composables/useFileOperations'
 import { useQuillEditor } from './composables/useQuillEditor'
 import { SYSTEM_PROMPTS } from './constants/prompts'
-import { createImporter } from './import'
-import { initMonaco } from './monacoConfig'
 import {
   calculateMenuPosition,
   clearHighlight,
@@ -315,7 +315,7 @@ async function handleExport(format: 'markdown' | 'docx' | 'pdf') {
   if (!quill) return
 
   try {
-    const { createExporter } = await import('./export')
+    const { createExporter } = await import('@/lib/export')
     const content = quill.root.innerHTML
     const exporter = createExporter(content, quill)
     await exporter.exportAs(format)
