@@ -69,7 +69,7 @@ function copyToClipboard() {
         >{{ message.content }}</code>
         <div
           v-else-if="message.content"
-          class="prose prose-sm dark:prose-invert prose-p:my-1.5 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-xs prose-pre:text-sm"
+          class="prose prose-sm dark:prose-invert prose-p:my-0 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-xs prose-pre:text-sm prose-ul:my-0 prose-ol:my-0 [&_*:first-child]:mt-0 [&_*:last-child]:mb-0"
         >
           <!-- 思考过程 -->
           <details

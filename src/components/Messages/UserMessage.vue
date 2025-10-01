@@ -54,7 +54,7 @@ function copyToClipboard() {
           >{{ message.content }}</code>
           <div
             v-else
-            class="prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400"
+            class="prose prose-sm dark:prose-invert prose-p:my-0 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-ul:my-0 prose-ol:my-0 prose-pre:my-0 [&_*:first-child]:mt-0 [&_*:last-child]:mb-0"
           >
             <Markdown :source="message.content" />
           </div>

@@ -195,10 +195,23 @@ onMounted(() => {
   scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
 }
 
+/* 统一亮色和暗色模式的边距 */
+.dark .prose > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.dark .prose p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /* 改进暗色模式下的代码块样式 */
 .dark .prose pre {
   background-color: rgba(30, 41, 59, 0.95) !important;
   border-color: rgba(71, 85, 105, 0.5) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .dark .prose code {

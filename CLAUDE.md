@@ -387,3 +387,26 @@ No test framework currently configured. No test files exist in the repository.
 - 使用 Playwright 或 Cypress 进行 E2E 测试
 - 优先为核心业务逻辑（`services/chat.ts`, `services/useAI.ts`）编写测试
 - 使用 Chrome DevTools MCP 进行手动集成测试和调试
+
+## Git 和 PR 配置
+
+### Commit 消息格式
+
+创建 commit 时，**不要**包含 Claude Code 相关信息。使用简洁的 commit 消息格式：
+
+```
+feat: 功能描述
+
+- 修改点 1
+- 修改点 2
+```
+
+**❌ 不要包含**:
+- `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
+- `Co-Authored-By: Claude <noreply@anthropic.com>`
+
+### Pull Request 格式
+
+创建 PR 时，使用以下格式，**不要**包含 Claude Code 信息：
+
+**保持简洁专业，不包含任何工具生成标记。**
