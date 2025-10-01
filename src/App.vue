@@ -5,7 +5,7 @@ import AIEditingMain from './components/AIEditing/index.vue'
 import ChatInput from './components/chat/ChatInput.vue'
 import ChatMessages from './components/chat/ChatMessages.vue'
 import SystemPrompt from './components/chat/SystemPrompt.vue'
-import ModelSelector from './components/common/ModelSelector.vue'
+import CompactModelSelector from './components/common/CompactModelSelector.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/Inputs/TextInput.vue'
 import Settings from './components/Settings.vue'
@@ -72,40 +72,57 @@ onMounted(() => {
 
       <!-- Chat Scene -->
       <div v-if="currentScene === SCENES.CHAT" class="mx-auto flex h-screen w-full flex-col">
-        <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
+        <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-4xl flex-col gap-4 px-4 pb-4">
           <SystemPrompt />
         </div>
 
-        <div v-else class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
-          <div class="flex w-full flex-row items-center justify-center gap-4 rounded-b-xl bg-gray-100 px-4 py-2 dark:bg-gray-800/95 border-b dark:border-gray-700">
-            <div v-if="currentChat" class="mr-auto flex h-full items-center">
-              <div>
-                <div v-if="isEditingChatName">
-                  <TextInput
-                    id="chat-name"
-                    ref="chatNameInput"
-                    v-model="editedChatName"
-                    @keyup.enter="confirmRename"
-                    @keyup.esc="cancelEditing"
-                    @blur="cancelEditing"
-                  />
-                </div>
+        <div v-else class="mx-auto flex h-screen w-full max-w-4xl flex-col px-4 pb-4">
+          <!-- 紧凑型顶部栏 -->
+          <div class="flex w-full items-center justify-between border-b px-2 py-2.5 dark:border-gray-700">
+            <!-- 左侧：场景标识 -->
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Chat</span>
+              <span class="text-gray-400 dark:text-gray-600">•</span>
+              <CompactModelSelector />
+            </div>
 
+            <!-- 右侧：快捷操作（可选） -->
+            <div v-if="currentChat" class="flex items-center gap-1">
+              <button
+                v-if="!isEditingChatName"
+                type="button"
+                title="重命名会话"
+                class="rounded-lg px-2 py-1 text-xs text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                @click.prevent="startEditing"
+              >
+                {{ currentChat.name }}
+              </button>
+              <div v-else class="flex items-center gap-1">
+                <TextInput
+                  id="chat-name"
+                  ref="chatNameInput"
+                  v-model="editedChatName"
+                  class="w-32 text-xs"
+                  @keyup.enter="confirmRename"
+                  @keyup.esc="cancelEditing"
+                />
                 <button
-                  v-else
-                  type="button"
-                  class="block h-full rounded border-none p-2 text-gray-900 decoration-gray-400 decoration-dashed outline-none hover:underline focus:ring-2 focus:ring-blue-600 dark:text-gray-100 dark:focus:ring-blue-600"
-                  @click.prevent="startEditing"
+                  class="rounded px-1.5 py-0.5 text-xs text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
+                  @click="confirmRename"
                 >
-                  {{ currentChat.name }}
+                  ✓
+                </button>
+                <button
+                  class="rounded px-1.5 py-0.5 text-xs text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                  @click="cancelEditing"
+                >
+                  ✕
                 </button>
               </div>
             </div>
-
-            <ModelSelector />
           </div>
 
-          <ChatMessages />
+          <ChatMessages class="mt-4" />
           <ChatInput />
         </div>
       </div>
@@ -115,9 +132,23 @@ onMounted(() => {
         <AIEditingMain />
       </div>
 
-      <transition name="slide">
-        <Settings v-if="isSettingsOpen" />
-      </transition>
+      <!-- 设置模态窗口 -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isSettingsOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          @click.self="appStore.toggleSettingsPanel()"
+        >
+          <Settings />
+        </div>
+      </Transition>
     </main>
   </div>
 </template>

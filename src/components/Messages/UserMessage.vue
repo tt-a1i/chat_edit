@@ -26,42 +26,56 @@ function copyToClipboard() {
 </script>
 
 <template>
-  <div class="group flex flex-row-reverse items-start px-2 py-0.5 sm:px-3 sm:py-1 mb-1.5 relative">
+  <div class="group flex flex-row-reverse items-start gap-3 px-2 py-2 sm:px-4">
+    <!-- 头像 -->
     <img
       v-if="avatarUrl"
       :src="avatarUrl"
-      class="w-7 h-7 rounded-full shadow-sm ring-1 ring-offset-1 ring-indigo-200 dark:ring-indigo-700 object-cover ml-2 sm:ml-2.5 mt-0.5"
+      class="h-8 w-8 flex-shrink-0 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-700"
       alt="avatar"
     >
     <div
       v-else
-      class="w-7 h-7 rounded-full shadow-sm flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-sm font-semibold ml-2 sm:ml-2.5 mt-0.5"
+      class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white shadow-sm"
     >
       U
     </div>
 
-    <div class="bg-blue-600 dark:bg-blue-700 text-white rounded-md shadow-sm p-1.5 max-w-3xl relative">
-      <code
-        v-if="!enableMarkdown"
-        class="whitespace-pre-line text-sm"
-      >{{ message.content }}</code>
+    <!-- 消息气泡 -->
+    <div class="relative max-w-[75%] sm:max-w-2xl">
       <div
-        v-else
-        class="prose prose-xs sm:prose-sm dark:prose-invert prose-headings:font-medium prose-headings:my-1 prose-p:text-white prose-p:my-0.5 prose-a:text-blue-200 hover:prose-a:underline prose-code:bg-blue-500 prose-code:text-white prose-code:px-1 prose-code:rounded prose-pre:bg-blue-800 prose-pre:text-white prose-pre:p-2"
+        class="rounded-2xl px-4 py-3 shadow-sm"
+        style="background-color: var(--message-user-bg); border: 1px solid var(--message-user-border);"
       >
-        <Markdown :source="message.content" />
+        <code
+          v-if="!enableMarkdown"
+          class="whitespace-pre-line text-sm leading-relaxed text-gray-900 dark:text-gray-100"
+        >{{ message.content }}</code>
+        <div
+          v-else
+          class="prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 prose-a:text-blue-600 dark:prose-a:text-blue-400"
+        >
+          <Markdown :source="message.content" />
+        </div>
+
+        <!-- 图片 -->
+        <div v-if="message.imageUrl" class="mt-3">
+          <img
+            :src="message.imageUrl"
+            alt="用户上传的图片"
+            class="max-h-64 rounded-lg object-contain shadow-sm"
+          >
+        </div>
       </div>
-      <!-- Display image if imageUrl exists -->
-      <div v-if="message.imageUrl" class="mt-2">
-        <img :src="message.imageUrl" alt="User uploaded image" class="max-w-xs max-h-64 rounded-md object-contain">
-      </div>
+
+      <!-- 复制按钮 -->
       <button
         title="复制"
-        class="absolute -bottom-1.5 -right-1.5 p-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-110 active:scale-95"
+        class="absolute -bottom-2 -right-2 rounded-full bg-white p-1.5 text-gray-500 opacity-0 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-50 active:scale-95 group-hover:opacity-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
         @click="copyToClipboard"
       >
-        <CheckIcon v-if="copied" class="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
-        <ClipboardDocumentIcon v-else class="w-3.5 h-3.5" />
+        <CheckIcon v-if="copied" class="h-4 w-4 text-green-600 dark:text-green-400" />
+        <ClipboardDocumentIcon v-else class="h-4 w-4" />
       </button>
     </div>
   </div>

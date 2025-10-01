@@ -1,0 +1,224 @@
+/**
+ * 设计令牌（Design Tokens）
+ * 统一管理颜色、间距、字体、阴影等视觉规范
+ */
+
+:root {
+  /* ========== 主色系统 ========== */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
+
+  /* ========== 中性色系统 ========== */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* ========== 语义色 ========== */
+  --success-50: #ecfdf5;
+  --success-500: #10b981;
+  --success-600: #059669;
+
+  --warning-50: #fffbeb;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
+
+  --danger-50: #fef2f2;
+  --danger-500: #ef4444;
+  --danger-600: #dc2626;
+
+  /* ========== 亮色模式应用色 ========== */
+  --bg-primary: #ffffff;
+  --bg-secondary: var(--gray-50);
+  --bg-tertiary: var(--gray-100);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-600);
+  --text-tertiary: var(--gray-500);
+  --text-inverse: #ffffff;
+
+  --border-light: var(--gray-200);
+  --border-medium: var(--gray-300);
+  --border-dark: var(--gray-400);
+
+  /* 消息气泡颜色 */
+  --message-user-bg: var(--primary-50);
+  --message-user-border: var(--primary-200);
+  --message-ai-bg: #ffffff;
+  --message-ai-border: var(--gray-200);
+  --message-system-bg: var(--warning-50);
+  --message-system-border: var(--warning-200);
+
+  /* ========== 间距规范 ========== */
+  --space-xs: 0.25rem;   /* 4px */
+  --space-sm: 0.5rem;    /* 8px */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+
+  /* ========== 圆角规范 ========== */
+  --radius-sm: 0.25rem;  /* 4px - 小组件（标签） */
+  --radius-md: 0.5rem;   /* 8px - 按钮、输入框 */
+  --radius-lg: 0.75rem;  /* 12px - 卡片 */
+  --radius-xl: 1rem;     /* 16px - 对话框 */
+  --radius-2xl: 1.25rem; /* 20px - 大容器 */
+  --radius-full: 9999px; /* 圆形 */
+
+  /* ========== 阴影规范 ========== */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* ========== Z-index 层级 ========== */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-tooltip: 1060;
+  --z-notification: 1070;
+
+  /* ========== 字体规范 ========== */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'Courier New', monospace;
+
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ========== 过渡动画 ========== */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ========== 布局规范 ========== */
+  --sidebar-width: 16rem;        /* 256px */
+  --sidebar-collapsed-width: 4rem; /* 64px */
+  --header-height: 3.5rem;       /* 56px */
+  --input-height: 2.75rem;       /* 44px */
+  --max-content-width: 48rem;    /* 768px */
+}
+
+/* ========== 暗色模式 ========== */
+.dark {
+  /* 暗色模式背景 */
+  --dark-bg-primary: #1a1b1e;
+  --dark-bg-secondary: #25262b;
+  --dark-bg-tertiary: #2c2e33;
+  --dark-bg-elevated: #373a40;
+  --dark-bg-overlay: rgba(0, 0, 0, 0.7);
+
+  /* 暗色模式文本 */
+  --dark-text-primary: #f8f9fa;
+  --dark-text-secondary: #c1c2c5;
+  --dark-text-tertiary: #909296;
+  --dark-text-inverse: var(--gray-900);
+
+  /* 暗色模式边框 */
+  --dark-border-light: #373a40;
+  --dark-border-medium: #424347;
+  --dark-border-dark: #4c4f52;
+
+  /* 应用暗色模式变量 */
+  --bg-primary: var(--dark-bg-primary);
+  --bg-secondary: var(--dark-bg-secondary);
+  --bg-tertiary: var(--dark-bg-tertiary);
+  --bg-overlay: var(--dark-bg-overlay);
+
+  --text-primary: var(--dark-text-primary);
+  --text-secondary: var(--dark-text-secondary);
+  --text-tertiary: var(--dark-text-tertiary);
+  --text-inverse: var(--dark-text-inverse);
+
+  --border-light: var(--dark-border-light);
+  --border-medium: var(--dark-border-medium);
+  --border-dark: var(--dark-border-dark);
+
+  /* 暗色模式消息气泡 */
+  --message-user-bg: rgba(59, 130, 246, 0.15);
+  --message-user-border: rgba(59, 130, 246, 0.3);
+  --message-ai-bg: var(--dark-bg-secondary);
+  --message-ai-border: var(--dark-border-light);
+  --message-system-bg: rgba(245, 158, 11, 0.15);
+  --message-system-border: rgba(245, 158, 11, 0.3);
+
+  /* 暗色模式阴影 */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+/* ========== 全局样式重置 ========== */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--dark-border-medium);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--dark-border-dark);
+}
+
+/* Firefox 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-300) transparent;
+}
+
+.dark * {
+  scrollbar-color: var(--dark-border-medium) transparent;
+}

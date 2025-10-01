@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { SCENES, useAppStore, useChatStore } from '@/stores'
+import { formatSmartTime, simplifyModelName } from '@/utils/format'
 import {
   IconEdit,
   IconMessageCode,
@@ -14,9 +15,9 @@ import { storeToRefs } from 'pinia'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
-const { currentScene, isDarkMode, isSystemPromptOpen } = storeToRefs(appStore)
+const { currentScene, isDarkMode, isSystemPromptOpen, isSidebarCollapsed } = storeToRefs(appStore)
 const { sortedChats, currentChat } = storeToRefs(chatStore)
-const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode } = appStore
+const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode, toggleSidebar } = appStore
 const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
 
 function onNewChat() {
@@ -43,21 +44,42 @@ function _toggleAIEditing() {
   }
 }
 
-const lang = navigator.language
+// 格式化聊天元数据（时间 + 模型）
+function formatChatMeta(chat: typeof sortedChats.value[number]): string {
+  const time = formatSmartTime(chat.createdAt)
+  const model = simplifyModelName(chat.model)
+  return `${time} • ${model}`
+}
 </script>
 
 <template>
-  <aside class="flex">
+  <aside
+    class="flex transition-all duration-300 ease-in-out"
+    :class="isSidebarCollapsed ? 'w-16' : 'w-60 sm:w-64'"
+  >
     <div
-      class="flex h-screen w-60 flex-col overflow-y-auto border-r border-gray-200 bg-white pt-2 dark:border-gray-800 dark:bg-gray-900 sm:h-screen sm:w-64"
+      class="flex h-screen flex-col overflow-y-auto border-r border-gray-200 bg-white pt-2 dark:border-gray-800 dark:bg-gray-900 relative"
+      :class="isSidebarCollapsed ? 'w-16' : 'w-full'"
     >
+      <!-- 折叠按钮 -->
+      <button
+        class="absolute top-2 -right-3 z-10 h-6 w-6 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 shadow-md transition-colors"
+        :title="isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'"
+        @click="toggleSidebar"
+      >
+        <svg class="w-4 h-4 transition-transform duration-300" :class="isSidebarCollapsed ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
       <div class="mx-2 mb-2">
         <button
           class="flex w-full items-center justify-center gap-x-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900"
+          :class="isSidebarCollapsed ? 'px-2' : 'px-4'"
+          :title="isSidebarCollapsed ? 'New Chat' : ''"
           @click="onNewChat"
         >
-          <IconPlus class="h-5 w-5" />
-          <span>New Chat</span>
+          <IconPlus class="h-5 w-5" :class="isSidebarCollapsed ? 'mx-auto' : ''" />
+          <span v-if="!isSidebarCollapsed">New Chat</span>
         </button>
       </div>
 
@@ -66,26 +88,35 @@ const lang = navigator.language
         <button
           type="button"
           class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-          :class="{ 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.CHAT }"
+          :class="[
+            { 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.CHAT },
+            isSidebarCollapsed ? 'justify-center px-2' : '',
+          ]"
+          :title="isSidebarCollapsed ? 'Chat' : ''"
           @click="switchScene(SCENES.CHAT)"
         >
           <IconMessageCode class="size-5" />
-          <span>Chat</span>
+          <span v-if="!isSidebarCollapsed">Chat</span>
         </button>
 
         <button
           type="button"
           class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
-          :class="{ 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.AI_EDITING }"
+          :class="[
+            { 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.AI_EDITING },
+            isSidebarCollapsed ? 'justify-center px-2' : '',
+          ]"
+          :title="isSidebarCollapsed ? 'AI Editing' : ''"
           @click="switchScene(SCENES.AI_EDITING)"
         >
           <IconEdit class="size-5" />
-          <span>AI Editing</span>
+          <span v-if="!isSidebarCollapsed">AI Editing</span>
         </button>
       </div>
 
       <!-- Chat history -->
       <div
+        v-if="!isSidebarCollapsed"
         class="h-full space-y-4 overflow-y-auto border-b border-gray-200 px-2 py-4 dark:border-gray-800"
       >
         <button
@@ -94,38 +125,28 @@ const lang = navigator.language
           :class="{
             'bg-gray-100 dark:bg-gray-800': currentChat?.id === chat.id,
           }"
-          class="flex w-full flex-col gap-y-1 rounded-md px-3 py-2 text-left transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          class="flex w-full flex-col gap-y-1 rounded-md px-3 py-2.5 text-left transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
           @click="onSwitchChat(chat.id!)"
           @keyup.delete="deleteChat(chat.id!)"
         >
-          <span class="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
+          <span class="text-sm font-medium leading-tight text-gray-900 dark:text-gray-100 truncate">
             {{ chat.name }}
           </span>
-          <span class="text-xs leading-none text-gray-700 dark:text-gray-300">
-            {{ chat.model }}
-          </span>
-          <span class="text-xs leading-none text-gray-700 dark:text-gray-300">
-            {{
-              chat.createdAt.toLocaleDateString(lang, {
-                day: '2-digit',
-                month: 'short',
-                weekday: 'long',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-              })
-            }}
+          <span class="text-xs leading-tight text-gray-500 dark:text-gray-400 truncate">
+            {{ formatChatMeta(chat) }}
           </span>
         </button>
       </div>      <div class="mt-auto w-full space-y-2 px-2 py-4">
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
+          :title="isSidebarCollapsed ? (isDarkMode ? 'Light Mode' : 'Dark Mode') : ''"
           @click="toggleDarkMode"
         >
           <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80" />
           <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80" />
 
-          Toggle dark mode
+          <span v-if="!isSidebarCollapsed">Toggle dark mode</span>
         </button>
         <button
           v-if="false"
@@ -136,22 +157,26 @@ const lang = navigator.language
         </button>
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
+          :title="isSidebarCollapsed ? 'System prompt' : ''"
           @click="toggleSystemPromptPanel"
         >
           <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80" />
 
-          System prompt
+          <span v-if="!isSidebarCollapsed">System prompt</span>
         </button>
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
+          :title="isSidebarCollapsed ? 'Settings' : ''"
           @click="toggleSettingsPanel"
         >
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80" />
 
-          Settings
+          <span v-if="!isSidebarCollapsed">Settings</span>
         </button>        <!-- 删除当前聊天按钮 -->
         <button
-          v-if="currentChat"
+          v-if="currentChat && !isSidebarCollapsed"
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
           @click="deleteChat(currentChat.id!)"
         >
@@ -160,10 +185,11 @@ const lang = navigator.language
         </button>
         <!-- 删除所有会话按钮 -->
         <button
-          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          v-if="!isSidebarCollapsed"
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-red-600 transition-colors duration-100 ease-in-out hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-900/20 dark:focus:ring-red-500"
           @click="wipeDatabase()"
         >
-          <IconTrashX class="size-4 opacity-50 group-hover:opacity-80" />
+          <IconTrashX class="size-4" />
           删除所有会话
         </button>
       </div>
