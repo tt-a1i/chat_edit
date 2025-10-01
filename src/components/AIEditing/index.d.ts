@@ -3,6 +3,6 @@
  */
 import type { DefineComponent } from 'vue'
 
-declare const AIEditingComponent: DefineComponent<{}, {}, any>
+declare const AIEditingComponent: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>
 
 export default AIEditingComponent

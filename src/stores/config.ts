@@ -24,7 +24,8 @@ export const useConfigStore = defineStore('config', () => {
       return config
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      logger.error('获取配置失败', err); showError('获取配置失败')
+      logger.error('获取配置失败', err)
+      showError('获取配置失败')
       return undefined
     }
   }
@@ -53,7 +54,8 @@ export const useConfigStore = defineStore('config', () => {
       await db.config.put(config)
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      logger.error('保存配置失败', err); showError('保存配置失败')
+      logger.error('保存配置失败', err)
+      showError('保存配置失败')
       throw err
     } finally {
       isLoading.value = false
@@ -66,7 +68,8 @@ export const useConfigStore = defineStore('config', () => {
       configs.value = []
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      logger.error('清除配置失败', err); showError('清除配置失败')
+      logger.error('清除配置失败', err)
+      showError('清除配置失败')
     }
   }
 
@@ -82,7 +85,8 @@ export const useConfigStore = defineStore('config', () => {
       return { modelConfig, defaultConfig }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
-      logger.error('初始化配置失败', err); showError('初始化配置失败')
+      logger.error('初始化配置失败', err)
+      showError('初始化配置失败')
       return null
     }
   }
