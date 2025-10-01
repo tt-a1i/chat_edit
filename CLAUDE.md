@@ -324,17 +324,20 @@ Chrome DevTools MCP 提供 26 个浏览器自动化和调试工具，分为以�
 }
 ```
 
-**启动命令**:
+**默认启动方式**（推荐）:
 ```bash
-# 1. 关闭所有 Chrome 实例
-pkill -f "Google Chrome"
-
-# 2. 启动带远程调试端口的 Chrome
+# 启动带远程调试端口的 Chrome（不关闭现有实例）
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
   --remote-debugging-port=9222 \
   --user-data-dir="$HOME/.chrome-debug-profile" \
   http://localhost:5173/ &
 ```
+
+**说明**:
+- 这会启动一个新的 Chrome 实例，与现有 Chrome 实例共存
+- 使用独立的配置目录 `~/.chrome-debug-profile`，不影响日常使用的 Chrome
+- 自动连接到远程调试端口 9222
+- 如果需要全新启动，可以先执行 `pkill -f "Google Chrome"` 关闭所有 Chrome 实例
 
 **安装浏览器扩展**:
 1. 在启动的 Chrome 中访问 Chrome Web Store
