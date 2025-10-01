@@ -324,7 +324,7 @@ async function handleExport(format: 'markdown' | 'docx' | 'pdf') {
       exportMenuRef.value.style.display = 'none'
     }
   } catch (error) {
-    const { AppError, ErrorCode } = await import('@/utils/errors')
+    const { AppError, ErrorCode } = await import('@/utils/error-handler')
     const { ErrorHandler } = await import('@/utils/errorHandler')
     ErrorHandler.handle(new AppError(
       ErrorCode.EXPORT_ERROR,

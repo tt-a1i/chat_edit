@@ -19,7 +19,7 @@ import type {
   ShowModelInformationResponse,
 } from './types.ts'
 import { useAppStore } from '@/stores'
-import { toError } from '@/utils/error'
+import { toError } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
 import { ref } from 'vue'
 

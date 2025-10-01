@@ -39,7 +39,6 @@ export function calculateMenuPosition(
   // 默认配置
   const {
     editorSelector = '#editor',
-    leftOffset = 30,
     topOffset = 42,
     menuHeightEstimate = 320,
     minTopSpace = 47,
