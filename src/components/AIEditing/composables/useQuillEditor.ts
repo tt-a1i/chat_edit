@@ -1,7 +1,7 @@
 import type Quill from 'quill'
 import { useEventListener } from '@vueuse/core'
 import { nextTick, ref, shallowRef } from 'vue'
-import { copyAsMarkdown, showExportMenu } from '../util'
+import { copyAsMarkdown, showExportMenu } from '../utils'
 
 /**
  * Quill 编辑器 Composable

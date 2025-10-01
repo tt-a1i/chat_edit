@@ -22,7 +22,7 @@ import {
   showDiffEditor,
   updateCreationTimeDisplay,
   updateWordCountDisplay,
-} from './util'
+} from './utils'
 import 'github-markdown-css/github-markdown.css'
 import 'katex/dist/katex.min.css'
 import 'quill-table-ui/dist/index.css'

@@ -1,7 +1,7 @@
 import type Quill from 'quill'
 import type { Ref } from 'vue'
 import { ref } from 'vue'
-import { handleSend } from '../util'
+import { handleSend } from '../utils'
 
 /**
  * AI 交互 Composable
