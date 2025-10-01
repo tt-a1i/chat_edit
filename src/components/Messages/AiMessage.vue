@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Message } from '../../services/database.ts'
-import { useAppStore } from '@/stores'
-import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
+import { useAppStore, useChatStore } from '@/stores'
+import { ArrowPathIcon, CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import AIAvatar from '../common/AIAvatar.vue'
@@ -11,11 +11,15 @@ import 'highlight.js/styles/github-dark.css'
 interface Props {
   message: Message
   isStreaming?: boolean
+  isLastMessage?: boolean
 }
 
-const { message, isStreaming = false } = defineProps<Props>()
+const { message, isStreaming = false, isLastMessage = false } = defineProps<Props>()
 const appStore = useAppStore()
+const chatStore = useChatStore()
 const { enableMarkdown } = storeToRefs(appStore)
+const { regenerateResponse } = chatStore
+
 const thought = computed(() => {
   const end = message.content.indexOf('</think>')
   if (end !== -1) {
@@ -38,6 +42,12 @@ function copyToClipboard() {
         copied.value = false
       }, 1500)
     })
+  }
+}
+
+function handleRegenerate() {
+  if (message.id) {
+    regenerateResponse(message.id)
   }
 }
 </script>
@@ -89,16 +99,32 @@ function copyToClipboard() {
         </div>
       </div>
 
-      <!-- 复制按钮 -->
-      <button
+      <!-- 操作按钮栏 -->
+      <div
         v-if="!message.isStreaming && !isStreaming && message.content"
-        title="复制"
-        class="absolute -bottom-2 -left-2 rounded-full bg-white p-1.5 text-gray-500 opacity-0 shadow-sm transition-all duration-200 hover:scale-110 hover:bg-gray-50 active:scale-95 group-hover:opacity-100 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
-        @click="copyToClipboard"
+        class="mt-2 flex items-center gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       >
-        <CheckIcon v-if="copied" class="h-4 w-4 text-green-600 dark:text-green-400" />
-        <ClipboardDocumentIcon v-else class="h-4 w-4" />
-      </button>
+        <button
+          v-if="isLastMessage"
+          type="button"
+          title="重新生成"
+          class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+          @click="handleRegenerate"
+        >
+          <ArrowPathIcon class="h-3.5 w-3.5" />
+          <span>重新生成</span>
+        </button>
+        <button
+          type="button"
+          title="复制"
+          class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+          @click="copyToClipboard"
+        >
+          <CheckIcon v-if="copied" class="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+          <ClipboardDocumentIcon v-else class="h-3.5 w-3.5" />
+          <span>{{ copied ? '已复制' : '复制' }}</span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
