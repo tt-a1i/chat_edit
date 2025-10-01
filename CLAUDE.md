@@ -237,6 +237,92 @@ Both chat and AI editing maintain abort controllers for canceling ongoing reques
 - 移动端适配不完整
 - 缺少单元测试和E2E测试
 
+## Chrome DevTools MCP 调试工具
+
+**MCP 服务器配置**: Chrome DevTools MCP 已安装并配置
+
+### 启动和调试流程
+
+**1. 启动开发服务器**:
+```bash
+pnpm dev  # 默认运行在 http://localhost:5173/
+```
+
+**2. 使用 Chrome MCP 工具**:
+
+Chrome DevTools MCP 提供 26 个浏览器自动化和调试工具，分为以下类别：
+
+**输入自动化** (7个):
+- `click` - 点击页面元素
+- `fill` - 填充表单字段
+- `hover` - 悬停在元素上
+- `drag` - 拖拽元素
+- `fill_form` - 批量填充表单
+- `upload_file` - 上传文件
+- `handle_dialog` - 处理浏览器对话框
+
+**导航控制** (7个):
+- `navigate_page` - 打开指定 URL
+- `list_pages` - 列出所有打开的页面
+- `new_page` - 创建新页面标签
+- `close_page` - 关闭页面
+- `select_page` - 切换到指定页面
+- `navigate_page_history` - 浏览器前进/后退
+- `wait_for` - 等待元素/内容出现
+
+**调试工具** (4个):
+- `list_console_messages` - 获取浏览器控制台消息（检查错误）
+- `take_screenshot` - 截取页面截图
+- `take_snapshot` - 获取 DOM 快照
+- `evaluate_script` - 执行 JavaScript 代码
+
+**性能分析** (3个):
+- `performance_start_trace` - 开始性能追踪
+- `performance_stop_trace` - 停止追踪并获取数据
+- `performance_analyze_insight` - 分析性能洞察
+
+**网络监控** (2个):
+- `list_network_requests` - 列出所有网络请求
+- `get_network_request` - 获取特定请求详情
+
+**模拟测试** (3个):
+- `resize_page` - 调整页面尺寸（测试响应式）
+- `emulate_network` - 模拟网络条件（3G/4G/慢速）
+- `emulate_cpu` - 模拟 CPU 限制
+
+### 常见调试场景
+
+**检查运行时错误**:
+```
+请使用 Chrome MCP 打开 http://localhost:5173/ 并检查控制台错误
+```
+
+**性能分析**:
+```
+分析 http://localhost:5173/ 的页面性能指标
+```
+
+**网络请求监控**:
+```
+列出页面加载时的所有网络请求
+```
+
+**响应式测试**:
+```
+将页面调整为移动端尺寸并截图
+```
+
+### 使用示例
+
+项目启动后，可以直接使用自然语言请求 Chrome MCP 工具：
+
+1. **打开页面**: "请打开开发服务器页面"
+2. **检查错误**: "检查浏览器控制台是否有错误"
+3. **截图**: "截取当前页面的截图"
+4. **性能**: "分析页面的 LCP 和性能指标"
+
+**注意**: Chrome MCP 会在第一次使用时自动启动 Chrome 浏览器实例。
+
 ## Testing
 
 No test framework currently configured. No test files exist in the repository.
@@ -245,3 +331,4 @@ No test framework currently configured. No test files exist in the repository.
 - 考虑引入 Vitest 作为单元测试框架
 - 使用 Playwright 或 Cypress 进行 E2E 测试
 - 优先为核心业务逻辑（`services/chat.ts`, `services/useAI.ts`）编写测试
+- 使用 Chrome DevTools MCP 进行手动集成测试和调试
