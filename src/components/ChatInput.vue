@@ -5,7 +5,7 @@ import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from 
 import { useTextareaAutosize } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAI } from '../services/useAI.ts'
+import { useAI } from '../services/ai.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
 

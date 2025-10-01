@@ -2,9 +2,9 @@
  * 配置管理 Store（系统提示词等）
  */
 import type { Config } from '@/services/database'
+import { showError } from '@/composables/useToast'
 import { db } from '@/services/database'
 import { logger } from '@/utils/logger'
-import { showError } from '@/utils/toast'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 

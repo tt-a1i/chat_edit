@@ -3,7 +3,7 @@ import { useAppStore, useChatStore } from '@/stores'
 import { IconRefresh } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useAI } from '../services/useAI.ts'
+import { useAI } from '../services/ai.ts'
 
 const { disabled = false } = defineProps<Props>()
 

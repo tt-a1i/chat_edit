@@ -9,9 +9,9 @@ import ModelSelector from './components/ModelSelector.vue'
 import Settings from './components/Settings.vue'
 import Sidebar from './components/Sidebar.vue'
 import SystemPrompt from './components/SystemPrompt.vue'
-import { useAI } from './services/useAI.ts'
+import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
+import { useAI } from './services/ai.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
-import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
 
 // Stores
 const appStore = useAppStore()
