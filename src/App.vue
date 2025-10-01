@@ -76,56 +76,65 @@ onMounted(() => {
           <SystemPrompt />
         </div>
 
-        <div v-else class="mx-auto flex h-screen w-full max-w-5xl flex-col px-3 sm:px-4 lg:px-6">
-          <!-- 现代化顶部栏 -->
-          <div class="flex w-full items-center justify-between border-b bg-white/50 backdrop-blur-sm py-2.5 sm:py-3 px-2 sm:px-3 dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-10">
-            <!-- 左侧：会话信息 -->
-            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">
-                <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Chat</span>
+        <div v-else class="flex h-screen w-full flex-col">
+          <!-- 现代化顶部栏 - 全宽但内容居中 -->
+          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-10">
+            <div class="mx-auto flex max-w-5xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
+              <!-- 左侧：会话信息 -->
+              <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Chat</span>
+                </div>
+                <div class="hidden sm:block h-4 w-px bg-gray-300 dark:bg-gray-600" />
+                <CompactModelSelector />
               </div>
-              <div class="hidden sm:block h-4 w-px bg-gray-300 dark:bg-gray-600" />
-              <CompactModelSelector />
-            </div>
 
-            <!-- 右侧：会话名称 -->
-            <div v-if="currentChat" class="flex items-center gap-2 ml-2 sm:ml-4">
-              <button
-                v-if="!isEditingChatName"
-                type="button"
-                title="点击重命名会话"
-                class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs"
-                @click.prevent="startEditing"
-              >
-                {{ currentChat.name }}
-              </button>
-              <div v-else class="flex items-center gap-2">
-                <TextInput
-                  id="chat-name"
-                  ref="chatNameInput"
-                  v-model="editedChatName"
-                  class="w-48 text-sm"
-                  @keyup.enter="confirmRename"
-                  @keyup.esc="cancelEditing"
-                />
+              <!-- 右侧：会话名称 -->
+              <div v-if="currentChat" class="flex items-center gap-2 ml-2 sm:ml-4">
                 <button
-                  class="rounded-lg px-2 py-1 text-sm text-green-600 hover:bg-green-50 font-medium dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
-                  @click="confirmRename"
+                  v-if="!isEditingChatName"
+                  type="button"
+                  title="点击重命名会话"
+                  class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs"
+                  @click.prevent="startEditing"
                 >
-                  确认
+                  {{ currentChat.name }}
                 </button>
-                <button
-                  class="rounded-lg px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
-                  @click="cancelEditing"
-                >
-                  取消
-                </button>
+                <div v-else class="flex items-center gap-2">
+                  <TextInput
+                    id="chat-name"
+                    ref="chatNameInput"
+                    v-model="editedChatName"
+                    class="w-48 text-sm"
+                    @keyup.enter="confirmRename"
+                    @keyup.esc="cancelEditing"
+                  />
+                  <button
+                    class="rounded-lg px-2 py-1 text-sm text-green-600 hover:bg-green-50 font-medium dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+                    @click="confirmRename"
+                  >
+                    确认
+                  </button>
+                  <button
+                    class="rounded-lg px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                    @click="cancelEditing"
+                  >
+                    取消
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- 消息区域 - 全宽滚动，内容居中 -->
           <ChatMessages class="flex-1" />
-          <ChatInput />
+
+          <!-- 输入区域 - 全宽但内容居中 -->
+          <div class="w-full border-t bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-700">
+            <div class="mx-auto max-w-5xl px-3 sm:px-4 lg:px-6 pt-4 pb-2">
+              <ChatInput />
+            </div>
+          </div>
         </div>
       </div>
 

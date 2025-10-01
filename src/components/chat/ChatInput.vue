@@ -129,7 +129,7 @@ function clearImage() {
 </script>
 
 <template>
-  <form class="border-t bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-700 pt-4 pb-2" @submit.prevent="onSubmit">
+  <form @submit.prevent="onSubmit">
     <div class="flex px-2 flex-col sm:flex-row items-center mb-3">
       <div v-if="hasMessages" class="ml-auto">
         <button
