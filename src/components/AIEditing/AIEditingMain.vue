@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { useAI } from '../../services/useAI.ts'
 import ModelSelector from '../ModelSelector.vue'
 import NavHeader from '../NavHeader.vue'
 import AIEditingComponent from './index.vue'
-
-const { currentModel } = useAI()
 </script>
 
 <template>

@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { useAI } from '../services/useAI.ts'
 import ModelSelector from './ModelSelector.vue'
-
-const { currentModel } = useAI()
 </script>
 
 <template>

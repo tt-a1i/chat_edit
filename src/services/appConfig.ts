@@ -1,4 +1,5 @@
 import type { Config } from './database'
+import { env } from '@/config/env'
 import { useLocalStorage } from '@vueuse/core'
 import gravatarUrl from 'gravatar-url'
 import { computed, ref } from 'vue'
@@ -18,10 +19,10 @@ export const avatarUrl = computed(() => gravatarEmail.value
   ? gravatarUrl(gravatarEmail.value, { size: 200, default: '/avatar.png' })
   : null,
 )
-export const enableMarkdown = useLocalStorage('markdown', true)
-export const showSystem = useLocalStorage('systemMessages', true)
-export const baseUrl = useLocalStorage('baseUrl', 'https://api.moonshot.cn')
-export const apiKey = useLocalStorage('apiKey', 'sk-yKsCTYQTG2cRGplbTmq45V5srKN8DM2vFKJwlbv4WbDsYaET')
+export const enableMarkdown = useLocalStorage('markdown', env.enableMarkdown)
+export const showSystem = useLocalStorage('systemMessages', env.showSystemMessages)
+export const baseUrl = useLocalStorage('baseUrl', env.apiBaseUrl)
+export const apiKey = useLocalStorage('apiKey', env.apiKey)
 export const isDarkMode = useLocalStorage('darkMode', true)
 export const isSettingsOpen = useLocalStorage('settingsPanelOpen', true)
 export const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
