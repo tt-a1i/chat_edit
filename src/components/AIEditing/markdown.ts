@@ -1,9 +1,9 @@
-import MarkdownIt from 'markdown-it'
-import mdKatex from 'markdown-it-texmath'
-import mdLinkAttrs from 'markdown-it-link-attributes'
 import hljs from 'highlight.js'
-import 'highlight.js/styles/github.css'
 import katex from 'katex'
+import MarkdownIt from 'markdown-it'
+import mdLinkAttrs from 'markdown-it-link-attributes'
+import mdKatex from 'markdown-it-texmath'
+import 'highlight.js/styles/github.css'
 
 // 配置数学公式渲染规则
 function renderKatex(latex: string, displayMode = false): string {
@@ -13,8 +13,7 @@ function renderKatex(latex: string, displayMode = false): string {
       throwOnError: false,
       strict: false,
     })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('KaTeX error:', error)
     return latex
   }
@@ -34,8 +33,7 @@ export function createMarkdownRenderer() {
           return `<pre class="hljs"><code class="language-${lang}">${
             hljs.highlight(str, { language: lang }).value
           }</code></pre>`
-        }
-        catch {}
+        } catch {}
       }
       return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
     },
@@ -60,8 +58,9 @@ export function createMarkdownRenderer() {
       const start = state.pos
       const max = state.posMax
 
-      if (state.src[start] !== '$')
+      if (state.src[start] !== '$') {
         return false
+      }
 
       let pos = start + 1
       let found = false
@@ -74,8 +73,9 @@ export function createMarkdownRenderer() {
         pos++
       }
 
-      if (!found || pos === start + 1)
+      if (!found || pos === start + 1) {
         return false
+      }
 
       const content = state.src.slice(start + 1, pos)
       if (!silent) {
@@ -93,22 +93,25 @@ export function createMarkdownRenderer() {
       const start = state.bMarks[startLine] + state.tShift[startLine]
       const max = state.eMarks[startLine]
 
-      if (state.src.slice(start, start + 2) !== '$$')
+      if (state.src.slice(start, start + 2) !== '$$') {
         return false
+      }
 
       const pos = start + 2
       let firstLine = state.src.slice(pos, max)
 
-      if (silent)
+      if (silent) {
         return true
+      }
 
       let nextLine = startLine
       let endPos = -1
 
       while (nextLine < endLine) {
         nextLine++
-        if (nextLine >= endLine)
+        if (nextLine >= endLine) {
           break
+        }
 
         const lineStart = state.bMarks[nextLine] + state.tShift[nextLine]
         const lineMax = state.eMarks[nextLine]

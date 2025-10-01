@@ -44,7 +44,7 @@ interface Props {
         <option :value="undefined" disabled selected>
           选择模型
         </option>
-        <option v-for="model in availableModels" :value="model.name" class="dark:bg-gray-800">
+        <option v-for="model in availableModels" :key="model.name" :value="model.name" class="dark:bg-gray-800">
           {{ model.name }}
         </option>
       </select>

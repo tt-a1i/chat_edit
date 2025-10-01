@@ -1,25 +1,20 @@
 <script setup>
-import { NButton, NCard, NInput, NModal, NSpace, NText, NTooltip, NUpload, NUploadDragger } from 'naive-ui'
+import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import Quill from 'quill'
 import * as QuillTableUI from 'quill-table-ui'
-import { nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import * as AIEditingAPI from './api.ts'
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { createExporter } from './export'
 import { createImporter } from './import'
 import { renderMarkdown } from './markdown'
 import {
   initMonaco,
 } from './monacoConfig'
-import { loadEditorContent, saveEditorContent } from './storage'
 import {
   checkEmptyLine,
   clearHighlight,
   closeDiffEditor,
   copyAsMarkdown,
   createTimeAndWordCountDisplay,
-  ensureElementsVisible,
-  getCurrentTime,
   handleOutsideClick,
   handleRegenerate,
   handleSend,
@@ -167,8 +162,7 @@ async function handleFileUpload(options) {
 
     // 如果编辑器为空，直接处理导入
     await processImport(file.file)
-  }
-  catch (error) {
+  } catch (error) {
     console.error('导入过程中发生错误:', error)
     window.$message.error('导入失败')
     uploading.value = false
@@ -187,12 +181,10 @@ async function processImport(fileObj) {
 
     window.$message.success('导入成功')
     showUploadModal.value = false
-  }
-  catch (error) {
+  } catch (error) {
     console.error('导入失败:', error)
     window.$message.error('导入失败')
-  }
-  finally {
+  } finally {
     uploading.value = false
   }
 }
@@ -284,8 +276,9 @@ onMounted(() => {
     }
 
     const prompt = hiddenPrompt.value || promptInputRef.value
-    if (!prompt)
+    if (!prompt) {
       return
+    }
 
     hiddenPrompt.value = ''
 
@@ -312,8 +305,9 @@ onMounted(() => {
       isGenerating,
       abortController,
       onResponse: (response) => {
-        if (!responseContent)
+        if (!responseContent) {
           return
+        }
 
         if (response.error) {
           responseContent.classList.remove('loading')
@@ -363,7 +357,6 @@ onMounted(() => {
     const aiResponseText = responseContent?.getAttribute('data-original-text')
 
     if (!currentRange || !aiResponseText) {
-      // eslint-disable-next-line no-console
       console.log('No selection range or AI response')
       return
     }
@@ -417,7 +410,6 @@ onMounted(() => {
   })
   document.getElementById('compare')?.addEventListener('click', () => {
     if (!monacoLoaded) {
-      // eslint-disable-next-line no-console
       console.log('Monaco Editor is still loading...')
       return
     }
@@ -429,7 +421,6 @@ onMounted(() => {
       .querySelector('.response-content')
       ?.getAttribute('data-original-text') || ''
     if (!selectedText || !aiResponseText) {
-      // eslint-disable-next-line no-console
       console.log('No selected text or AI response')
       return
     }
@@ -508,8 +499,9 @@ onMounted(() => {
         isGenerating,
         abortController,
         onResponse: (response) => {
-          if (!responseContent)
+          if (!responseContent) {
             return
+          }
           handleResponseUpdate(response.text, responseContent)
         },
       })
@@ -538,10 +530,9 @@ onMounted(() => {
         const exporter = createExporter(content, quillInstance)
         await exporter.exportAs(format)
         exportMenuRef.style.display = 'none'
-      }
-      catch (error) {
+      } catch (error) {
         const format = item.dataset.format
-        // eslint-disable-next-line no-console
+
         console.log(format)
         console.error(`Export to ${format} failed:`, error)
       }
@@ -737,8 +728,7 @@ function initQuillEditor() {
           if (resversed) {
             floatingInputRef.style.top = 'auto'
             floatingInputRef.style.bottom = `${containerRect.height - adjustTop + floatingInputRef.offsetHeight + 5}px`
-          }
-          else {
+          } else {
             floatingInputRef.style.top = `${adjustTop + 5}px`
             floatingInputRef.style.bottom = 'auto'
           }
@@ -746,8 +736,7 @@ function initQuillEditor() {
           if (resversed) {
             verticalMenuRef.style.top = `auto`
             verticalMenuRef.style.bottom = `${containerRect.height - adjustTop + floatingInputRef.offsetHeight * 2 + 10}px`
-          }
-          else {
+          } else {
             verticalMenuRef.style.top = `${adjustTop + floatingInputRef.offsetHeight + 10}px`
             verticalMenuRef.style.bottom = 'auto'
           }
@@ -767,8 +756,7 @@ function initQuillEditor() {
           if (resversed) {
             aiResponseRef.style.top = `auto`
             aiResponseRef.style.bottom = `${floatingInputRef.offsetHeight + 5}px`
-          }
-          else {
+          } else {
             aiResponseRef.style.top = `${floatingInputRef.offsetHeight + 5}px`
             aiResponseRef.style.bottom = 'auto'
           }
@@ -777,8 +765,7 @@ function initQuillEditor() {
           // nextTick(() => {
           //   ensureElementsVisible([floatingInputRef, verticalMenuRef], editorContainer)
           // })
-        }
-        else if (!range) {
+        } else if (!range) {
           // 检查点击是否在相关组件内
           const isInRelevantComponent = floatingInputRef.contains(document.activeElement)
             || verticalMenuRef.contains(document.activeElement)
@@ -842,8 +829,9 @@ function initQuillEditor() {
       quill.root.addEventListener('keydown', async (e) => {
         if (e.key === '/') {
           const selection = quill.getSelection()
-          if (!selection)
+          if (!selection) {
             return
+          }
 
           const [line, _offset] = quill.getLine(selection.index)
           const text = line.domNode.textContent
@@ -878,8 +866,7 @@ function initQuillEditor() {
         }
       })
     })
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error initializing Quill editor:', error)
   }
 }
@@ -899,8 +886,7 @@ function autoResize(event) {
   if (textarea.value.includes('\n')) {
     textarea.style.height = 'auto'
     textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`
-  }
-  else {
+  } else {
     textarea.style.height = '2.5rem' // 单行时保持固定高度
   }
 }
@@ -916,8 +902,7 @@ function handlePromptKeydown(e) {
       const end = input.selectionEnd
       input.value = `${input.value.substring(0, start)}\n${input.value.substring(end)}`
       input.selectionStart = input.selectionEnd = start + 1
-    }
-    else {
+    } else {
       // Enter: 触发发送
       e.preventDefault()
       sendBtnRef?.click()
@@ -926,8 +911,9 @@ function handlePromptKeydown(e) {
 }
 
 function handleResponseUpdate(text, responseContent) {
-  if (!responseContent)
+  if (!responseContent) {
     return
+  }
   responseContent.classList.add('markdown-body')
   responseContent.style.display = 'block'
   responseContent.style.alignItems = 'flex-start'
@@ -966,12 +952,14 @@ function handleMenuItemClick(prompt) {
 }
 function updateEditorPlaceholder() {
   setTimeout(() => {
-    if (!quill)
+    if (!quill) {
       return
+    }
 
     const container = quill.container
-    if (!container)
+    if (!container) {
       return
+    }
 
     const placeholderElement = container.querySelector('.ql-editor[data-placeholder]')
     if (placeholderElement) {
@@ -999,8 +987,9 @@ function updateEditorPlaceholder() {
 function updateToolbarTooltips() {
   setTimeout(() => {
     const toolbarElement = toolbar || document.querySelector('.ql-toolbar')
-    if (!toolbarElement)
+    if (!toolbarElement) {
       return
+    }
 
     const toolbarButtons = {
       '.ql-header': '标题',

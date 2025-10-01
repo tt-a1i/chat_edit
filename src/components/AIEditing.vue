@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useAI } from '../services/useAI.ts'
 import ModelSelector from './ModelSelector.vue'
 

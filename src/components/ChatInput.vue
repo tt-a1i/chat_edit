@@ -48,8 +48,7 @@ function onSubmit() {
     if (isSystemMessage.value) {
       // System messages typically don't have images, but you could adapt if needed
       addSystemMessage(userInput.value.trim())
-    }
-    else {
+    } else {
       addUserMessage(userInput.value.trim(), selectedImage.value).then(() => { // Pass selectedImage
         isAiResponding.value = false
       })

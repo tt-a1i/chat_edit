@@ -55,8 +55,7 @@ export function useAI() {
     await generateChat({ model, messages: apiMessages }, (data: ChatResponse) => {
       if (!data.done && onMessage) {
         onMessage(data as ChatPartResponse)
-      }
-      else if (data.done && onDone) {
+      } else if (data.done && onDone) {
         onDone(data as ChatCompletedResponse)
       }
     })

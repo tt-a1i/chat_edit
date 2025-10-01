@@ -59,8 +59,7 @@ class DocumentImporter {
       html = html.replace(/<p(?! class)/g, '<p class="ql-align-left"')
 
       return html
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error importing Word document:', error)
       throw new Error('Failed to import Word document')
     }

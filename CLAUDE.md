@@ -59,8 +59,8 @@ pnpm format
 The app operates in two distinct scenes controlled by `services/appConfig.ts`:
 
 ```typescript
-SCENES.CHAT        // Traditional chat interface
-SCENES.AI_EDITING  // Rich text editor with AI features
+SCENES.CHAT // Traditional chat interface
+SCENES.AI_EDITING // Rich text editor with AI features
 ```
 
 Scene switching happens through `switchScene()` which updates `currentScene.value` and manages panel visibility.

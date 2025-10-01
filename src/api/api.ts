@@ -1,4 +1,3 @@
-import type { Message } from '../services/database.ts'
 import type {
   ChatPartResponse,
   ChatRequest,
@@ -83,8 +82,7 @@ export function useApi() {
         }
 
         return await processStreamResponse(response, request.model, onDataReceived)
-      }
-      catch (err) {
+      } catch (err) {
         console.error('生成聊天内容时出错:', err)
         error.value = err
         return []
@@ -110,8 +108,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('创建模型时出错:', err)
         error.value = err
         throw err
@@ -139,8 +136,7 @@ export function useApi() {
             size: 0,
           })),
         }
-      }
-      catch (err) {
+      } catch (err) {
         console.error('获取模型列表时出错:', err)
         error.value = err
         // 返回默认模型列表以防止完全失败
@@ -177,8 +173,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('获取模型信息时出错:', err)
         error.value = err
         throw err
@@ -199,8 +194,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('复制模型时出错:', err)
         error.value = err
         throw err
@@ -223,8 +217,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('删除模型时出错:', err)
         error.value = err
         throw err
@@ -245,8 +238,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('下载模型时出错:', err)
         error.value = err
         throw err
@@ -267,8 +259,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('上传模型时出错:', err)
         error.value = err
         throw err
@@ -294,8 +285,7 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
+      } catch (err) {
         console.error('生成嵌入向量时出错:', err)
         error.value = err
         throw err
@@ -310,13 +300,14 @@ export function useApi() {
     onDataReceived: (data: any) => void,
   ): Promise<ChatResponse[]> {
     const reader = response.body?.getReader()
-    let results: ChatResponse[] = []
+    const results: ChatResponse[] = []
 
     if (reader) {
       while (true) {
         const { done, value } = await reader.read()
-        if (done)
+        if (done) {
           break
+        }
 
         const chunk = new TextDecoder().decode(value)
         const lines = chunk.split('\n').filter(line => line.trim() !== '')
@@ -369,8 +360,7 @@ export function useApi() {
                 }
                 onDataReceived(completedResponse)
               }
-            }
-            catch (e) {
+            } catch (e) {
               console.error('解析 SSE 消息失败:', e)
             }
           }

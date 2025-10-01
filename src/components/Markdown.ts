@@ -13,8 +13,7 @@ const md = new MarkdownIt({
         return `<pre class="hljs"><code>${
           hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
         }</code></pre>`
-      }
-      catch (__) {}
+      } catch (__) {}
     }
     // 对于未知语言，使用普通文本高亮
     return `<pre class="hljs dark:bg-gray-800"><code>${md.utils.escapeHtml(str)}</code></pre>`

@@ -20,8 +20,7 @@ const thought = computed(() => {
       message.content.substring('<think>'.length, end),
       message.content.substring(end + '</think>'.length),
     ]
-  }
-  else {
+  } else {
     return [null, message.content]
   }
 })

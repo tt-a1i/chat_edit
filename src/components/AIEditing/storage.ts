@@ -1,4 +1,3 @@
-
 // 防抖函数
 function debounce(func: (...args: any[]) => void, wait: number) {
   let timeout: ReturnType<typeof setTimeout> | null = null
@@ -9,8 +8,9 @@ function debounce(func: (...args: any[]) => void, wait: number) {
       func(...args)
     }
 
-    if (timeout)
+    if (timeout) {
       clearTimeout(timeout)
+    }
     timeout = setTimeout(later, wait)
   }
 }
@@ -19,8 +19,7 @@ function debounce(func: (...args: any[]) => void, wait: number) {
 const debouncedSaveToServer = debounce(async (sessionId: string, content: string) => {
   try {
     await AIEditingAPI.saveDraft(sessionId, content)
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Failed to save content to server:', error)
   }
 }, 500)
@@ -50,9 +49,7 @@ export async function loadEditorContent(sessionId?: string): Promise<string | nu
       if (serverContent) {
         return serverContent
       }
-    }
-    catch (error) {
-      // eslint-disable-next-line no-console
+    } catch (error) {
       console.log('Failed to load content from server:', error)
     }
   }

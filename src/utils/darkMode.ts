@@ -22,8 +22,7 @@ export function applyDarkModeToDocument() {
   watchEffect(() => {
     if (isDarkMode.value) {
       document.documentElement.classList.add('dark')
-    }
-    else {
+    } else {
       document.documentElement.classList.remove('dark')
     }
   })

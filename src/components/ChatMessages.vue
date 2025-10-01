@@ -9,8 +9,9 @@ const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 
 function isAtBottom() {
-  if (!chatElement.value)
+  if (!chatElement.value) {
     return false
+  }
 
   const { scrollTop, scrollHeight, clientHeight } = chatElement.value
   return scrollHeight - scrollTop <= clientHeight + 10 // 10 is a small threshold
@@ -21,8 +22,9 @@ function handleUserScroll() {
 }
 
 function scrollToBottom() {
-  if (userInterferedWithScroll.value)
+  if (userInterferedWithScroll.value) {
     return
+  }
 
   nextTick(() => {
     if (chatElement.value) {
@@ -47,7 +49,7 @@ watch(messages, () => {
 onUnmounted(() => chatElement.value?.removeEventListener('scroll', handleUserScroll))
 
 const visibleMessages = computed(() =>
-  showSystem.value ? messages?.value : messages?.value.filter(m => m.role != 'system'),
+  showSystem.value ? messages?.value : messages?.value.filter(m => m.role !== 'system'),
 )
 
 // Reset userInterferedWithScroll when streaming starts
@@ -74,6 +76,7 @@ const streamingMessageId = computed(() => {
   >
     <ChatMessage
       v-for="message in visibleMessages"
+      :key="message.id"
       :message="message"
       :is-streaming="isStreaming && message.id === streamingMessageId"
     />

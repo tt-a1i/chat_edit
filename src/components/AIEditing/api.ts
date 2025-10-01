@@ -3,10 +3,7 @@ import {
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
 import { ref } from 'vue'
-import { baseUrl, apiKey } from '../../services/appConfig'
-import { useAuthStore } from '../../stores/auth'
 import { getApiUrl, getHeaders } from '../../api/api'
-import { get } from '@vueuse/core'
 // import { useAppStore } from '../../stores/app'
 export interface ChatResponse {
   text: string
@@ -56,12 +53,12 @@ export async function streamChat(
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify({
-      model: "moonshot-v1-32k",
+      model: 'moonshot-v1-32k',
       messages: [
         {
-          role: "user",
-          content: `选中的文本内容: ${selected_text}， 用户提问: ${prompt}`
-        }
+          role: 'user',
+          content: `选中的文本内容: ${selected_text}， 用户提问: ${prompt}`,
+        },
       ],
       stream: true,
       temperature: 0.3,
@@ -109,7 +106,7 @@ export async function streamChat(
           data.done = true
           callback({
             ...data,
-            done: true
+            done: true,
           })
           _controller.abort()
           return
@@ -131,7 +128,7 @@ export async function streamChat(
               data.text += content
               callback({
                 ...data,
-                text: data.text
+                text: data.text,
               })
             }
 
@@ -140,7 +137,7 @@ export async function streamChat(
               data.done = true
               callback({
                 ...data,
-                done: true
+                done: true,
               })
               _controller.abort()
             }
@@ -159,7 +156,7 @@ export async function streamChat(
 
           callback({
             ...data,
-            text: data.text
+            text: data.text,
           })
         }
       } catch (err) {

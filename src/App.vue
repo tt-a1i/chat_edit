@@ -5,7 +5,6 @@ import ChatInput from './components/ChatInput.vue'
 import ChatMessages from './components/ChatMessages.vue'
 import TextInput from './components/Inputs/TextInput.vue'
 import ModelSelector from './components/ModelSelector.vue'
-import NavHeader from './components/NavHeader.vue'
 import Settings from './components/Settings.vue'
 import Sidebar from './components/Sidebar.vue'
 import SystemPrompt from './components/SystemPrompt.vue'
@@ -35,8 +34,9 @@ function startEditing() {
   isEditingChatName.value = true
   editedChatName.value = activeChat.value?.name || ''
   nextTick(() => {
-    if (!chatNameInput.value)
+    if (!chatNameInput.value) {
       return
+    }
     const input = chatNameInput.value.$el.querySelector('input')
     input.focus()
     input.select()

@@ -1,12 +1,12 @@
-import MarkdownIt from 'markdown-it'
 import type { editor } from 'monaco-editor'
-import * as monaco from 'monaco-editor'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
+import MarkdownIt from 'markdown-it'
+import * as monaco from 'monaco-editor'
 import { nextTick } from 'vue'
+import * as AIEditingAPI from './api.ts'
 import { createExporter } from './export'
 import { defaultDiffEditorOptions } from './monacoConfig'
-import * as AIEditingAPI from './api.ts'
 
 interface DiffEditorParams {
   currentRange: { index: number, length: number } | null
@@ -26,7 +26,6 @@ export function showDiffEditor({
   onAccept,
 }: DiffEditorParams) {
   if (!currentRange) {
-    // eslint-disable-next-line no-console
     console.log('No selection range available')
     return null
   }
@@ -205,8 +204,9 @@ export function showDiffEditor({
           const selection = modifiedEditor.getSelection()
           const model = modifiedEditor.getModel()
 
-          if (!selection || !model)
+          if (!selection || !model) {
             return
+          }
 
           // 如果有文本选择，删除选择的内容
           if (!selection.isEmpty()) {
@@ -294,8 +294,7 @@ export function showDiffEditor({
       originalDispose()
     }
     return newDiffEditor
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error creating diff editor:', error)
     return null
   }
@@ -315,12 +314,15 @@ export function closeDiffEditor(
     const aiResponseRef = document.getElementById('aiResponse')
     const actionButtonsRef = document.getElementById('actionButtons')
 
-    if (floatingInputRef)
+    if (floatingInputRef) {
       floatingInputRef.style.display = 'none'
-    if (aiResponseRef)
+    }
+    if (aiResponseRef) {
       aiResponseRef.style.display = 'none'
-    if (actionButtonsRef)
+    }
+    if (actionButtonsRef) {
       actionButtonsRef.style.display = 'none'
+    }
   }
 
   if (diffEditor) {
@@ -331,8 +333,7 @@ export function closeDiffEditor(
         models.modified?.dispose()
       }
       diffEditor.dispose()
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error disposing editor:', error)
     }
   }
@@ -341,8 +342,9 @@ export function highlightSelection(
   quill: Quill,
   range: { index: number, length: number },
 ) {
-  if (!range || range.length === 0)
+  if (!range || range.length === 0) {
     return
+  }
 
   // 添加自定义 CSS 类到编辑器根元素，用于标记高亮状态
   const editorRoot = quill.root
@@ -383,8 +385,9 @@ export function clearHighlight(
   quill: Quill,
   currentRange: { index: number, length: number },
 ) {
-  if (!currentRange)
+  if (!currentRange) {
     return
+  }
 
   // 检查是否在相关组件中
   const isInRelevantComponent = document.activeElement?.id === 'promptInput'
@@ -443,8 +446,9 @@ export function updateCreationTimeDisplay(
   creationTimeDisplay: HTMLElement | null,
 ) {
   // Add null check
-  if (!creationTimeDisplay)
+  if (!creationTimeDisplay) {
     return
+  }
 
   const currentTime = getCurrentTime()
   creationTimeDisplay.textContent = `最近修改: ${currentTime}`
@@ -452,8 +456,9 @@ export function updateCreationTimeDisplay(
 
 export function updateWordCountDisplay(wordCountDisplay: HTMLElement | null, quill: any) {
   // 添加空值检查
-  if (!wordCountDisplay || !quill)
+  if (!wordCountDisplay || !quill) {
     return
+  }
 
   const text = quill.getText()
   // 移除所有空白字符后计算字数
@@ -463,7 +468,8 @@ export function updateWordCountDisplay(wordCountDisplay: HTMLElement | null, qui
       '',
     ) // 移除标点符号
     .replace(/\s+/g, '') // 移除所有空格
-    .replace(/[^\u4E00-\u9FA5a-z0-9]/gi, '').length // 移除特殊符号
+    .replace(/[^\u4E00-\u9FA5a-z0-9]/gi, '')
+    .length // 移除特殊符号
 
   const title = `字数：${wordCount}`
   wordCountDisplay.textContent = title
@@ -473,8 +479,9 @@ export function checkEmptyLine(
   uiElements: HideAIUIParams, // 修改参数类型
 ) {
   const selection = quill.getSelection()
-  if (!selection)
+  if (!selection) {
     return
+  }
 
   const [line] = quill.getLine(selection.index)
   const text = line.domNode.textContent
@@ -499,8 +506,9 @@ export function showAIMenu({
   handleOutsideClick,
 }: AIMenuParams) {
   const selection = quill.getSelection()
-  if (!selection)
+  if (!selection) {
     return
+  }
 
   currentRange = { index: selection.index, length: selection.length }
   const bounds = quill.getBounds(selection.index)
@@ -650,8 +658,7 @@ export function showExportMenu({ exportMenuRef }: ShowExportMenuParams) {
     menuItems.forEach((item: HTMLElement) => {
       item.style.color = '#d4d4d4'
     })
-  }
-  else {
+  } else {
     // 正常模式下重置样式，避免状态混乱
     exportMenuRef.style.background = 'white'
     exportMenuRef.style.border = '1px solid #ddd'
@@ -684,14 +691,13 @@ export async function handleSend({
   onResponse,
   isTranslationPrompt,
 }: HandleSendParams) {
-
   const actualPrompt = promptValue || promptInputRef.value
   aiResponseRef.dataset.lastPrompt = actualPrompt
 
   const originalPlaceholder = promptInputRef.placeholder || ''
 
   promptInputRef.value = ''
-  promptInputRef.placeholder = "正在生成回答..."
+  promptInputRef.placeholder = '正在生成回答...'
 
   const selectedText = currentRange
     ? quill.getText(currentRange.index, currentRange.length)
@@ -702,7 +708,7 @@ export async function handleSend({
 
   if (!selectedText && !actualPrompt.trim()) {
     if (responseContent) {
-      responseContent.textContent = "输入提示..."
+      responseContent.textContent = '输入提示...'
       responseContent.classList.remove('loading')
     }
     promptInputRef.placeholder = originalPlaceholder
@@ -749,17 +755,14 @@ export async function handleSend({
         compareBtn.style.display = 'none'
       }
     }
-  }
-  catch (error) {
+  } catch (error) {
     if (error.name === 'AbortError') {
-      responseContent.textContent = "生成已中止"
-    }
-    else if (responseContent) {
+      responseContent.textContent = '生成已中止'
+    } else if (responseContent) {
       responseContent.classList.remove('loading')
-      responseContent.textContent = "生成回答时出现错误，请重试。"
+      responseContent.textContent = '生成回答时出现错误，请重试。'
     }
-  }
-  finally {
+  } finally {
     isGenerating.value = false
     // 恢复发送按钮状态
     const sendBtn = document.querySelector('.send-btn')
@@ -798,8 +801,9 @@ export function insertContent({
   isReplace = false,
   currentRange = null,
 }: InsertContentParams) {
-  if (!text || !quill)
+  if (!text || !quill) {
     return
+  }
   if (isReplace && currentRange) {
     quill.deleteText(currentRange.index, currentRange.length)
     startIndex = currentRange.index
@@ -812,8 +816,7 @@ export function insertContent({
       quill,
       cursorPosition: startIndex,
     })
-  }
-  else {
+  } else {
     quill.insertText(startIndex, text, 'api')
   }
 }
@@ -866,8 +869,7 @@ export function renderMarkdownToQuill({
     quill.setSelection(insertPosition + insertedLength, 0)
     // 在内容插入后添加
     return insertedLength
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Markdown rendering failed:', error)
     return 0
   }
@@ -878,8 +880,9 @@ export function renderMarkdownToQuill({
  * @param quill Quill 编辑器实例
  */
 export async function copyAsMarkdown(quill) {
-  if (!quill)
+  if (!quill) {
     return
+  }
 
   const content = quill.root.innerHTML
   const exporter = createExporter(content, quill)
@@ -893,8 +896,7 @@ export async function copyAsMarkdown(quill) {
 
     // 显示成功提示
     showCopySuccessMessage('Markdown 已复制到剪贴板')
-  }
-  catch (error) {
+  } catch (error) {
     console.error('复制 Markdown 失败:', error)
   }
 }
@@ -1003,10 +1005,12 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
 
   // 返回清理函数
   return () => {
-    if (colorButton)
+    if (colorButton) {
       colorButton.removeEventListener('click', handleToolbarButtonClick)
-    if (bgColorButton)
+    }
+    if (bgColorButton) {
       bgColorButton.removeEventListener('click', handleToolbarButtonClick)
+    }
     document.removeEventListener('click', handleDocumentClick)
   }
 }
@@ -1018,8 +1022,9 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
  */
 export function ensureElementsVisible(elements, container) {
   // 跳过无效元素
-  if (!elements || !elements.length || !container)
+  if (!elements || !elements.length || !container) {
     return
+  }
 
   const containerRect = container.getBoundingClientRect()
   const containerScrollBottom = container.scrollTop + containerRect.height
@@ -1027,8 +1032,9 @@ export function ensureElementsVisible(elements, container) {
   // 计算所有元素中最低的底部边界
   let lowestBottom = 0
   elements.forEach((el) => {
-    if (!el || el.style.display === 'none')
+    if (!el || el.style.display === 'none') {
       return
+    }
 
     const elRect = el.getBoundingClientRect()
     // 将元素底部边界转换为相对于容器的位置

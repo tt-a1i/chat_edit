@@ -120,8 +120,7 @@ class DocumentExporter {
               ],
               indent: { left: 720, hanging: 360 },
             })
-          }
-          else if (listType === 'ordered') {
+          } else if (listType === 'ordered') {
             return new Paragraph({
               numbering: {
                 reference: 'number-list',
@@ -246,8 +245,7 @@ class DocumentExporter {
       const processed = processNode(node)
       if (Array.isArray(processed)) {
         elements.push(...processed)
-      }
-      else if (processed) {
+      } else if (processed) {
         elements.push(processed)
       }
     })
@@ -316,8 +314,7 @@ class DocumentExporter {
           link.download = `document-${new Date().getTime()}.docx`
           link.click()
           window.URL.revokeObjectURL(url)
-        }
-        catch (error) {
+        } catch (error) {
           console.error('Error generating document:', error)
           throw error
         }
@@ -416,8 +413,7 @@ class DocumentExporter {
           link.click()
           window.URL.revokeObjectURL(url)
           break
-        }
-        else {
+        } else {
           return markdownContent
         }
       }

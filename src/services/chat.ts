@@ -85,14 +85,14 @@ export function useChats() {
 
   const switchModel = async (model: string) => {
     currentModel.value = model
-    if (!activeChat.value)
+    if (!activeChat.value) {
       return
+    }
 
     try {
       await dbLayer.updateChat(activeChat.value.id!, { model })
       activeChat.value.model = model
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Failed to switch model to ${model}:`, error)
     }
   }
@@ -109,8 +109,7 @@ export function useChats() {
       message.id = await dbLayer.addMessage(message)
       ongoingAiMessages.value.set(chatId, message)
       messages.value.push(message)
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to start AI message:', error)
     }
   }
@@ -121,8 +120,7 @@ export function useChats() {
       aiMessage.content += content
       try {
         await dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Failed to append to AI message:', error)
       }
     }
@@ -136,8 +134,7 @@ export function useChats() {
       aiMessage.content += data.message.content
       try {
         dbLayer.updateMessage(aiMessage.id!, { content: aiMessage.content })
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Failed to update AI message:', error)
       }
     }
@@ -155,8 +152,7 @@ export function useChats() {
           isStreaming: false,
         })
         ongoingAiMessages.value.delete(chatId)
-      }
-      catch (error) {
+      } catch (error) {
         console.error('Failed to finalize AI message:', error)
       }
     }
@@ -174,8 +170,7 @@ export function useChats() {
       chats.value.push(newChat)
       setActiveChat(newChat)
       setMessages([])
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to start a new chat:', error)
     }
   }
@@ -191,8 +186,7 @@ export function useChats() {
           await switchModel(activeChat.value.model)
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Failed to switch to chat with ID ${chatId}:`, error)
     }
   }
@@ -203,24 +197,23 @@ export function useChats() {
 
       if (chats.value.length === 0) {
         await startNewChat('New Chat')
-      }
-      else {
+      } else {
         await switchChat(sortedChats.value[0].id!)
       }
 
       if (!currentModel.value || currentModel.value === 'none') {
         currentModel.value = 'moonshot-v1-8k'
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to initialize chats:', error)
       await startNewChat('New Chat')
     }
   }
 
   const renameChat = async (newName: string) => {
-    if (!activeChat.value)
+    if (!activeChat.value) {
       return
+    }
 
     activeChat.value.name = newName
     await dbLayer.updateChat(activeChat.value.id!, { name: newName })
@@ -228,10 +221,12 @@ export function useChats() {
   }
 
   const addSystemMessage = async (content: string | null, meta?: any) => {
-    if (!activeChat.value)
+    if (!activeChat.value) {
       return
-    if (!content)
+    }
+    if (!content) {
       return
+    }
 
     const systemPromptMessage: Message = {
       chatId: activeChat.value.id!,
@@ -291,8 +286,7 @@ export function useChats() {
         data => handleAiPartialResponse(data, currentChatId),
         data => handleAiCompletion(data, currentChatId),
       )
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -305,13 +299,15 @@ export function useChats() {
   }
 
   const regenerateResponse = async () => {
-    if (!activeChat.value)
+    if (!activeChat.value) {
       return
+    }
     const currentChatId = activeChat.value.id!
     const message = messages.value[messages.value.length - 1]
     if (message && message.role === 'assistant') {
-      if (message.id)
+      if (message.id) {
         db.messages.delete(message.id)
+      }
       messages.value.pop()
     }
     try {
@@ -323,8 +319,7 @@ export function useChats() {
         data => handleAiPartialResponse(data, currentChatId),
         data => handleAiCompletion(data, currentChatId),
       )
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           ongoingAiMessages.value.delete(currentChatId)
@@ -347,8 +342,7 @@ export function useChats() {
       ongoingAiMessages.value.clear()
 
       await startNewChat('New chat')
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to wipe the database:', error)
     }
   }
@@ -363,13 +357,11 @@ export function useChats() {
       if (activeChat.value?.id === chatId) {
         if (sortedChats.value.length) {
           await switchChat(sortedChats.value[0].id!)
-        }
-        else {
+        } else {
           await startNewChat('New chat')
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Failed to delete chat with ID ${chatId}:`, error)
     }
   }
@@ -378,8 +370,9 @@ export function useChats() {
     const chats = await dbLayer.getAllChats()
     const exportData: ChatExport[] = []
     await Promise.all(chats.map(async (chat) => {
-      if (!chat?.id)
+      if (!chat?.id) {
         return
+      }
       const messages = await dbLayer.getMessages(chat.id)
       exportData.push(Object.assign({ messages }, chat))
     }))

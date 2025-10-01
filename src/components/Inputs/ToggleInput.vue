@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 
-type Props = {
+interface Props {
   label?: string
   modelValue: boolean
 }
@@ -27,18 +27,18 @@ watchEffect(() => {
 <template>
   <div class="flex items-center mb-4 justify-between">
     <label
-      @click="toggle"
-      class="block px-2 text-sm font-medium text-gray-900 dark:text-gray-100"
       v-if="label"
+      class="block px-2 text-sm font-medium text-gray-900 dark:text-gray-100"
+      @click="toggle"
     >
       {{ label }}
     </label>
     <button
       :class="toggleState ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'"
       class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:opacity-50"
-      @click="toggle"
       role="switch"
       :aria-checked="toggleState"
+      @click="toggle"
     >
       <span
         :class="toggleState ? 'translate-x-5' : 'translate-x-0'"

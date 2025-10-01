@@ -63,16 +63,6 @@ export const configDbLayer = {
 }
 
 export function useConfig() {
-  const setConfig = async (newConfig: Config) => {
-    newConfig.id = await generateIdFromModel(newConfig.model)
-    await configDbLayer.setConfig(newConfig)
-  }
-
-  const getCurrentSystemMessage = async () => {
-    let config = await configDbLayer.getCurrentConfig(currentModel.value)
-    return config?.systemPrompt ?? null
-  }
-
   const generateIdFromModel = async (model: string): Promise<number> => {
     let hash = 0
     for (let i = 0; i < model.length; i++) {
@@ -81,13 +71,22 @@ export function useConfig() {
     return hash
   }
 
+  const setConfig = async (newConfig: Config) => {
+    newConfig.id = await generateIdFromModel(newConfig.model)
+    await configDbLayer.setConfig(newConfig)
+  }
+
+  const getCurrentSystemMessage = async () => {
+    const config = await configDbLayer.getCurrentConfig(currentModel.value)
+    return config?.systemPrompt ?? null
+  }
+
   const initializeConfig = async (model: string) => {
     try {
       const modelConfig = await configDbLayer.getConfig(model)
       const defaultConfig = await configDbLayer.getConfig('default')
       return { modelConfig, defaultConfig }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Failed to initialize config:', error)
     }
     return null
