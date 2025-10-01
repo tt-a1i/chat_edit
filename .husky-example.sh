@@ -27,3 +27,4 @@
 #
 # 4. 创建 pre-commit hook
 # echo "pnpm lint-staged && pnpm typecheck" > .husky/pre-commit
+test
