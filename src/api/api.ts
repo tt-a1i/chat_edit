@@ -11,6 +11,7 @@ import type {
   GenerateEmbeddingsRequest,
   GenerateEmbeddingsResponse,
   ListLocalModelsResponse,
+  Model,
   PullModelRequest,
   PullModelResponse,
   PushModelRequest,
@@ -18,8 +19,16 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
+
+export type {
+  ChatCompletedResponse,
+  ChatPartResponse,
+  ChatResponse,
+  Model,
+} from './types.ts'
 import { ref } from 'vue'
 import { apiKey, baseUrl } from '../services/appConfig.ts'
+import { toError } from '@/utils/error'
 
 // 定义获取完整 API URL 的方法
 export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
@@ -49,7 +58,7 @@ function createAbortController() {
 
 // 导出 API 钩子函数
 export function useApi() {
-  const error = ref(null)
+  const error = ref<Error | null>(null)
   const { signal, abort } = createAbortController()
 
   // 聊天相关 API
@@ -84,7 +93,7 @@ export function useApi() {
         return await processStreamResponse(response, request.model, onDataReceived)
       } catch (err) {
         console.error('生成聊天内容时出错:', err)
-        error.value = err
+        error.value = toError(err)
         return []
       }
     },
@@ -110,7 +119,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('创建模型时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -138,7 +147,7 @@ export function useApi() {
         }
       } catch (err) {
         console.error('获取模型列表时出错:', err)
-        error.value = err
+        error.value = toError(err)
         // 返回默认模型列表以防止完全失败
         return {
           models: [
@@ -175,7 +184,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('获取模型信息时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -196,7 +205,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('复制模型时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -219,7 +228,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('删除模型时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -240,7 +249,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('下载模型时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -261,7 +270,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('上传模型时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
@@ -287,7 +296,7 @@ export function useApi() {
         return await response.json()
       } catch (err) {
         console.error('生成嵌入向量时出错:', err)
-        error.value = err
+        error.value = toError(err)
         throw err
       }
     },
