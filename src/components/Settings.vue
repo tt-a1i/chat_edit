@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
 import { ref } from 'vue'
-import {
+import { useAppStore } from '../stores'
+import { useChats } from '../services/chat.ts'
+import ExportButton from './History/ExportButton.vue'
+import ImportButton from './History/ImportButton.vue'
+import TextInput from './Inputs/TextInput.vue'
+import ToggleInput from './Inputs/ToggleInput.vue'
+
+// Stores
+const appStore = useAppStore()
+const {
   apiKey,
   baseUrl,
   enableMarkdown,
@@ -9,13 +18,9 @@ import {
   historyMessageLength,
   showSystem,
   toggleSettingsPanel,
-} from '../services/appConfig.ts'
-import { useChats } from '../services/chat.ts'
-import ExportButton from './History/ExportButton.vue'
-import ImportButton from './History/ImportButton.vue'
-import TextInput from './Inputs/TextInput.vue'
-import ToggleInput from './Inputs/ToggleInput.vue'
+} = appStore
 
+// Services
 const { wipeDatabase } = useChats()
 
 const showConfirmDialog = ref(false)

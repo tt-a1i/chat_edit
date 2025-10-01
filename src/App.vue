@@ -8,18 +8,16 @@ import ModelSelector from './components/ModelSelector.vue'
 import Settings from './components/Settings.vue'
 import Sidebar from './components/Sidebar.vue'
 import SystemPrompt from './components/SystemPrompt.vue'
-import {
-  currentModel,
-  currentScene,
-  isDarkMode,
-  isSettingsOpen,
-  isSystemPromptOpen,
-  SCENES,
-} from './services/appConfig.ts'
 import { useChats } from './services/chat.ts'
 import { useAI } from './services/useAI.ts'
+import { SCENES, useAppStore } from './stores'
 import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
 
+// Stores
+const appStore = useAppStore()
+const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = appStore
+
+// Services
 const { refreshModels, availableModels } = useAI()
 const { activeChat, renameChat, switchModel, initialize } = useChats()
 const isEditingChatName = ref(false)
