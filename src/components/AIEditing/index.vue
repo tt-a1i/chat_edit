@@ -1,25 +1,20 @@
 <script setup lang="ts">
+import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import type { editor } from 'monaco-editor'
-import { ErrorHandler } from '@/utils/errorHandler'
-import { AppError, ErrorCode } from '@/utils/errors'
-import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useAIEditorActions } from './composables/useAIEditorActions'
 import { useAIInteraction } from './composables/useAIInteraction'
+import { useDOMRefs } from './composables/useDOMRefs'
 import { useEditorEventListeners } from './composables/useEditorEventListeners'
 import { useFileOperations } from './composables/useFileOperations'
 import { useQuillEditor } from './composables/useQuillEditor'
+import { SYSTEM_PROMPTS } from './constants/prompts'
 import { createImporter } from './import'
-import { renderMarkdown } from './markdown'
 import { initMonaco } from './monacoConfig'
 import {
   clearHighlight,
-  closeDiffEditor,
   createTimeAndWordCountDisplay,
-  handleRegenerate,
-  handleSend,
-  renderMarkdownToQuill,
   showAIMenu,
-  showDiffEditor,
   updateCreationTimeDisplay,
   updateWordCountDisplay,
 } from './utils'
@@ -36,99 +31,81 @@ const { isGenerating, abortController, isTranslationPrompt, hiddenPrompt } = use
 const { showUploadModal } = useFileOperations(quillInstanceRef)
 const { onElementClick, onDocumentEvent } = useEditorEventListeners()
 
-// ==================== 本地状态 ====================
+// DOM 引用管理
+const {
+  floatingInputRef,
+  verticalMenuRef,
+  promptInputRef,
+  sendBtnRef,
+  aiResponseRef,
+  actionButtonsRef,
+  exportMenuRef,
+  creationTimeDisplay,
+  wordCountDisplay,
+  initDOMRefs,
+  hideAllAIUI,
+} = useDOMRefs()
+
+// 本地状态
 const currentRange = ref<{ index: number, length: number } | null>(null)
 const replacementRange = ref<{ index: number, length: number } | null>(null)
 const diffEditor = ref<editor.IStandaloneDiffEditor | null>(null)
 const showMobileWarning = ref(false)
 const isMobile = ref(false)
-
-// DOM 引用
-let floatingInputRef: HTMLElement | null = null
-let verticalMenuRef: HTMLElement | null = null
-let promptInputRef: HTMLInputElement | null = null
-let sendBtnRef: HTMLElement | null = null
-let aiResponseRef: HTMLElement | null = null
-let actionButtonsRef: HTMLElement | null = null
-let exportMenuRef: HTMLElement | null = null
-let creationTimeDisplay: HTMLElement | null = null
-let wordCountDisplay: HTMLElement | null = null
-let monacoLoaded = false
-
-// 提示词数据
+const monacoLoaded = ref(false)
 const currentLanguage = ref('zh-CN')
-const promptsData = ref({
-  system: [
-    {
-      id: '1',
-      name: '继续写',
-      name_en: 'Continue Writing',
-      template: '请继续写下面的内容，保持风格和语气一致：',
-      en_name: '✍️',
-    },
-    {
-      id: '2',
-      name: '翻译',
-      name_en: 'Translate',
-      template: '请将以下文本翻译成中文/英文（根据原文语言自动判断）：',
-      en_name: '🌐',
-    },
-    {
-      id: '3',
-      name: '润色文本',
-      name_en: 'Polish Text',
-      template: '请对以下文本进行润色，提升语言表达质量，但保持原意不变：',
-      en_name: '✨',
-    },
-    {
-      id: '4',
-      name: '扩写内容',
-      name_en: 'Expand Content',
-      template: '请扩展以下文本，添加更多细节、例子或解释，使其更加全面：',
-      en_name: '📈',
-    },
-    {
-      id: '5',
-      name: '缩写内容',
-      name_en: 'Condense Content',
-      template: '请将以下文本精简，保留关键信息但使其更加简洁：',
-      en_name: '📉',
-    },
-    {
-      id: '6',
-      name: '总结要点',
-      name_en: 'Summarize',
-      template: '请总结以下文本的主要观点和要点：',
-      en_name: '📋',
-    },
-  ],
-})
+const promptsData = ref({ system: SYSTEM_PROMPTS })
+
+// AI 编辑器操作
+const {
+  handleInsertAfter,
+  handleReplace,
+  handleCompare,
+  handleRegenerateClick,
+  handleCopy,
+  handleDiffInsertAfter,
+  handleConfirmReplace,
+  handleCancelReplace,
+  handleSendClick,
+} = useAIEditorActions(
+  quillInstanceRef,
+  currentRange,
+  replacementRange,
+  diffEditor,
+  {
+    floatingInputRef,
+    verticalMenuRef,
+    aiResponseRef,
+    actionButtonsRef,
+    promptInputRef,
+    sendBtnRef,
+    exportMenuRef,
+  },
+  {
+    isGenerating,
+    abortController,
+    isTranslationPrompt,
+    hiddenPrompt,
+  },
+)
 
 // ==================== 生命周期 ====================
 onMounted(async () => {
   detectMobileDevice()
-
-  // 监听窗口大小变化
-  onDocumentEvent('mouseup', handleMouseUp)
-
-  // 获取 DOM 引用
-  floatingInputRef = document.getElementById('floatingInput')
-  verticalMenuRef = document.getElementById('verticalMenu')
-  promptInputRef = document.getElementById('promptInput') as HTMLInputElement
-  sendBtnRef = document.getElementById('sendBtn')
-  aiResponseRef = document.getElementById('aiResponse')
-  actionButtonsRef = document.getElementById('actionButtons')
-  exportMenuRef = document.getElementById('exportMenu')
+  initDOMRefs()
 
   // 初始化编辑器
   await initQuillEditor()
 
   // 初始化 Monaco
   initMonaco()
-  monacoLoaded = true
+  monacoLoaded.value = true
 
   // 设置事件监听器
   setupEventListeners()
+
+  // 监听鼠标抬起
+  onDocumentEvent('mouseup', handleMouseUp)
 })
 
 onBeforeUnmount(() => {
@@ -143,29 +120,26 @@ onBeforeUnmount(() => {
  * 初始化 Quill 编辑器
  */
 async function initQuillEditor() {
-  const quill = await initEditor(exportMenuRef)
+  const quill = await initEditor(exportMenuRef.value)
   if (!quill) return
 
-  // 设置工具栏显示
   await nextTick()
   const toolbar = getToolbar()
   if (toolbar) {
     const elements = createTimeAndWordCountDisplay(toolbar)
     if (elements) {
-      creationTimeDisplay = elements.creationTimeDisplay
-      wordCountDisplay = elements.wordCountDisplay
-      updateCreationTimeDisplay(creationTimeDisplay)
+      creationTimeDisplay.value = elements.creationTimeDisplay
+      wordCountDisplay.value = elements.wordCountDisplay
+      updateCreationTimeDisplay(creationTimeDisplay.value)
     }
   }
 
-  // 设置编辑器事件
   quill.on('text-change', () => {
-    if (wordCountDisplay) {
-      updateWordCountDisplay(wordCountDisplay, quill)
+    if (wordCountDisplay.value) {
+      updateWordCountDisplay(wordCountDisplay.value, quill)
     }
   })
 
-  // 监听 / 快捷键
   quill.root.addEventListener('keydown', async (e) => {
     if (e.key === '/') {
       const selection = quill.getSelection()
@@ -179,8 +153,8 @@ async function initQuillEditor() {
         const range = showAIMenu({
           quill,
           currentRange: currentRange.value,
-          floatingInputRef: floatingInputRef!,
-          verticalMenuRef: verticalMenuRef!,
+          floatingInputRef: floatingInputRef.value!,
+          verticalMenuRef: verticalMenuRef.value!,
           handleOutsideClick: () => {},
         })
         if (range) {
@@ -202,7 +176,7 @@ function detectMobileDevice() {
 }
 
 /**
- * 处理鼠标抬起事件
+ * 处理鼠标抬起
  */
 function handleMouseUp(event: MouseEvent) {
   const target = event.target as Node
@@ -210,12 +184,11 @@ function handleMouseUp(event: MouseEvent) {
   if (!quill) return
 
   const isInComponents = [
-    verticalMenuRef?.contains(target),
-    floatingInputRef?.contains(target),
-    aiResponseRef?.contains(target),
+    verticalMenuRef.value?.contains(target),
+    floatingInputRef.value?.contains(target),
+    aiResponseRef.value?.contains(target),
     document.getElementById('diffContainer')?.contains(target),
     document.querySelector('.n-modal-container')?.contains(target),
-    document.querySelector('.n-dialog')?.contains(target),
   ].some(Boolean)
 
   if (!isInComponents) {
@@ -225,10 +198,7 @@ function handleMouseUp(event: MouseEvent) {
         if (currentRange.value) {
           clearHighlight(quill, currentRange.value)
         }
-        if (floatingInputRef) floatingInputRef.style.display = 'none'
-        if (aiResponseRef) aiResponseRef.style.display = 'none'
-        if (actionButtonsRef) actionButtonsRef.style.display = 'none'
-        if (verticalMenuRef) verticalMenuRef.style.display = 'none'
+        hideAllAIUI()
         currentRange.value = null
       }
     }, 0)
@@ -239,27 +209,18 @@ function handleMouseUp(event: MouseEvent) {
  * 设置所有事件监听器
  */
 function setupEventListeners() {
-  const quill = quillInstance.value
-  if (!quill) return
-
-  // AI 响应面板事件
   onElementClick('insertAfter', handleInsertAfter)
   onElementClick('replace', handleReplace)
-  onElementClick('compare', handleCompare)
+  onElementClick('compare', () => handleCompare(monacoLoaded.value))
   onElementClick('aiResponseRegenerateBtn', handleRegenerateClick)
   onElementClick('aiResponseCopyBtn', handleCopy)
-
-  // Diff 编辑器事件
   onElementClick('insertAfterDiff', handleDiffInsertAfter)
   onElementClick('confirmReplace', handleConfirmReplace)
   onElementClick('cancelReplace', handleCancelReplace)
-
-  // 导出菜单事件
   onDocumentEvent('click', handleDocumentClick)
 
-  // 发送按钮
-  if (sendBtnRef) {
-    sendBtnRef.addEventListener('click', handleSendClick)
+  if (sendBtnRef.value) {
+    sendBtnRef.value.addEventListener('click', handleSendClick)
   }
 }
 
@@ -271,280 +232,23 @@ function handleMenuItemClick(prompt: any) {
   if (!quill || !currentRange.value) return
 
   hiddenPrompt.value = prompt.template
-  if (verticalMenuRef) verticalMenuRef.style.display = 'none'
-  if (floatingInputRef) floatingInputRef.style.display = 'block'
-  if (promptInputRef) {
-    promptInputRef.value = ''
-    promptInputRef.focus()
+  if (verticalMenuRef.value) verticalMenuRef.value.style.display = 'none'
+  if (floatingInputRef.value) floatingInputRef.value.style.display = 'block'
+  if (promptInputRef.value) {
+    promptInputRef.value.value = ''
+    promptInputRef.value.focus()
   }
 }
 
 /**
- * 发送提示词
- */
-async function handleSendClick() {
-  const quill = quillInstance.value
-  if (!quill) return
-
-  // 检查是否是翻译提示
-  if (!isTranslationPrompt.value) {
-    const prompt = (hiddenPrompt.value || promptInputRef?.value || '').toLowerCase()
-    isTranslationPrompt.value
-      = prompt.includes('翻译')
-        || prompt.includes('translate')
-        || prompt.includes('中文')
-        || prompt.includes('english')
-  }
-
-  // 如果正在生成，则中止
-  if (isGenerating.value && abortController.value) {
-    abortController.value.abort()
-    if (sendBtnRef) {
-      sendBtnRef.classList.remove('loading')
-      sendBtnRef.innerHTML = '<i class="fas fa-paper-plane send-icon"></i>'
-    }
-    isGenerating.value = false
-    abortController.value = null
-    return
-  }
-
-  const prompt = hiddenPrompt.value || promptInputRef?.value
-  if (!prompt) return
-
-  hiddenPrompt.value = ''
-  if (verticalMenuRef) verticalMenuRef.style.display = 'none'
-  if (aiResponseRef) aiResponseRef.style.display = 'block'
-  if (actionButtonsRef) actionButtonsRef.style.display = 'none'
-
-  const responseContent = aiResponseRef?.querySelector('.response-content')
-  if (responseContent) {
-    responseContent.classList.add('loading')
-    responseContent.textContent = '正在生成回答...'
-  }
-
-  await handleSend({
-    promptInputRef: promptInputRef!,
-    promptValue: prompt,
-    currentRange: currentRange.value,
-    quill,
-    aiResponseRef: aiResponseRef!,
-    actionButtonsRef: actionButtonsRef!,
-    isGenerating,
-    abortController,
-    onResponse: (response) => {
-      if (!responseContent) return
-
-      if (response.error) {
-        responseContent.classList.remove('loading')
-        responseContent.textContent = `错误: ${response.error}`
-        return
-      }
-
-      responseContent.classList.remove('loading')
-      handleResponseUpdate(response.content, responseContent)
-
-      if (!actionButtonsRef?.style.display || actionButtonsRef.style.display === 'none') {
-        actionButtonsRef!.style.display = 'flex'
-      }
-    },
-  })
-}
-
-/**
- * 更新响应内容
- */
-function handleResponseUpdate(text: string, responseContent: Element) {
-  const renderedHtml = renderMarkdown(text)
-  responseContent.innerHTML = renderedHtml
-  responseContent.setAttribute('data-original-text', text)
-}
-
-/**
- * 插入到后面
- */
-function handleInsertAfter() {
-  const quill = quillInstance.value
-  if (!currentRange.value || !quill) return
-
-  const responseContent = aiResponseRef?.querySelector('.response-content')
-  const aiResponseText = responseContent?.getAttribute('data-original-text')
-
-  if (aiResponseText) {
-    const insertIndex = currentRange.value.index + currentRange.value.length
-    renderMarkdownToQuill({
-      markdownText: aiResponseText,
-      quill,
-      cursorPosition: insertIndex,
-    })
-
-    if (aiResponseRef) aiResponseRef.style.display = 'none'
-    if (floatingInputRef) floatingInputRef.style.display = 'none'
-    if (actionButtonsRef) actionButtonsRef.style.display = 'none'
-  }
-
-  const length = quill.getLength()
-  quill.formatText(0, length, 'background', false, 'api')
-}
-
-/**
- * 替换内容
- */
-function handleReplace() {
-  const quill = quillInstance.value
-  if (!currentRange.value || !quill) return
-
-  const responseContent = aiResponseRef?.querySelector('.response-content')
-  const aiResponseText = responseContent?.getAttribute('data-original-text')
-
-  if (!aiResponseText) return
-
-  quill.deleteText(currentRange.value.index, currentRange.value.length)
-  renderMarkdownToQuill({
-    markdownText: aiResponseText,
-    quill,
-    cursorPosition: currentRange.value.index,
-  })
-
-  clearHighlight(quill, currentRange.value)
-  if (floatingInputRef) floatingInputRef.style.display = 'none'
-  if (aiResponseRef) aiResponseRef.style.display = 'none'
-  if (actionButtonsRef) actionButtonsRef.style.display = 'none'
-  currentRange.value = null
-}
-
-/**
- * 对比功能
- */
-function handleCompare() {
-  const quill = quillInstance.value
-  if (!monacoLoaded || !currentRange.value || !quill) return
-
-  const selectedText = quill.getText(currentRange.value.index, currentRange.value.length)
-  const aiResponseText = aiResponseRef?.querySelector('.response-content')?.getAttribute('data-original-text') || ''
-
-  if (!selectedText || !aiResponseText) return
-
-  replacementRange.value = { ...currentRange.value }
-  diffEditor.value = showDiffEditor({
-    currentRange: currentRange.value,
-    originalText: selectedText,
-    modifiedText: aiResponseText,
-    diffEditor: diffEditor.value,
-    quill,
-  })
-}
-
-/**
- * 重新生成
- */
-function handleRegenerateClick() {
-  const quill = quillInstance.value
-  if (!quill) return
-
-  const responseContent = aiResponseRef?.querySelector('.response-content')
-  const prompt = hiddenPrompt.value || promptInputRef?.value
-
-  handleRegenerate({
-    promptInputRef: promptInputRef!,
-    promptValue: prompt || '',
-    currentRange: currentRange.value,
-    quill,
-    aiResponseRef: aiResponseRef!,
-    actionButtonsRef: actionButtonsRef!,
-    isGenerating,
-    abortController,
-    onResponse: (response) => {
-      if (!responseContent) return
-      handleResponseUpdate(response.content, responseContent)
-    },
-  })
-}
-
-/**
- * 复制响应内容
- */
-function handleCopy() {
-  const responseContent = aiResponseRef?.querySelector('.response-content')?.textContent
-  if (responseContent) {
-    navigator.clipboard.writeText(responseContent).then(() => {
-      const copyBtn = document.getElementById('aiResponseCopyBtn')
-      if (copyBtn) {
-        const originalText = copyBtn.innerHTML
-        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制'
-        setTimeout(() => {
-          copyBtn.innerHTML = originalText
-        }, 2000)
-      }
-    })
-  }
-}
-
-/**
- * Diff 编辑器 - 插入到后面
- */
-function handleDiffInsertAfter() {
-  const quill = quillInstance.value
-  if (!diffEditor.value || !replacementRange.value || !quill) return
-
-  const modifiedText = diffEditor.value.getModifiedEditor().getValue()
-  const insertPosition = replacementRange.value.index + replacementRange.value.length
-
-  renderMarkdownToQuill({
-    markdownText: modifiedText,
-    quill,
-    cursorPosition: insertPosition,
-  })
-
-  if (currentRange.value) {
-    clearHighlight(quill, currentRange.value)
-  }
-  closeDiffEditor(diffEditor.value, true)
-
-  replacementRange.value = null
-  currentRange.value = null
-}
-
-/**
- * Diff 编辑器 - 确认替换
- */
-function handleConfirmReplace() {
-  const quill = quillInstance.value
-  if (!diffEditor.value || !replacementRange.value || !quill) return
-
-  const modifiedText = diffEditor.value.getModifiedEditor().getValue()
-
-  quill.deleteText(replacementRange.value.index, replacementRange.value.length)
-  renderMarkdownToQuill({
-    markdownText: modifiedText,
-    quill,
-    cursorPosition: replacementRange.value.index,
-  })
-
-  if (currentRange.value) {
-    clearHighlight(quill, currentRange.value)
-  }
-  closeDiffEditor(diffEditor.value, true)
-
-  replacementRange.value = null
-  currentRange.value = null
-}
-
-/**
- * Diff 编辑器 - 取消
- */
-function handleCancelReplace() {
-  closeDiffEditor(diffEditor.value)
-}
-
-/**
- * 处理文档点击（关闭导出菜单）
+ * 处理文档点击
  */
 function handleDocumentClick(e: MouseEvent) {
   const exportButton = document.querySelector('.ql-export')
   const target = e.target as Node
 
-  if (exportMenuRef && !exportMenuRef.contains(target) && !exportButton?.contains(target)) {
-    exportMenuRef.style.display = 'none'
+  if (exportMenuRef.value && !exportMenuRef.value.contains(target) && !exportButton?.contains(target)) {
+    exportMenuRef.value.style.display = 'none'
   }
 }
 
@@ -561,10 +265,13 @@ async function handleExport(format: 'markdown' | 'docx' | 'pdf') {
     const exporter = createExporter(content, quill)
     await exporter.exportAs(format)
 
-    if (exportMenuRef) {
-      exportMenuRef.style.display = 'none'
+    if (exportMenuRef.value) {
+      exportMenuRef.value.style.display = 'none'
     }
-  } catch (error) {
+  }
+  catch (error) {
+    const { AppError, ErrorCode } = await import('@/utils/errors')
+    const { ErrorHandler } = await import('@/utils/errorHandler')
     ErrorHandler.handle(new AppError(
       ErrorCode.EXPORT_ERROR,
       `导出为 ${format} 格式失败`,
@@ -581,7 +288,8 @@ function autoResize(event: Event) {
   if (textarea.value.includes('\n')) {
     textarea.style.height = 'auto'
     textarea.style.height = `${Math.min(textarea.scrollHeight, 160)}px`
-  } else {
+  }
+  else {
     textarea.style.height = '2.5rem'
   }
 }
@@ -592,7 +300,7 @@ function autoResize(event: Event) {
 function handlePromptKeydown(event: KeyboardEvent) {
   if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
     event.preventDefault()
-    sendBtnRef?.click()
+    sendBtnRef.value?.click()
   }
 }
 
@@ -604,9 +312,7 @@ async function handleFileUpload(options: any) {
   const actualFile = file.file || file
 
   const quill = quillInstance.value
-  if (!quill) {
-    return
-  }
+  if (!quill) return
 
   try {
     const importer = createImporter()
@@ -617,7 +323,8 @@ async function handleFileUpload(options: any) {
 
     showUploadModal.value = false
     window.$message?.success('文件导入成功')
-  } catch {
+  }
+  catch {
     // 错误已在 import.ts 中处理
   }
 }
@@ -703,7 +410,7 @@ async function handleFileUpload(options: any) {
       <div id="verticalMenu" class="vertical-menu" tabindex="0">
         <div class="menu-content system-prompts">
           <div
-            v-for="prompt in promptsData?.system"
+            v-for="prompt in promptsData.system"
             :key="prompt.id"
             class="menu-item"
             :data-prompt-id="prompt.id"
