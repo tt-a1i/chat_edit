@@ -164,7 +164,7 @@ function clearImage() {
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="block max-h-[500px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-50 dark:placeholder-gray-400 dark:focus:ring-blue-500 sm:text-base shadow-sm hover:shadow-md transition-all duration-300"
+        class="chat-input-textarea block max-h-[500px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-50 dark:placeholder-gray-400 dark:focus:ring-blue-500 sm:text-base shadow-sm hover:shadow-md transition-all duration-300"
         placeholder="输入消息... (Shift + Enter 换行)"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
@@ -205,3 +205,15 @@ function clearImage() {
     </div>
   </form>
 </template>
+
+<style scoped>
+/* 隐藏输入框滚动条 */
+.chat-input-textarea {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.chat-input-textarea::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+</style>
