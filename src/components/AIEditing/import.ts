@@ -1,3 +1,6 @@
+import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode } from '@/utils/errors'
+import { logger } from '@/utils/logger'
 import mammoth from 'mammoth'
 
 interface ImportOptions {
@@ -37,7 +40,7 @@ class DocumentImporter {
       )
 
       if (result.messages.length > 0) {
-        console.warn('Word import warnings:', result.messages)
+        logger.warn('Word import warnings', result.messages)
       }
 
       // 后处理阶段修正空格和换行
@@ -60,8 +63,13 @@ class DocumentImporter {
 
       return html
     } catch (error) {
-      console.error('Error importing Word document:', error)
-      throw new Error('Failed to import Word document')
+      ErrorHandler.handle(new AppError(
+        ErrorCode.IMPORT_ERROR,
+        'Word 文档导入失败，请检查文件格式',
+        error as Error,
+        { fileName: file.name, fileSize: file.size },
+      ))
+      throw error
     }
   }
 }

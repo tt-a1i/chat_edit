@@ -2,6 +2,9 @@ import type { ChatResponse } from '@/types/ai-editing'
 import type { editor } from 'monaco-editor'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
+import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode } from '@/utils/errors'
+import { logger } from '@/utils/logger'
 import MarkdownIt from 'markdown-it'
 import * as monaco from 'monaco-editor'
 import { nextTick } from 'vue'
@@ -27,7 +30,7 @@ export function showDiffEditor({
   onAccept,
 }: DiffEditorParams) {
   if (!currentRange) {
-    console.log('No selection range available')
+    logger.debug('No selection range available')
     return null
   }
 
@@ -36,7 +39,12 @@ export function showDiffEditor({
   const acceptButton = document.getElementById('acceptDiffButton')
 
   if (!container || !editorElement) {
-    console.error('Required DOM elements not found')
+    ErrorHandler.handle(new AppError(
+      ErrorCode.EDITOR_ERROR,
+      '编辑器初始化失败，请刷新页面重试',
+      undefined,
+      { message: 'Required DOM elements not found' },
+    ))
     return null
   }
 
@@ -287,7 +295,11 @@ export function showDiffEditor({
     }
     return newDiffEditor
   } catch (error) {
-    console.error('Error creating diff editor:', error)
+    ErrorHandler.handle(new AppError(
+      ErrorCode.EDITOR_ERROR,
+      '创建对比编辑器失败',
+      error as Error,
+    ))
     return null
   }
 }
@@ -326,7 +338,7 @@ export function closeDiffEditor(
       }
       diffEditor.dispose()
     } catch (error) {
-      console.error('Error disposing editor:', error)
+      logger.error('Error disposing editor', error)
     }
   }
 }
@@ -353,7 +365,7 @@ export function highlightSelection(
   // 定位覆盖层与选中内容重叠
   const bounds = quill.getBounds(range.index, range.length)
   if (!bounds) {
-    console.warn('无法获取选区边界')
+    logger.warn('无法获取选区边界')
     return
   }
 
@@ -425,7 +437,7 @@ export function createTimeAndWordCountDisplay(
   toolbar: HTMLElement,
 ) {
   if (!toolbar) {
-    console.error('Toolbar not initialized')
+    logger.error('Toolbar not initialized')
     return
   }
 
@@ -518,7 +530,7 @@ export function showAIMenu({
   const bounds = quill.getBounds(selection.index)
   const editorContainer = document.querySelector('.editor-container')
   if (!editorContainer) {
-    console.error('Editor container not found')
+    logger.error('Editor container not found')
     return currentRange
   }
 
@@ -536,7 +548,7 @@ export function showAIMenu({
 
   // 如果是空行按/唤起，额外增加一个行高的偏移
   if (!bounds) {
-    console.error('Cannot get bounds for selection')
+    logger.error('Cannot get bounds for selection')
     return currentRange
   }
 
@@ -645,7 +657,7 @@ export function showExportMenu({ exportMenuRef }: ShowExportMenuParams) {
   const editorContainer = document.querySelector('.editor-container')
 
   if (!toolbarButton || !exportMenuRef || !editorContainer) {
-    console.error('Required elements not found')
+    logger.error('Required elements not found for export menu')
     return
   }
 
@@ -906,7 +918,11 @@ export function renderMarkdownToQuill({
     // 在内容插入后添加
     return insertedLength
   } catch (error) {
-    console.error('Markdown rendering failed:', error)
+    ErrorHandler.handle(new AppError(
+      ErrorCode.EDITOR_ERROR,
+      'Markdown 渲染失败',
+      error as Error,
+    ))
     return 0
   }
 }
@@ -933,7 +949,11 @@ export async function copyAsMarkdown(quill: Quill) {
     // 显示成功提示
     showCopySuccessMessage('Markdown 已复制到剪贴板')
   } catch (error) {
-    console.error('复制 Markdown 失败:', error)
+    ErrorHandler.handle(new AppError(
+      ErrorCode.EXPORT_ERROR,
+      '复制 Markdown 失败',
+      error as Error,
+    ))
   }
 }
 

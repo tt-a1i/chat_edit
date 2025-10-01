@@ -1,3 +1,5 @@
+import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode } from '@/utils/errors'
 import {
   Document,
   HeadingLevel,
@@ -326,7 +328,11 @@ class DocumentExporter {
           link.click()
           window.URL.revokeObjectURL(url)
         } catch (error) {
-          console.error('Error generating document:', error)
+          ErrorHandler.handle(new AppError(
+            ErrorCode.EXPORT_ERROR,
+            'Word 文档导出失败',
+            error as Error,
+          ))
           throw error
         }
         break

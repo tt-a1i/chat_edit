@@ -8,7 +8,7 @@ type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 interface LogEntry {
   level: LogLevel
   message: string
-  data?: any
+  data?: unknown
   timestamp: Date
 }
 
@@ -19,7 +19,7 @@ class Logger {
   /**
    * 调试日志（仅开发环境）
    */
-  debug(message: string, data?: any) {
+  debug(message: string, data?: unknown) {
     if (import.meta.env.DEV) {
       console.log(`[DEBUG] ${message}`, data)
       this.addLog('debug', message, data)
@@ -29,7 +29,7 @@ class Logger {
   /**
    * 信息日志
    */
-  info(message: string, data?: any) {
+  info(message: string, data?: unknown) {
     console.info(`[INFO] ${message}`, data)
     this.addLog('info', message, data)
   }
@@ -37,7 +37,7 @@ class Logger {
   /**
    * 警告日志
    */
-  warn(message: string, data?: any) {
+  warn(message: string, data?: unknown) {
     console.warn(`[WARN] ${message}`, data)
     this.addLog('warn', message, data)
   }
@@ -45,18 +45,33 @@ class Logger {
   /**
    * 错误日志
    */
-  error(message: string, error?: any) {
-    console.error(`[ERROR] ${message}`, error)
-    this.addLog('error', message, error)
+  error(message: string, error?: unknown, context?: Record<string, unknown>) {
+    const errorStack = error && typeof error === 'object' && 'stack' in error
+      ? (error as Error).stack
+      : error
 
-    // 可选: 上报到错误监控服务
-    // this.reportError(message, error)
+    const errorInfo = {
+      message,
+      error: errorStack || error,
+      context,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    }
+
+    console.error(`[ERROR] ${message}`, errorInfo)
+    this.addLog('error', message, errorInfo)
+
+    // 生产环境上报到错误监控服务
+    if (import.meta.env.PROD) {
+      this.reportError(message, error, context)
+    }
   }
 
   /**
    * 添加日志到内存
    */
-  private addLog(level: LogLevel, message: string, data?: any) {
+  private addLog(level: LogLevel, message: string, data?: unknown) {
     this.logs.push({
       level,
       message,
@@ -94,9 +109,32 @@ class Logger {
   /**
    * 上报错误到监控服务（可扩展）
    */
-  private reportError(_message: string, _error?: any) {
+  private reportError(_message: string, _error?: unknown, _context?: Record<string, unknown>) {
     // TODO: 集成 Sentry 或其他监控服务
-    // Sentry.captureException(_error, { extra: { _message } })
+    // Sentry.captureException(_error, {
+    //   extra: { message: _message, context: _context }
+    // })
+  }
+
+  /**
+   * 性能追踪
+   */
+  performance<T>(label: string, fn: () => T): T
+  performance<T>(label: string, fn: () => Promise<T>): Promise<T>
+  performance<T>(label: string, fn: () => T | Promise<T>): T | Promise<T> {
+    const start = performance.now()
+    const result = fn()
+
+    if (result instanceof Promise) {
+      return result.finally(() => {
+        const duration = performance.now() - start
+        this.debug(`[PERF] ${label}: ${duration.toFixed(2)}ms`)
+      }) as Promise<T>
+    }
+
+    const duration = performance.now() - start
+    this.debug(`[PERF] ${label}: ${duration.toFixed(2)}ms`)
+    return result
   }
 }
 

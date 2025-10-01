@@ -374,7 +374,7 @@ export function useApi() {
                 onDataReceived(completedResponse)
               }
             } catch (e) {
-              console.error('解析 SSE 消息失败:', e)
+              logger.error('解析 SSE 消息失败', e, { line, model: modelName })
             }
           }
         }

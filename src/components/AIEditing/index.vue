@@ -1,4 +1,6 @@
 <script setup>
+import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode } from '@/utils/errors'
 import { logger } from '@/utils/logger'
 import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import Quill from 'quill'
@@ -534,8 +536,11 @@ onMounted(() => {
       } catch (error) {
         const format = item.dataset.format
 
-        // logger.debug(format)
-        console.error(`Export to ${format} failed:`, error)
+        ErrorHandler.handle(new AppError(
+          ErrorCode.EXPORT_ERROR,
+          `导出为 ${format} 格式失败`,
+          error,
+        ))
       }
     })
   })
