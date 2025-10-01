@@ -86,12 +86,24 @@ const streamingMessageId = computed(() => {
 </template>
 
 <style scoped>
+/* macOS 风格滚动条 - 默认隐藏，悬停/滚动时显示 */
 .chat-messages-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
 }
 
+.chat-messages-container:hover {
+  scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+}
+
+/* Webkit 滚动条 */
 .chat-messages-container::-webkit-scrollbar {
+  width: 0px;
+  transition: width 0.3s ease;
+}
+
+.chat-messages-container:hover::-webkit-scrollbar {
   width: 6px;
 }
 
@@ -100,16 +112,30 @@ const streamingMessageId = computed(() => {
 }
 
 .chat-messages-container::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.5);
+  background-color: transparent;
   border-radius: 20px;
+  transition: background-color 0.3s ease;
 }
 
-.dark .chat-messages-container::-webkit-scrollbar-thumb {
-  background-color: rgba(156, 163, 175, 0.7);
+.chat-messages-container:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.3);
 }
 
-.dark .chat-messages-container {
-  scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
+.chat-messages-container:hover::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.5);
+}
+
+/* 暗色模式 */
+.dark .chat-messages-container:hover {
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+}
+
+.dark .chat-messages-container:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.4);
+}
+
+.dark .chat-messages-container:hover::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.6);
 }
 
 /* 动画优化 */
