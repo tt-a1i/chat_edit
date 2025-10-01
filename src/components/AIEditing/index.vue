@@ -2,10 +2,12 @@
 import { ErrorHandler } from '@/utils/errorHandler'
 import { AppError, ErrorCode } from '@/utils/errors'
 import { logger } from '@/utils/logger'
+import { useEventListener } from '@vueuse/core'
 import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import Quill from 'quill'
 import * as QuillTableUI from 'quill-table-ui'
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useEditorEventListeners } from './composables/useEditorEventListeners'
 import { createExporter } from './export'
 import { createImporter } from './import'
 import { renderMarkdown } from './markdown'
@@ -35,6 +37,10 @@ import 'quill/dist/quill.snow.css'
 import 'quill-table-ui/dist/index.css'
 import 'katex/dist/katex.min.css'
 import 'github-markdown-css/github-markdown.css'
+
+// 事件监听器管理
+const { onElementClick, onDocumentEvent } = useEditorEventListeners()
+
 // 组件状态
 let quill = null
 // eslint-disable-next-line unused-imports/no-unused-vars
@@ -209,7 +215,9 @@ function detectMobileDevice() {
 }
 onMounted(() => {
   detectMobileDevice()
-  window.addEventListener('resize', () => {
+
+  // 使用 useEventListener 自动清理
+  useEventListener(window, 'resize', () => {
     const wasMobile = isMobile.value
     detectMobileDevice()
     if (!wasMobile && isMobile.value) {
@@ -232,7 +240,7 @@ onMounted(() => {
   monacoLoaded = true
 
   // 在 onMounted 中添加新按钮的事件监听
-  document.getElementById('insertAfterDiff')?.addEventListener('click', () => {
+  onElementClick('insertAfterDiff', () => {
     if (!diffEditor || !replacementRange) {
       logger.error('No diff editor or replacement range available')
       return
@@ -259,79 +267,83 @@ onMounted(() => {
     replacementRange = null
     currentRange = null
   })
-  sendBtnRef.addEventListener('click', async () => {
-    if (!isTranslationPrompt.value) {
-      const prompt = (hiddenPrompt.value || promptInputRef.value)?.toLowerCase() || ''
-      isTranslationPrompt.value
+
+  // sendBtn 事件监听
+  if (sendBtnRef) {
+    useEventListener(sendBtnRef, 'click', async () => {
+      if (!isTranslationPrompt.value) {
+        const prompt = (hiddenPrompt.value || promptInputRef.value)?.toLowerCase() || ''
+        isTranslationPrompt.value
         = prompt.includes('翻译')
           || prompt.includes('translate')
           || prompt.includes('中文')
           || prompt.includes('english')
-    }
+      }
 
-    if (isGenerating.value && abortController.value) {
-      abortController.value.abort()
-      sendBtnRef.classList.remove('loading')
-      sendBtnRef.innerHTML = '<i class="fas fa-paper-plane send-icon"></i>'
-      isGenerating.value = false
-      abortController.value = null
-      return
-    }
+      if (isGenerating.value && abortController.value) {
+        abortController.value.abort()
+        sendBtnRef.classList.remove('loading')
+        sendBtnRef.innerHTML = '<i class="fas fa-paper-plane send-icon"></i>'
+        isGenerating.value = false
+        abortController.value = null
+        return
+      }
 
-    const prompt = hiddenPrompt.value || promptInputRef.value
-    if (!prompt) {
-      return
-    }
+      const prompt = hiddenPrompt.value || promptInputRef.value
+      if (!prompt) {
+        return
+      }
 
-    hiddenPrompt.value = ''
+      hiddenPrompt.value = ''
 
-    verticalMenuRef.style.display = 'none'
-    aiResponseRef.style.display = 'block'
-    const responseContent = aiResponseRef.querySelector('.response-content')
-    actionButtonsRef.style.display = 'none'
+      verticalMenuRef.style.display = 'none'
+      aiResponseRef.style.display = 'block'
+      const responseContent = aiResponseRef.querySelector('.response-content')
+      actionButtonsRef.style.display = 'none'
 
-    // aiResponseRef.style.bottom = 'auto'
-    aiResponseRef.style.transform = 'none'
+      // aiResponseRef.style.bottom = 'auto'
+      aiResponseRef.style.transform = 'none'
 
-    if (responseContent) {
-      responseContent.classList.add('loading')
-      responseContent.textContent = '正在生成回答...'
-    }
+      if (responseContent) {
+        responseContent.classList.add('loading')
+        responseContent.textContent = '正在生成回答...'
+      }
 
-    await handleSend({
-      promptInputRef,
-      promptValue: prompt,
-      currentRange,
-      quill,
-      aiResponseRef,
-      actionButtonsRef,
-      isGenerating,
-      abortController,
-      onResponse: (response) => {
-        if (!responseContent) {
-          return
-        }
+      await handleSend({
+        promptInputRef,
+        promptValue: prompt,
+        currentRange,
+        quill,
+        aiResponseRef,
+        actionButtonsRef,
+        isGenerating,
+        abortController,
+        onResponse: (response) => {
+          if (!responseContent) {
+            return
+          }
 
-        if (response.error) {
+          if (response.error) {
+            responseContent.classList.remove('loading')
+            responseContent.textContent = `错误: ${response.errorMessage}`
+            return
+          }
+
           responseContent.classList.remove('loading')
-          responseContent.textContent = `错误: ${response.errorMessage}`
-          return
-        }
+          handleResponseUpdate(response.text, responseContent)
 
-        responseContent.classList.remove('loading')
-        handleResponseUpdate(response.text, responseContent)
-
-        if (
-          !actionButtonsRef.style.display
-          || actionButtonsRef.style.display === 'none'
-        ) {
-          actionButtonsRef.style.display = 'flex'
-        }
-      },
+          if (
+            !actionButtonsRef.style.display
+            || actionButtonsRef.style.display === 'none'
+          ) {
+            actionButtonsRef.style.display = 'flex'
+          }
+        },
+      })
     })
-  })
+  }
 
-  document.getElementById('insertAfter')?.addEventListener('click', () => {
+  onElementClick('insertAfter', () => {
     if (currentRange) {
       const responseContent = aiResponseRef.querySelector('.response-content')
       if (responseContent) {
@@ -355,7 +367,7 @@ onMounted(() => {
     quill.formatText(0, length, 'background', false, 'api')
   })
 
-  document.getElementById('replace')?.addEventListener('click', () => {
+  onElementClick('replace', () => {
     const responseContent = aiResponseRef.querySelector('.response-content')
     const aiResponseText = responseContent?.getAttribute('data-original-text')
 
@@ -383,7 +395,7 @@ onMounted(() => {
   })
 
   // 修改后
-  document.addEventListener('mouseup', (event) => {
+  onDocumentEvent('mouseup', (event) => {
     const target = event.target
     const isInComponents = [
       verticalMenuRef.contains(target),
@@ -411,7 +423,7 @@ onMounted(() => {
       }, 0)
     }
   })
-  document.getElementById('compare')?.addEventListener('click', () => {
+  onElementClick('compare', () => {
     if (!monacoLoaded) {
       // logger.debug('Monaco Editor is still loading...')
       return
@@ -437,7 +449,7 @@ onMounted(() => {
     })
   })
 
-  document.getElementById('confirmReplace')?.addEventListener('click', () => {
+  onElementClick('confirmReplace', () => {
     if (!diffEditor || !replacementRange) {
       logger.error('No diff editor or replacement range available')
       return
@@ -461,55 +473,51 @@ onMounted(() => {
     currentRange = null
   })
 
-  document.getElementById('cancelReplace')?.addEventListener('click', () => {
+  onElementClick('cancelReplace', () => {
     closeDiffEditor(diffEditor)
     posCloseToBottom = false
   })
 
-  document
-    .getElementById('aiResponseCopyBtn')
-    ?.addEventListener('click', () => {
-      const responseContent = aiResponseRef.querySelector('.response-content')?.textContent
+  onElementClick('aiResponseCopyBtn', () => {
+    const responseContent = aiResponseRef.querySelector('.response-content')?.textContent
 
-      if (responseContent) {
-        navigator.clipboard.writeText(responseContent).then(() => {
-          const copyBtn = document.getElementById('aiResponseCopyBtn')
-          const originalText = copyBtn.innerHTML
+    if (responseContent) {
+      navigator.clipboard.writeText(responseContent).then(() => {
+        const copyBtn = document.getElementById('aiResponseCopyBtn')
+        const originalText = copyBtn.innerHTML
 
-          copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制'
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制'
 
-          setTimeout(() => {
-            copyBtn.innerHTML = originalText
-          }, 2000)
-        })
-      }
-    })
-
-  document
-    .getElementById('aiResponseRegenerateBtn')
-    ?.addEventListener('click', () => {
-      const responseContent = aiResponseRef.querySelector('.response-content')
-      const prompt = hiddenPrompt.value || promptInputRef.value
-
-      handleRegenerate({
-        currentSession: currentSession.value,
-        promptInputRef,
-        promptValue: prompt,
-        currentRange,
-        quill,
-        aiResponseRef,
-        actionButtonsRef,
-        isGenerating,
-        abortController,
-        onResponse: (response) => {
-          if (!responseContent) {
-            return
-          }
-          handleResponseUpdate(response.text, responseContent)
-        },
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText
+        }, 2000)
       })
+    }
+  })
+
+  onElementClick('aiResponseRegenerateBtn', () => {
+    const responseContent = aiResponseRef.querySelector('.response-content')
+    const prompt = hiddenPrompt.value || promptInputRef.value
+
+    handleRegenerate({
+      currentSession: currentSession.value,
+      promptInputRef,
+      promptValue: prompt,
+      currentRange,
+      quill,
+      aiResponseRef,
+      actionButtonsRef,
+      isGenerating,
+      abortController,
+      onResponse: (response) => {
+        if (!responseContent) {
+          return
+        }
+        handleResponseUpdate(response.text, responseContent)
+      },
     })
-  document.addEventListener('click', (e) => {
+  })
+  onDocumentEvent('click', (e) => {
     const exportButton = document.querySelector('.ql-export')
     if (
       !exportMenuRef?.contains(e.target)
@@ -519,7 +527,7 @@ onMounted(() => {
     }
   })
   document.querySelectorAll('.export-menu-item')?.forEach((item) => {
-    item.addEventListener('click', async () => {
+    useEventListener(item, 'click', async () => {
       try {
         const format = item.dataset.format
         if (!format) {
@@ -545,7 +553,7 @@ onMounted(() => {
     })
   })
 
-  document.getElementById('aiResponse').addEventListener('click', (e) => {
+  onElementClick('aiResponse', (e) => {
     if (e.target.closest('#compare') && isTranslationPrompt.value) {
       e.preventDefault()
       e.stopPropagation()
@@ -646,7 +654,7 @@ function initQuillEditor() {
         const editorElement = quill.root
 
         // 监听 compositionstart 事件（输入法输入开始）
-        editorElement.addEventListener('compositionstart', () => {
+        useEventListener(editorElement, 'compositionstart', () => {
           // 添加一个临时的空格以触发 placeholder 隐藏
           if (quill.getText().trim() === '') {
             quill.root.classList.add('hiding-placeholder')
@@ -654,7 +662,7 @@ function initQuillEditor() {
         })
 
         // 监听 compositionend 事件（输入法输入结束）
-        editorElement.addEventListener('compositionend', () => {
+        useEventListener(editorElement, 'compositionend', () => {
           // 如果输入被取消且内容为空，恢复 placeholder
           setTimeout(() => {
             if (quill.getText().trim() === '') {
@@ -664,7 +672,7 @@ function initQuillEditor() {
         })
 
         // 监听 blur 事件（失去焦点）确保状态正确
-        editorElement.addEventListener('blur', () => {
+        useEventListener(editorElement, 'blur', () => {
           if (quill.getText().trim() === '') {
             quill.root.classList.remove('hiding-placeholder')
           }
@@ -832,7 +840,7 @@ function initQuillEditor() {
           promptInputRef,
         })
       })
-      quill.root.addEventListener('keydown', async (e) => {
+      useEventListener(quill.root, 'keydown', async (e) => {
         if (e.key === '/') {
           const selection = quill.getSelection()
           if (!selection) {
