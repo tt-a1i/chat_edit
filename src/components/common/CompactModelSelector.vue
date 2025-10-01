@@ -124,7 +124,7 @@ function toggleDropdown() {
     >
       <div
         v-if="isOpen"
-        class="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+        class="absolute right-0 top-full z-[100] mt-2 w-72 overflow-hidden rounded-xl border bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
         style="max-height: 70vh;"
       >
         <!-- 搜索框 -->
