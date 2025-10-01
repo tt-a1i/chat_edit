@@ -243,7 +243,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function addSystemMessage(content: string | null, meta?: any) {
+  async function addSystemMessage(content: string | null, meta?: Record<string, unknown>) {
     if (!currentChatId.value || !content) return
 
     const message: Omit<Message, 'id'> = {

@@ -3,6 +3,12 @@
  */
 import type { DefineComponent } from 'vue'
 
-declare const AIEditingComponent: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>
+// AIEditing 组件不需要 props，使用空对象
+// 组件实例没有暴露方法，使用空对象
+declare const AIEditingComponent: DefineComponent<
+  Record<string, never>, // props
+  Record<string, never>, // emits
+  Record<string, never>
+>
 
 export default AIEditingComponent
