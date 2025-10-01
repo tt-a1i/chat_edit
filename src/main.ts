@@ -1,6 +1,7 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
+import './styles/tokens.css'
 import './style.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import './assets/markdown-dark.css'

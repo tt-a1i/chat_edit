@@ -32,9 +32,10 @@ export const useAppStore = defineStore('app', () => {
 
   // UI state
   const isDarkMode = useLocalStorage('darkMode', true)
-  const isSettingsOpen = useLocalStorage('settingsPanelOpen', true)
+  const isSettingsOpen = useLocalStorage('settingsPanelOpen', false) // 默认关闭设置面板
   const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
   const isAIEditingOpen = ref(false)
+  const isSidebarCollapsed = useLocalStorage('sidebarCollapsed', false) // 侧边栏折叠状态
 
   // Computed
   const avatarUrl = computed(() => {
@@ -63,6 +64,10 @@ export const useAppStore = defineStore('app', () => {
     isDarkMode.value = !isDarkMode.value
   }
 
+  function toggleSidebar() {
+    isSidebarCollapsed.value = !isSidebarCollapsed.value
+  }
+
   return {
     // Scene
     SCENES,
@@ -86,10 +91,12 @@ export const useAppStore = defineStore('app', () => {
     isSettingsOpen,
     isSystemPromptOpen,
     isAIEditingOpen,
+    isSidebarCollapsed,
 
     // Actions
     toggleSettingsPanel,
     toggleSystemPromptPanel,
     toggleDarkMode,
+    toggleSidebar,
   }
 })
