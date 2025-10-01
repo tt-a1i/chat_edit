@@ -41,6 +41,7 @@
     "markdown-it-texmath": "^1.0.0",
     "monaco-editor": "^0.52.2",
     "naive-ui": "^2.41.0",
+    "pinia": "^3.0.3",
     "postcss": "^8.4.31",
     "quill": "^2.0.3",
     "quill-table-ui": "^1.0.7",

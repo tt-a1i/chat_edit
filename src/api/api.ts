@@ -1,4 +1,5 @@
 import type {
+  ChatCompletedResponse,
   ChatPartResponse,
   ChatRequest,
   ChatResponse,
@@ -19,6 +20,9 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
+import { ref } from 'vue'
+import { apiKey, baseUrl } from '../services/appConfig.ts'
+import { toError } from '@/utils/error'
 
 export type {
   ChatCompletedResponse,
@@ -26,9 +30,6 @@ export type {
   ChatResponse,
   Model,
 } from './types.ts'
-import { ref } from 'vue'
-import { apiKey, baseUrl } from '../services/appConfig.ts'
-import { toError } from '@/utils/error'
 
 // 定义获取完整 API URL 的方法
 export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
