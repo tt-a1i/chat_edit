@@ -78,7 +78,7 @@ onMounted(() => {
 
         <div v-else class="flex h-screen w-full flex-col">
           <!-- 现代化顶部栏 - 全宽但内容居中 -->
-          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-10">
+          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-[60]">
             <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
               <!-- 左侧：会话信息 -->
               <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
