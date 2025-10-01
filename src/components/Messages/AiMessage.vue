@@ -4,9 +4,9 @@ import { useAppStore } from '@/stores'
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
+import AIAvatar from '../common/AIAvatar.vue'
 import Markdown from '../Markdown.ts'
 import 'highlight.js/styles/github-dark.css'
-import logo from '/logo.png'
 
 interface Props {
   message: Message
@@ -44,12 +44,8 @@ function copyToClipboard() {
 
 <template>
   <div class="group flex items-start gap-3 px-2 py-2 sm:px-4">
-    <!-- AI Logo -->
-    <img
-      :src="logo"
-      alt="AI"
-      class="h-8 w-8 flex-shrink-0 rounded-full object-contain shadow-sm ring-2 ring-white dark:ring-gray-700"
-    >
+    <!-- AI 头像 -->
+    <AIAvatar :size="32" variant="default" />
 
     <!-- 消息卡片 -->
     <div class="relative max-w-[85%] sm:max-w-3xl">

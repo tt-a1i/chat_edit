@@ -54,23 +54,31 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
 
 <template>
   <aside
-    class="flex transition-all duration-300 ease-in-out"
+    class="relative flex transition-all duration-300 ease-in-out"
     :class="isSidebarCollapsed ? 'w-16' : 'w-60 sm:w-64'"
   >
+    <!-- 折叠/展开按钮 - 移到外部避免遮挡 -->
+    <button
+      class="absolute -right-3 top-4 z-50 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl active:scale-95 dark:border-gray-800"
+      :title="isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'"
+      @click="toggleSidebar"
+    >
+      <svg
+        class="h-4 w-4 text-white transition-transform duration-300"
+        :class="isSidebarCollapsed ? 'rotate-180' : ''"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
     <div
-      class="flex h-screen flex-col overflow-y-auto border-r border-gray-200 bg-white pt-2 dark:border-gray-800 dark:bg-gray-900 relative"
+      class="flex h-screen flex-col overflow-y-auto border-r border-gray-200 bg-white pt-2 dark:border-gray-800 dark:bg-gray-900"
       :class="isSidebarCollapsed ? 'w-16' : 'w-full'"
     >
-      <!-- 折叠按钮 -->
-      <button
-        class="absolute top-2 -right-3 z-10 h-6 w-6 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 shadow-md transition-colors"
-        :title="isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'"
-        @click="toggleSidebar"
-      >
-        <svg class="w-4 h-4 transition-transform duration-300" :class="isSidebarCollapsed ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
       <div class="mx-2 mb-2">
         <button
           class="flex w-full items-center justify-center gap-x-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900"
