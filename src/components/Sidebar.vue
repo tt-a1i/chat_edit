@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SCENES, useAppStore, useChatStore } from '@/stores'
 import {
   IconEdit,
   IconMessageCode,
@@ -10,7 +11,6 @@ import {
   IconUserCircle,
 } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
-import { SCENES, useAppStore, useChatStore } from '@/stores'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()

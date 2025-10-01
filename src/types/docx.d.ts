@@ -44,7 +44,7 @@ declare module 'docx' {
     size?: number
     font?: string
     color?: string
-    [key: string]: any  // 允许其他属性
+    [key: string]: any // 允许其他属性
   }
 
   export class Table {

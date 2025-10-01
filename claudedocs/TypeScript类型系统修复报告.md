@@ -144,7 +144,7 @@ import AIEditingComponent from './index.vue'
 **修复内容**:
 ```typescript
 // 1. 导入 ChatRole
-import type { Message, ChatRole } from './database'
+import type { ChatRole, Message } from './database'
 
 // 2. 定义 APIMessage 接口
 interface APIMessage {
@@ -258,7 +258,7 @@ const bounds = quill.getBounds(range.index, range.length)
 ```typescript
 // ✅ 好的实践
 import type { ChatResponse } from '@/types/ai-editing'
-import type { Message, ChatRole } from './database'
+import type { ChatRole, Message } from './database'
 
 // ❌ 之前的代码
 // 缺少类型导入，导致 'ChatResponse' 未定义错误

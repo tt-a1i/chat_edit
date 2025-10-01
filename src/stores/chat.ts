@@ -1,13 +1,13 @@
+import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 /**
  * 聊天状态管理 Store
  */
 import type { Chat, Message } from '@/services/database'
-import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
+import { useApi } from '@/api/api'
 import { db } from '@/services/database'
+import { useAI } from '@/services/useAI'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useApi } from '@/api/api'
-import { useAI } from '@/services/useAI'
 import { useAppStore } from './app'
 
 interface ChatExport extends Chat {
@@ -156,8 +156,7 @@ export const useChatStore = defineStore('chat', () => {
     try {
       await db.chats.update(chatId, updates)
       await loadChats()
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('更新聊天失败:', err)
     }
@@ -169,8 +168,7 @@ export const useChatStore = defineStore('chat', () => {
     try {
       await db.chats.update(currentChat.value.id!, { name: newName })
       await loadChats()
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('重命名聊天失败:', err)
     }
@@ -189,8 +187,7 @@ export const useChatStore = defineStore('chat', () => {
       await loadChats()
       await setCurrentChat(id)
       return id
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('创建新聊天失败:', err)
       throw err
@@ -205,8 +202,7 @@ export const useChatStore = defineStore('chat', () => {
         const appStore = useAppStore()
         appStore.currentModel = chat.model
       }
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('切换聊天失败:', err)
     }
@@ -218,8 +214,7 @@ export const useChatStore = defineStore('chat', () => {
 
       if (chats.value.length === 0) {
         await startNewChat('New Chat')
-      }
-      else {
+      } else {
         await switchChat(sortedChats.value[0].id!)
       }
 
@@ -227,8 +222,7 @@ export const useChatStore = defineStore('chat', () => {
       if (!appStore.currentModel || appStore.currentModel === 'none') {
         appStore.currentModel = 'moonshot-v1-8k'
       }
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('初始化聊天失败:', err)
       await startNewChat('New Chat')
@@ -250,8 +244,7 @@ export const useChatStore = defineStore('chat', () => {
       const id = await db.messages.add(message as Message)
       systemPrompt.value = { ...message, id } as Message
       await loadMessages(currentChatId.value)
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('添加系统消息失败:', err)
     }
@@ -304,8 +297,7 @@ export const useChatStore = defineStore('chat', () => {
         data => handleAiPartialResponse(data, chatId),
         data => handleAiCompletion(data, chatId),
       )
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         ongoingAiMessages.value.delete(chatId)
         return
@@ -319,7 +311,7 @@ export const useChatStore = defineStore('chat', () => {
     const aiMessage = ongoingAiMessages.value.get(chatId)
     if (aiMessage) {
       aiMessage.content += data.message.content
-      db.messages.update(aiMessage.id!, { content: aiMessage.content }).catch(err => {
+      db.messages.update(aiMessage.id!, { content: aiMessage.content }).catch((err) => {
         console.error('更新AI消息失败:', err)
       })
     }
@@ -336,8 +328,7 @@ export const useChatStore = defineStore('chat', () => {
         })
         ongoingAiMessages.value.delete(chatId)
         await loadMessages(chatId)
-      }
-      catch (err) {
+      } catch (err) {
         error.value = err instanceof Error ? err : new Error(String(err))
         console.error('完成AI消息失败:', err)
       }
@@ -368,8 +359,7 @@ export const useChatStore = defineStore('chat', () => {
         data => handleAiPartialResponse(data, chatId),
         data => handleAiCompletion(data, chatId),
       )
-    }
-    catch (err) {
+    } catch (err) {
       if (err instanceof Error && err.name === 'AbortError') {
         ongoingAiMessages.value.delete(chatId)
         return
@@ -388,8 +378,7 @@ export const useChatStore = defineStore('chat', () => {
       currentChatId.value = null
       ongoingAiMessages.value.clear()
       await startNewChat('New Chat')
-    }
-    catch (err) {
+    } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       console.error('清空数据库失败:', err)
     }
