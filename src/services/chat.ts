@@ -380,7 +380,7 @@ export function useChats() {
   }
 
   const importChats = async (jsonData: ChatExport[]) => {
-    jsonData.forEach(async (chatData) => {
+    for (const chatData of jsonData) {
       const chat: Chat = {
         name: chatData?.name,
         model: chatData?.model,
@@ -388,8 +388,9 @@ export function useChats() {
       }
       chat.id = await dbLayer.addChat(chat)
       chats.value.push(chat)
+
       if (chatData.messages) {
-        chatData.messages.forEach(async (messageData) => {
+        for (const messageData of chatData.messages) {
           const message: Message = {
             chatId: chat.id!,
             role: messageData.role,
@@ -398,9 +399,9 @@ export function useChats() {
             createdAt: new Date(messageData.createdAt),
           }
           await dbLayer.addMessage(message)
-        })
+        }
       }
-    })
+    }
   }
 
   return {

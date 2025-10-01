@@ -4,12 +4,11 @@ import type {
   ChatResponse,
   Model,
 } from '../api/api.ts'
-import type { ChatRole, Message } from './database'
-
+import type { Message } from './database'
 import { ref } from 'vue'
-import {
-  useApi,
-} from '../api/api.ts'
+import { useApi } from '../api/api.ts'
+
+type ChatRole = 'user' | 'assistant' | 'system'
 
 // Define availableModels outside the function to ensure a shared state.
 const availableModels = ref<Model[]>([])
@@ -34,7 +33,7 @@ export function useAI() {
       content: string | any[]
     }
 
-    const apiMessages: APIMessage[] = chatHistory.map((msg) => {
+    const apiMessages: APIMessage[] = chatHistory.map((msg): APIMessage => {
       if (msg.role === 'user' && msg.imageUrl) {
         const contentPayload: any[] = [
           {

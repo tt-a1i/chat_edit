@@ -10,6 +10,7 @@ import ToggleInput from './Inputs/ToggleInput.vue'
 
 // Stores
 const appStore = useAppStore()
+const { toggleSettingsPanel } = appStore
 const {
   apiKey,
   baseUrl,
@@ -17,7 +18,6 @@ const {
   gravatarEmail,
   historyMessageLength,
   showSystem,
-  toggleSettingsPanel,
 } = appStore
 
 // Services
