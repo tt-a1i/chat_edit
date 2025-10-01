@@ -352,25 +352,55 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function regenerateResponse() {
+  async function regenerateResponse(messageId?: number) {
     if (!currentChatId.value) return
 
     const chatId = currentChatId.value
     const { generate } = useAI()
     const appStore = useAppStore()
-    const lastMessage = messages.value[messages.value.length - 1]
 
-    if (lastMessage && lastMessage.role === 'assistant') {
-      if (lastMessage.id) {
-        await db.messages.delete(lastMessage.id)
+    // 如果指定了 messageId，删除该消息及之后的所有消息
+    if (messageId) {
+      const messageIndex = messages.value.findIndex(m => m.id === messageId)
+      if (messageIndex === -1) return
+
+      // 删除该消息及之后的所有消息
+      const messagesToDelete = messages.value.slice(messageIndex)
+      for (const msg of messagesToDelete) {
+        if (msg.id) {
+          await db.messages.delete(msg.id)
+        }
       }
       await loadMessages(chatId)
+    } else {
+      // 原有逻辑：重新生成最后一条消息
+      const lastMessage = messages.value[messages.value.length - 1]
+      if (lastMessage && lastMessage.role === 'assistant') {
+        if (lastMessage.id) {
+          await db.messages.delete(lastMessage.id)
+        }
+        await loadMessages(chatId)
+      }
     }
 
+    // 创建新的 AI 响应消息
+    const aiMessage: Omit<Message, 'id'> = {
+      chatId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date(),
+      isStreaming: true,
+    }
+    const aiId = await db.messages.add(aiMessage as Message)
+    const aiMsg = { ...aiMessage, id: aiId } as Message
+    ongoingAiMessages.value.set(chatId, aiMsg)
+    await loadMessages(chatId)
+
     try {
+      // 发送给 API 时排除最后一条空的 AI 消息
       await generate(
         appStore.currentModel,
-        messages.value,
+        messages.value.slice(0, -1),
         systemPrompt.value,
         appStore.historyMessageLength,
         data => handleAiPartialResponse(data, chatId),

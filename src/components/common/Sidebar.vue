@@ -57,9 +57,9 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
     class="relative flex transition-all duration-300 ease-in-out"
     :class="isSidebarCollapsed ? 'w-16' : 'w-60 sm:w-64'"
   >
-    <!-- 折叠/展开按钮 - 移到外部避免遮挡 -->
+    <!-- 折叠/展开按钮 - 垂直居中 -->
     <button
-      class="absolute -right-3 top-4 z-50 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl active:scale-95 dark:border-gray-800"
+      class="absolute -right-3 top-1/2 -translate-y-1/2 z-50 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl active:scale-95 dark:border-gray-800"
       :title="isSidebarCollapsed ? '展开侧边栏' : '收起侧边栏'"
       @click="toggleSidebar"
     >

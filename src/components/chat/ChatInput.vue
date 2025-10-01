@@ -15,8 +15,7 @@ const { currentModel } = storeToRefs(appStore)
 const { currentMessages } = storeToRefs(chatStore)
 
 const { availableModels } = useAI()
-const { addSystemMessage, addUserMessage, abort, regenerateResponse } = chatStore
-const hasMessages = computed(() => currentMessages.value.length > 0)
+const { addSystemMessage, addUserMessage, abort } = chatStore
 
 const selectedImage = ref<string | null>(null) // To store the base64 image string. Defined before isInputValid
 const isSystemMessage = ref(false)
@@ -130,17 +129,6 @@ function clearImage() {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <div class="flex px-2 flex-col sm:flex-row items-center mb-3">
-      <div v-if="hasMessages" class="ml-auto">
-        <button
-          type="button"
-          class="rounded-lg text-blue-600 text-sm font-medium transition duration-200 ease-in-out hover:text-blue-700 hover:bg-blue-50 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:text-gray-400 disabled:opacity-50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20 dark:focus:ring-blue-800 dark:disabled:text-gray-600"
-          @click="regenerateResponse"
-        >
-          重新生成回答
-        </button>
-      </div>
-    </div>
     <div class="relative px-2">
       <!-- Image Preview -->
       <div v-if="selectedImage" class="mb-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg relative max-w-xs">
@@ -164,7 +152,7 @@ function clearImage() {
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="block max-h-[500px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-50 dark:placeholder-gray-400 dark:focus:ring-blue-500 sm:text-base shadow-sm hover:shadow-md transition-all duration-300"
+        class="chat-input-textarea block max-h-[500px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-50 dark:placeholder-gray-400 dark:focus:ring-blue-500 sm:text-base shadow-sm hover:shadow-md transition-all duration-300"
         placeholder="输入消息... (Shift + Enter 换行)"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
@@ -205,3 +193,15 @@ function clearImage() {
     </div>
   </form>
 </template>
+
+<style scoped>
+/* 隐藏输入框滚动条 */
+.chat-input-textarea {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.chat-input-textarea::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+</style>

@@ -7,13 +7,14 @@ import UserMessage from '../Messages/UserMessage.vue'
 interface Props {
   message: Message
   isStreaming?: boolean
+  isLastAiMessage?: boolean
 }
 
-const { message, isStreaming = false } = defineProps<Props>()
+const { message, isStreaming = false, isLastAiMessage = false } = defineProps<Props>()
 </script>
 
 <template>
   <SystemMessage v-if="message.role === 'system'" :message="message" />
   <UserMessage v-if="message.role === 'user'" :message="message" />
-  <AiMessage v-if="message.role === 'assistant'" :message="message" :is-streaming="isStreaming" />
+  <AiMessage v-if="message.role === 'assistant'" :message="message" :is-streaming="isStreaming" :is-last-message="isLastAiMessage" />
 </template>

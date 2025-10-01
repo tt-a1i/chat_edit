@@ -79,7 +79,7 @@ onMounted(() => {
         <div v-else class="flex h-screen w-full flex-col">
           <!-- 现代化顶部栏 - 全宽但内容居中 -->
           <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-10">
-            <div class="mx-auto flex max-w-5xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
+            <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
               <!-- 左侧：会话信息 -->
               <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                 <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">
@@ -131,7 +131,7 @@ onMounted(() => {
 
           <!-- 输入区域 - 全宽但内容居中 -->
           <div class="w-full border-t bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-700">
-            <div class="mx-auto max-w-5xl px-3 sm:px-4 lg:px-6 pt-4 pb-2">
+            <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-2">
               <ChatInput />
             </div>
           </div>
@@ -195,10 +195,23 @@ onMounted(() => {
   scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
 }
 
+/* 统一亮色和暗色模式的边距 */
+.dark .prose > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.dark .prose p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /* 改进暗色模式下的代码块样式 */
 .dark .prose pre {
   background-color: rgba(30, 41, 59, 0.95) !important;
   border-color: rgba(71, 85, 105, 0.5) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .dark .prose code {

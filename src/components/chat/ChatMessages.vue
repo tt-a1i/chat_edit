@@ -64,6 +64,13 @@ const streamingMessageId = computed(() => {
   }
   return null
 })
+
+// 获取最后一条 AI 消息的 ID
+const lastAiMessageId = computed(() => {
+  const aiMessages = visibleMessages.value.filter(m => m.role === 'assistant')
+  const lastAiMessage = aiMessages[aiMessages.length - 1]
+  return lastAiMessage?.id || null
+})
 </script>
 
 <template>
@@ -73,7 +80,7 @@ const streamingMessageId = computed(() => {
   >
     <!-- 内容容器 - 居中且有最大宽度 -->
     <div
-      class="mx-auto max-w-5xl text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
+      class="mx-auto max-w-7xl text-sm leading-6 text-gray-900 dark:text-gray-100 sm:text-base sm:leading-7"
       :class="visibleMessages.length > 0 ? 'p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6' : ''"
     >
       <!-- 空状态 -->
@@ -85,6 +92,7 @@ const streamingMessageId = computed(() => {
         :key="message.id"
         :message="message"
         :is-streaming="message.id === streamingMessageId"
+        :is-last-ai-message="message.id === lastAiMessageId"
       />
     </div>
   </div>
