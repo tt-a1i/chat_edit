@@ -1,3 +1,4 @@
+import type { ModelInfo } from '@/types/api'
 import type {
   ChatPartResponse,
   ChatRequest,
@@ -19,7 +20,7 @@ import type {
   ShowModelInformationResponse,
 } from './types.ts'
 import { useAppStore } from '@/stores'
-import { toError } from '@/utils/error'
+import { toError } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
 import { ref } from 'vue'
 
@@ -70,7 +71,7 @@ export function useApi() {
     // 生成聊天内容
     generateChat: async (
       request: ChatRequest,
-      onDataReceived: (data: any) => void,
+      onDataReceived: (data: ChatResponse) => void,
     ): Promise<ChatResponse[]> => {
       try {
         const messages = request.messages?.map(msg => ({
@@ -143,7 +144,7 @@ export function useApi() {
         const data = await response.json()
 
         return {
-          models: (data.data || []).map((model: any) => ({
+          models: (data.data || []).map((model: ModelInfo) => ({
             name: model.id,
             modified_at: new Date().toISOString(),
             size: 0,
@@ -310,7 +311,7 @@ export function useApi() {
   async function processStreamResponse(
     response: Response,
     modelName: string,
-    onDataReceived: (data: any) => void,
+    onDataReceived: (data: ChatResponse) => void,
   ): Promise<ChatResponse[]> {
     const reader = response.body?.getReader()
     const results: ChatResponse[] = []

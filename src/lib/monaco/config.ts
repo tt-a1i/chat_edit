@@ -1,13 +1,18 @@
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 
+interface MonacoEnvironment {
+  getWorker: (_moduleId: string, _label: string) => Worker
+}
+
 export function initMonaco(): void {
   // 定义全局 MonacoEnvironment
+  // eslint-disable-next-line ts/no-explicit-any
   (globalThis as any).MonacoEnvironment = {
     getWorker(_moduleId: string, _label: string): Worker {
       // eslint-disable-next-line new-cap
       return new editorWorker()
     },
-  }
+  } as MonacoEnvironment
 }
 
 // 配置 Monaco 编辑器的默认选项

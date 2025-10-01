@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
-import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
-import ChatInput from './components/ChatInput.vue'
-import ChatMessages from './components/ChatMessages.vue'
+import AIEditingMain from './components/AIEditing/index.vue'
+import ChatInput from './components/chat/ChatInput.vue'
+import ChatMessages from './components/chat/ChatMessages.vue'
+import SystemPrompt from './components/chat/SystemPrompt.vue'
+import ModelSelector from './components/common/ModelSelector.vue'
+import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/Inputs/TextInput.vue'
-import ModelSelector from './components/ModelSelector.vue'
 import Settings from './components/Settings.vue'
-import Sidebar from './components/Sidebar.vue'
-import SystemPrompt from './components/SystemPrompt.vue'
-import { useAI } from './services/useAI.ts'
+import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
+import { useAI } from './services/ai.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
-import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
 
 // Stores
 const appStore = useAppStore()

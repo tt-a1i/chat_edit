@@ -4,7 +4,7 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
-import { getApiUrl, getHeaders } from '../../api/api'
+import { getApiUrl, getHeaders } from './api'
 
 /**
  * HTTP 错误类
@@ -13,14 +13,14 @@ class HttpError extends Error {
   status: number
   statusText: string
   code?: string
-  data?: any
+  data?: unknown
 
   constructor(options: {
     status: number
     statusText: string
     code?: string
     message?: string
-    data?: any
+    data?: unknown
   }) {
     super(options.message || options.statusText)
     this.name = 'HttpError'

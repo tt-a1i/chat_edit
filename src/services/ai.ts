@@ -1,3 +1,4 @@
+import type { APIMessage, MultiModalContent } from '@/types/api'
 import type {
   ChatCompletedResponse,
   ChatPartResponse,
@@ -28,14 +29,9 @@ export function useAI() {
       chatHistory.unshift(system)
     }
 
-    interface APIMessage {
-      role: ChatRole
-      content: string | any[]
-    }
-
     const apiMessages: APIMessage[] = chatHistory.map((msg): APIMessage => {
       if (msg.role === 'user' && msg.imageUrl) {
-        const contentPayload: any[] = [
+        const contentPayload: MultiModalContent[] = [
           {
             type: 'image_url',
             image_url: { url: msg.imageUrl },
@@ -46,17 +42,17 @@ export function useAI() {
           },
         ]
         return {
-          role: msg.role,
+          role: msg.role as ChatRole,
           content: contentPayload,
         }
       }
       return {
-        role: msg.role,
+        role: msg.role as ChatRole,
         content: msg.content,
       }
     })
 
-    await generateChat({ model, messages: apiMessages as any }, (data: ChatResponse) => {
+    await generateChat({ model, messages: apiMessages }, (data: ChatResponse) => {
       if (!data.done && onMessage) {
         onMessage(data as ChatPartResponse)
       } else if (data.done && onDone) {

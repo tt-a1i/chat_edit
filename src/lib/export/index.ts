@@ -1,5 +1,6 @@
+import type { QuillInstance } from '@/types/quill'
+import { AppError, ErrorCode } from '@/utils/error-handler'
 import { ErrorHandler } from '@/utils/errorHandler'
-import { AppError, ErrorCode } from '@/utils/errors'
 import {
   Document,
   HeadingLevel,
@@ -16,9 +17,9 @@ import TurndownService from 'turndown'
 class DocumentExporter {
   private content: string
   private parser: DOMParser
-  private quill?: any
+  private quill?: QuillInstance
 
-  constructor(content: string, quill?: any) {
+  constructor(content: string, quill?: QuillInstance) {
     this.content = content
     this.parser = new DOMParser()
     this.quill = quill
@@ -191,21 +192,21 @@ class DocumentExporter {
           case 'h1':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 36 } as any)] : [],
+                child instanceof TextRun ? [new TextRun({ text: element.textContent || '', size: 36 })] : [],
               ),
               heading: HeadingLevel.HEADING_1,
             })
           case 'h2':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 32 } as any)] : [],
+                child instanceof TextRun ? [new TextRun({ text: element.textContent || '', size: 32 })] : [],
               ),
               heading: HeadingLevel.HEADING_2,
             })
           case 'h3':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 28 } as any)] : [],
+                child instanceof TextRun ? [new TextRun({ text: element.textContent || '', size: 28 })] : [],
               ),
               heading: HeadingLevel.HEADING_3,
             })
@@ -389,7 +390,7 @@ class DocumentExporter {
 
         turndownService.addRule('table', {
           filter: 'table',
-          replacement(content: string, node: any): string {
+          replacement(content: string, node: unknown): string {
             const rows = (node as HTMLElement).querySelectorAll('tr')
             let markdownTable = ''
 
@@ -442,6 +443,6 @@ class DocumentExporter {
   }
 }
 
-export function createExporter(content: string, quill?: any) {
+export function createExporter(content: string, quill?: QuillInstance) {
   return new DocumentExporter(content, quill)
 }

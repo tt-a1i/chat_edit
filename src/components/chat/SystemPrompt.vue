@@ -5,7 +5,7 @@ import { useTextareaAutosize } from '@vueuse/core'
 import { createDiscreteApi } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
-import ModelSelector from './ModelSelector.vue'
+import ModelSelector from '../common/ModelSelector.vue'
 
 const appStore = useAppStore()
 const configStore = useConfigStore()

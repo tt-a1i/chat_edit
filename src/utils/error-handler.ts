@@ -1,4 +1,9 @@
 /**
+ * 统一的错误处理模块
+ * 合并了 error.ts 和 errors.ts 的功能
+ */
+
+/**
  * 错误码枚举
  */
 export enum ErrorCode {
@@ -39,4 +44,30 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ErrorCode.VALIDATION_ERROR]: '输入数据格式不正确',
   [ErrorCode.EDITOR_ERROR]: '编辑器操作失败',
   [ErrorCode.UNKNOWN_ERROR]: '操作失败，请重试',
+}
+
+/**
+ * 将未知错误转换为 Error 对象
+ */
+export function toError(err: unknown): Error {
+  if (err instanceof Error) {
+    return err
+  }
+  if (typeof err === 'string') {
+    return new Error(err)
+  }
+  return new Error(String(err))
+}
+
+/**
+ * 安全地获取错误消息
+ */
+export function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    return err.message
+  }
+  if (typeof err === 'string') {
+    return err
+  }
+  return '未知错误'
 }

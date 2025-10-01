@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { showError } from '@/composables/useToast'
 import { useChatStore } from '@/stores'
 import { logger } from '@/utils/logger'
-import { showError } from '@/utils/toast'
 
 const chatStore = useChatStore()
 const { importChats } = chatStore

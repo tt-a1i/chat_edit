@@ -1,4 +1,4 @@
-import { AppError, ERROR_MESSAGES, ErrorCode } from './errors'
+import { AppError, ERROR_MESSAGES, ErrorCode } from './error-handler'
 import { logger } from './logger'
 
 /**

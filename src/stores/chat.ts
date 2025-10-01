@@ -4,10 +4,10 @@ import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
  */
 import type { Chat, Message } from '@/services/database'
 import { useApi } from '@/api/api'
+import { showError } from '@/composables/useToast'
+import { useAI } from '@/services/ai'
 import { db } from '@/services/database'
-import { useAI } from '@/services/useAI'
 import { logger } from '@/utils/logger'
-import { showError } from '@/utils/toast'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAppStore } from './app'
@@ -243,7 +243,7 @@ export const useChatStore = defineStore('chat', () => {
     }
   }
 
-  async function addSystemMessage(content: string | null, meta?: any) {
+  async function addSystemMessage(content: string | null, meta?: Record<string, unknown>) {
     if (!currentChatId.value || !content) return
 
     const message: Omit<Message, 'id'> = {

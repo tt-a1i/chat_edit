@@ -7,12 +7,12 @@
 
 import type { editor } from 'monaco-editor'
 import type Quill from 'quill'
+import { defaultDiffEditorOptions } from '@/lib/monaco/config'
+import { AppError, ErrorCode } from '@/utils/error-handler'
 import { ErrorHandler } from '@/utils/errorHandler'
-import { AppError, ErrorCode } from '@/utils/errors'
 import { logger } from '@/utils/logger'
 import * as monaco from 'monaco-editor'
 import { nextTick } from 'vue'
-import { defaultDiffEditorOptions } from '../monacoConfig'
 
 export interface DiffEditorParams {
   currentRange: { index: number, length: number } | null
