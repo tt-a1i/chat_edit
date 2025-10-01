@@ -372,19 +372,6 @@ export const useChatStore = defineStore('chat', () => {
         }
       }
       await loadMessages(chatId)
-
-      // 创建新的 AI 响应消息
-      const aiMessage: Omit<Message, 'id'> = {
-        chatId,
-        role: 'assistant',
-        content: '',
-        createdAt: new Date(),
-        isStreaming: true,
-      }
-      const aiId = await db.messages.add(aiMessage as Message)
-      const aiMsg = { ...aiMessage, id: aiId } as Message
-      ongoingAiMessages.value.set(chatId, aiMsg)
-      await loadMessages(chatId)
     } else {
       // 原有逻辑：重新生成最后一条消息
       const lastMessage = messages.value[messages.value.length - 1]
@@ -396,10 +383,24 @@ export const useChatStore = defineStore('chat', () => {
       }
     }
 
+    // 创建新的 AI 响应消息
+    const aiMessage: Omit<Message, 'id'> = {
+      chatId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date(),
+      isStreaming: true,
+    }
+    const aiId = await db.messages.add(aiMessage as Message)
+    const aiMsg = { ...aiMessage, id: aiId } as Message
+    ongoingAiMessages.value.set(chatId, aiMsg)
+    await loadMessages(chatId)
+
     try {
+      // 发送给 API 时排除最后一条空的 AI 消息
       await generate(
         appStore.currentModel,
-        messages.value,
+        messages.value.slice(0, -1),
         systemPrompt.value,
         appStore.historyMessageLength,
         data => handleAiPartialResponse(data, chatId),
