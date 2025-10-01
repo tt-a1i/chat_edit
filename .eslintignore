@@ -1,0 +1,15 @@
+# ESLint 忽略配置
+
+# 文档目录（包含代码示例，不需要检查）
+claudedocs/
+
+# 构建产物
+dist/
+dist-ssr/
+*.local
+
+# 依赖
+node_modules/
+
+# 系统文件
+.DS_Store
