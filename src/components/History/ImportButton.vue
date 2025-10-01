@@ -16,8 +16,7 @@ const uploadChats = async (event: Event) => {
     try {
       const jsonData = JSON.parse(e.target.result as string)
       importChats(jsonData)
-    }
-    catch (error) {
+    } catch (error) {
       logger.error('解析导入文件失败', error)
       showError('导入失败：文件格式不正确')
     }

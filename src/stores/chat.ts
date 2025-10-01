@@ -1,8 +1,8 @@
+import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 /**
  * 聊天状态管理 Store
  */
 import type { Chat, Message } from '@/services/database'
-import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 import { useApi } from '@/api/api'
 import { db } from '@/services/database'
 import { useAI } from '@/services/useAI'

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useAppStore, useChatStore } from '@/stores'
+import { logger } from '@/utils/logger'
 import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from '@tabler/icons-vue' // Corrected Icon Import Order
 import { useTextareaAutosize } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { logger } from '@/utils/logger'
 import { useAI } from '../services/useAI.ts'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })

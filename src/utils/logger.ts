@@ -94,9 +94,9 @@ class Logger {
   /**
    * 上报错误到监控服务（可扩展）
    */
-  private reportError(message: string, error?: any) {
+  private reportError(_message: string, _error?: any) {
     // TODO: 集成 Sentry 或其他监控服务
-    // Sentry.captureException(error, { extra: { message } })
+    // Sentry.captureException(_error, { extra: { _message } })
   }
 }
 

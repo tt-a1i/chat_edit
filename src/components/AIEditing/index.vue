@@ -1,9 +1,9 @@
 <script setup>
+import { logger } from '@/utils/logger'
 import { NButton, NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import Quill from 'quill'
 import * as QuillTableUI from 'quill-table-ui'
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { logger } from '@/utils/logger'
 import { createExporter } from './export'
 import { createImporter } from './import'
 import { renderMarkdown } from './markdown'

@@ -16,6 +16,7 @@ export default antfu({
     'public',
     'ollama_data',
     'pnpm-lock.yaml',
+    'claudedocs/**',  // 忽略文档目录
   ],
 
   // 自定义规则
