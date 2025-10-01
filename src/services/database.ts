@@ -23,7 +23,7 @@ export interface Message {
   role: ChatRole
   content: string
   imageUrl?: string // 新增：存储图片URL或Base64数据
-  meta?: any
+  meta?: Record<string, unknown> // 元数据字段，可以存储任意键值对
   context?: number[]
   isStreaming?: boolean // 新增：表示是否正在流式加载响应
   createdAt: Date

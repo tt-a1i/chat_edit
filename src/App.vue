@@ -1,28 +1,27 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
-import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
-import ChatInput from './components/ChatInput.vue'
-import ChatMessages from './components/ChatMessages.vue'
+import AIEditingMain from './components/AIEditing/index.vue'
+import ChatInput from './components/chat/ChatInput.vue'
+import ChatMessages from './components/chat/ChatMessages.vue'
+import SystemPrompt from './components/chat/SystemPrompt.vue'
+import ModelSelector from './components/common/ModelSelector.vue'
+import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/Inputs/TextInput.vue'
-import ModelSelector from './components/ModelSelector.vue'
-import NavHeader from './components/NavHeader.vue'
 import Settings from './components/Settings.vue'
-import Sidebar from './components/Sidebar.vue'
-import SystemPrompt from './components/SystemPrompt.vue'
-import {
-  currentModel,
-  currentScene,
-  isDarkMode,
-  isSettingsOpen,
-  isSystemPromptOpen,
-  SCENES,
-} from './services/appConfig.ts'
-import { useChats } from './services/chat.ts'
-import { useAI } from './services/useAI.ts'
-import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
+import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
+import { useAI } from './services/ai.ts'
+import { SCENES, useAppStore, useChatStore } from './stores'
 
+// Stores
+const appStore = useAppStore()
+const chatStore = useChatStore()
+const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = storeToRefs(appStore)
+const { currentChat } = storeToRefs(chatStore)
+
+// Services
 const { refreshModels, availableModels } = useAI()
-const { activeChat, renameChat, switchModel, initialize } = useChats()
+const { renameChat, initialize } = chatStore
 const isEditingChatName = ref(false)
 const editedChatName = ref('')
 const chatNameInput = ref()
@@ -33,10 +32,11 @@ applyDarkModeToDocument()
 
 function startEditing() {
   isEditingChatName.value = true
-  editedChatName.value = activeChat.value?.name || ''
+  editedChatName.value = currentChat.value?.name || ''
   nextTick(() => {
-    if (!chatNameInput.value)
+    if (!chatNameInput.value) {
       return
+    }
     const input = chatNameInput.value.$el.querySelector('input')
     input.focus()
     input.select()
@@ -49,7 +49,7 @@ function cancelEditing() {
 }
 
 function confirmRename() {
-  if (activeChat.value && editedChatName.value) {
+  if (currentChat.value && editedChatName.value) {
     renameChat(editedChatName.value)
     isEditingChatName.value = false
   }
@@ -58,7 +58,9 @@ function confirmRename() {
 onMounted(() => {
   refreshModels().then(async () => {
     await initialize()
-    await switchModel(currentModel.value ?? availableModels.value[0].name)
+    if (!currentModel.value && availableModels.value.length > 0) {
+      appStore.currentModel = availableModels.value[0].name
+    }
   })
 })
 </script>
@@ -76,7 +78,7 @@ onMounted(() => {
 
         <div v-else class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
           <div class="flex w-full flex-row items-center justify-center gap-4 rounded-b-xl bg-gray-100 px-4 py-2 dark:bg-gray-800/95 border-b dark:border-gray-700">
-            <div v-if="activeChat" class="mr-auto flex h-full items-center">
+            <div v-if="currentChat" class="mr-auto flex h-full items-center">
               <div>
                 <div v-if="isEditingChatName">
                   <TextInput
@@ -95,7 +97,7 @@ onMounted(() => {
                   class="block h-full rounded border-none p-2 text-gray-900 decoration-gray-400 decoration-dashed outline-none hover:underline focus:ring-2 focus:ring-blue-600 dark:text-gray-100 dark:focus:ring-blue-600"
                   @click.prevent="startEditing"
                 >
-                  {{ activeChat.name }}
+                  {{ currentChat.name }}
                 </button>
               </div>
             </div>

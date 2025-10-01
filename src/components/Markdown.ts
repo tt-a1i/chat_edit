@@ -7,14 +7,15 @@ const md = new MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
-  highlight(str, lang) {
+  highlight(str: string, lang: string): string {
     if (lang && hljs.getLanguage(lang)) {
       try {
         return `<pre class="hljs"><code>${
           hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
         }</code></pre>`
+      } catch {
+        // 忽略高亮错误
       }
-      catch (__) {}
     }
     // 对于未知语言，使用普通文本高亮
     return `<pre class="hljs dark:bg-gray-800"><code>${md.utils.escapeHtml(str)}</code></pre>`

@@ -1,0 +1,14 @@
+{
+  "name": "Chat & Edit",
+  "short_name": "Chat&Edit",
+  "icons": [
+    {
+      "src": "/favicon/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}

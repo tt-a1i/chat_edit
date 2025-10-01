@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { useChats } from '../../services/chat.ts'
+import { useChatStore } from '@/stores'
 
-const { exportChats } = useChats()
+const chatStore = useChatStore()
+const { exportChats } = chatStore
 
 async function downloadChats() {
   const exportData = await exportChats()
