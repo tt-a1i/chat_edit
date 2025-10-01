@@ -1,3 +1,4 @@
+import type { ChatResponse } from '@/types/ai-editing'
 import type { editor } from 'monaco-editor'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
@@ -139,16 +140,10 @@ export function showDiffEditor({
     {
       ...defaultDiffEditorOptions,
       renderWhitespace: 'none', // 不显示空白字符
-      unicodeHighlight: {
-        nonBasicASCII: false,
-        invisibleCharacters: false,
-        ambiguousCharacters: false,
-      },
       // 使用严格的文本处理模式
       useTabStops: false,
-      trimAutoWhitespace: false,
       autoIndent: 'none',
-    },
+    } as monaco.editor.IStandaloneDiffEditorConstructionOptions,
   )
 
   const safeOriginalText = originalText || ''
@@ -183,10 +178,7 @@ export function showDiffEditor({
       // 禁用编辑器的选择高亮功能
       modifiedEditor.updateOptions({
         renderValidationDecorations: 'off',
-        selectionHighlight: false,
-        occurrencesHighlight: false,
         renderLineHighlight: 'none',
-        renderIndentGuides: false,
       })
     }, 0)
 
@@ -360,6 +352,11 @@ export function highlightSelection(
 
   // 定位覆盖层与选中内容重叠
   const bounds = quill.getBounds(range.index, range.length)
+  if (!bounds) {
+    console.warn('无法获取选区边界')
+    return
+  }
+
   Object.assign(highlightOverlay.style, {
     position: 'absolute',
     left: `${bounds.left}px`,
@@ -375,7 +372,10 @@ export function highlightSelection(
   document.querySelectorAll('.highlight-overlay').forEach(el => el.remove())
 
   // 添加新的高亮层
-  editorRoot.parentNode.insertBefore(highlightOverlay, editorRoot.nextSibling)
+  const parentNode = editorRoot.parentNode
+  if (parentNode) {
+    parentNode.insertBefore(highlightOverlay, editorRoot.nextSibling)
+  }
 
   // 保存范围信息，用于后续清除
   editorRoot.dataset.highlightedRange = JSON.stringify(savedSelection)
@@ -454,7 +454,7 @@ export function updateCreationTimeDisplay(
   creationTimeDisplay.textContent = `最近修改: ${currentTime}`
 }
 
-export function updateWordCountDisplay(wordCountDisplay: HTMLElement | null, quill: any) {
+export function updateWordCountDisplay(wordCountDisplay: HTMLElement | null, quill: Quill) {
   // 添加空值检查
   if (!wordCountDisplay || !quill) {
     return
@@ -484,10 +484,14 @@ export function checkEmptyLine(
   }
 
   const [line] = quill.getLine(selection.index)
+  if (!line) {
+    return
+  }
+
   const text = line.domNode.textContent
 
   // 如果不是空行，隐藏AI相关UI
-  if (!text.trim()) {
+  if (!text || !text.trim()) {
     hideAIUI(uiElements) // 传递UI元素参数
   }
 }
@@ -513,6 +517,11 @@ export function showAIMenu({
   currentRange = { index: selection.index, length: selection.length }
   const bounds = quill.getBounds(selection.index)
   const editorContainer = document.querySelector('.editor-container')
+  if (!editorContainer) {
+    console.error('Editor container not found')
+    return currentRange
+  }
+
   const editorContentRect = quill.root.getBoundingClientRect()
 
   // 获取编辑器容器的边界信息
@@ -523,9 +532,14 @@ export function showAIMenu({
 
   // 判断是否是空行按/唤起
   const [line] = quill.getLine(selection.index)
-  const isEmptyLine = !line.domNode.textContent.trim()
+  const isEmptyLine = line && line.domNode.textContent ? !line.domNode.textContent.trim() : true
 
   // 如果是空行按/唤起，额外增加一个行高的偏移
+  if (!bounds) {
+    console.error('Cannot get bounds for selection')
+    return currentRange
+  }
+
   const lineHeight = isEmptyLine ? bounds.height + 25 : 0
   const topPosition = bounds.top + bounds.height + lineHeight + 5;
 
@@ -544,15 +558,17 @@ export function showAIMenu({
 
   // AI响应区域也需要设置相同的宽度
   const aiResponseRef = document.querySelector('.ai-response')
-  if (aiResponseRef) {
+  if (aiResponseRef && aiResponseRef instanceof HTMLElement) {
     aiResponseRef.style.width = floatingInputRef.style.width
     // aiResponseRef.style.left = floatingInputRef.style.left;
   }
 
   // 确保元素在视口内可见，如果需要则滚动容器
   setTimeout(() => {
-    const editorContainer = document.querySelector('.editor-container')
-    ensureElementsVisible([floatingInputRef, verticalMenuRef], editorContainer)
+    const editorContainerEl = document.querySelector('.editor-container')
+    if (editorContainerEl instanceof HTMLElement) {
+      ensureElementsVisible([floatingInputRef, verticalMenuRef], editorContainerEl)
+    }
   }, 0)
 
   // 监听点击事件
@@ -655,8 +671,10 @@ export function showExportMenu({ exportMenuRef }: ShowExportMenuParams) {
 
     // 设置菜单项样式
     const menuItems = exportMenuRef.querySelectorAll('.export-menu-item')
-    menuItems.forEach((item: HTMLElement) => {
-      item.style.color = '#d4d4d4'
+    menuItems.forEach((item) => {
+      if (item instanceof HTMLElement) {
+        item.style.color = '#d4d4d4'
+      }
     })
   } else {
     // 正常模式下重置样式，避免状态混乱
@@ -717,9 +735,13 @@ export async function handleSend({
 
   try {
     isGenerating.value = true
-    sendBtn.classList.add('loading')
-    responseContent.classList.add('loading')
-    responseContent.textContent = '正在生成回答...'
+    if (sendBtn) {
+      sendBtn.classList.add('loading')
+    }
+    if (responseContent) {
+      responseContent.classList.add('loading')
+      responseContent.textContent = '正在生成回答...'
+    }
     actionButtonsRef.style.display = 'none'
 
     abortController.value = new AbortController()
@@ -729,13 +751,16 @@ export async function handleSend({
       selectedText,
       (response) => {
         if (response.error) {
-          responseContent.classList.remove('loading')
-
-          responseContent.textContent = `错误: ${response.errorMessage}`
+          if (responseContent) {
+            responseContent.classList.remove('loading')
+            responseContent.textContent = `错误: ${response.error}`
+          }
           promptInputRef.placeholder = originalPlaceholder
           return
         }
-        responseContent.classList.remove('loading')
+        if (responseContent) {
+          responseContent.classList.remove('loading')
+        }
         onResponse(response) // 调用回调函数而不是直接设置文本内容
 
         if (isTranslationPrompt?.value) {
@@ -755,9 +780,12 @@ export async function handleSend({
         compareBtn.style.display = 'none'
       }
     }
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      responseContent.textContent = '生成已中止'
+  } catch (error: unknown) {
+    const isAbortError = error instanceof Error && error.name === 'AbortError'
+    if (isAbortError) {
+      if (responseContent) {
+        responseContent.textContent = '生成已中止'
+      }
     } else if (responseContent) {
       responseContent.classList.remove('loading')
       responseContent.textContent = '生成回答时出现错误，请重试。'
@@ -837,7 +865,7 @@ export function renderMarkdownToQuill({
       html: true,
       breaks: true,
       linkify: true,
-    }).use((md) => {
+    }).use((md: MarkdownIt) => {
       // 自定义表格和代码块渲染
       // 完全覆盖表格渲染规则
       md.renderer.rules.table_open = () => '<table><tbody>'
@@ -862,7 +890,15 @@ export function renderMarkdownToQuill({
     // 计算新光标位置
     const delta = quill.clipboard.convert(html)
     const insertedLength = delta.reduce(
-      (acc, op) => acc + (op.insert ? op.insert.length || 1 : 0),
+      (acc, op) => {
+        if (op.insert) {
+          if (typeof op.insert === 'string') {
+            return acc + op.insert.length
+          }
+          return acc + 1
+        }
+        return acc
+      },
       0,
     )
     // 移动光标到插入内容末尾
@@ -879,7 +915,7 @@ export function renderMarkdownToQuill({
  * 复制编辑器内容为 Markdown 格式
  * @param quill Quill 编辑器实例
  */
-export async function copyAsMarkdown(quill) {
+export async function copyAsMarkdown(quill: Quill) {
   if (!quill) {
     return
   }
@@ -892,7 +928,7 @@ export async function copyAsMarkdown(quill) {
     const markdownContent = await exporter.exportAs('markdown', false)
 
     // 复制到剪贴板
-    await navigator.clipboard.writeText(markdownContent)
+    await navigator.clipboard.writeText(markdownContent as string)
 
     // 显示成功提示
     showCopySuccessMessage('Markdown 已复制到剪贴板')
@@ -905,7 +941,7 @@ export async function copyAsMarkdown(quill) {
  * 显示复制成功的提示消息
  * @param message 提示消息
  */
-function showCopySuccessMessage(message) {
+function showCopySuccessMessage(message: string) {
   // 创建一个临时提示元素
   const messageEl = document.createElement('div')
   messageEl.textContent = message
@@ -930,11 +966,11 @@ function showCopySuccessMessage(message) {
 
 /**
  * 保存并恢复工具栏操作时的选区
- * @param {object} quill Quill实例
- * @param {object} toolbar 工具栏元素
+ * @param quill Quill实例
+ * @param toolbar 工具栏元素
  */
-export function setupToolbarSelectionHandling(quill, toolbar) {
-  let toolbarSelection = null
+export function setupToolbarSelectionHandling(quill: Quill, toolbar: HTMLElement) {
+  let toolbarSelection: { index: number, length: number } | null = null
 
   // 处理颜色和背景色按钮
   const colorButton = toolbar.querySelector('.ql-color')
@@ -953,14 +989,17 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
   }
 
   // 监听颜色选择操作完成
-  const handleDocumentClick = (e) => {
+  const handleDocumentClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement
     if (toolbarSelection
-      && !e.target.closest('.ql-picker')
-      && !e.target.closest('.ql-color')
-      && !e.target.closest('.ql-background')) {
+      && !target.closest('.ql-picker')
+      && !target.closest('.ql-color')
+      && !target.closest('.ql-background')) {
       setTimeout(() => {
-        quill.setSelection(toolbarSelection)
-        toolbarSelection = null
+        if (toolbarSelection) {
+          quill.setSelection(toolbarSelection)
+          toolbarSelection = null
+        }
       }, 10)
     }
   }
@@ -974,8 +1013,10 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
       item.addEventListener('click', () => {
         if (toolbarSelection) {
           setTimeout(() => {
-            quill.setSelection(toolbarSelection)
-            toolbarSelection = null
+            if (toolbarSelection) {
+              quill.setSelection(toolbarSelection)
+              toolbarSelection = null
+            }
           }, 10)
         }
       })
@@ -988,6 +1029,7 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes'
           && mutation.attributeName === 'class'
+          && mutation.target instanceof Element
           && mutation.target.classList.contains('ql-expanded')) {
           setupColorPickerItems()
         }
@@ -1020,7 +1062,7 @@ export function setupToolbarSelectionHandling(quill, toolbar) {
  * @param elements 需要确保可见的元素数组
  * @param container 滚动容器
  */
-export function ensureElementsVisible(elements, container) {
+export function ensureElementsVisible(elements: HTMLElement[], container: HTMLElement) {
   // 跳过无效元素
   if (!elements || !elements.length || !container) {
     return
@@ -1031,7 +1073,7 @@ export function ensureElementsVisible(elements, container) {
 
   // 计算所有元素中最低的底部边界
   let lowestBottom = 0
-  elements.forEach((el) => {
+  elements.forEach((el: HTMLElement) => {
     if (!el || el.style.display === 'none') {
       return
     }

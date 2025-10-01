@@ -18,7 +18,9 @@ function debounce(func: (...args: any[]) => void, wait: number) {
 // 创建一个防抖的保存函数，500ms 内只执行一次
 const debouncedSaveToServer = debounce(async (sessionId: string, content: string) => {
   try {
-    await AIEditingAPI.saveDraft(sessionId, content)
+    // TODO: 实现 saveDraft API
+    // await AIEditingAPI.saveDraft(sessionId, content)
+    console.log('Save draft to server (not implemented):', sessionId, content.substring(0, 50))
   } catch (error) {
     console.error('Failed to save content to server:', error)
   }
@@ -44,11 +46,13 @@ export function saveEditorContent(content: string, sessionId?: string): void {
 export async function loadEditorContent(sessionId?: string): Promise<string | null> {
   if (sessionId) {
     try {
+      // TODO: 实现 loadDraft API
       // 优先从服务器加载
-      const serverContent = await AIEditingAPI.loadDraft(sessionId)
-      if (serverContent) {
-        return serverContent
-      }
+      // const serverContent = await AIEditingAPI.loadDraft(sessionId)
+      // if (serverContent) {
+      //   return serverContent
+      // }
+      console.log('Load draft from server (not implemented):', sessionId)
     } catch (error) {
       console.log('Failed to load content from server:', error)
     }

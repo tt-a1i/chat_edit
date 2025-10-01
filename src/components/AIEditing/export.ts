@@ -160,19 +160,6 @@ class DocumentExporter {
                           },
                         }),
                       ],
-                      margins: {
-                        top: 80, // 减小单元格上边距
-                        bottom: 80, // 减小单元格下边距
-                        left: 100, // 保持左右边距不变
-                        right: 100,
-                      },
-                      borders: {
-                        top: { style: 'single', size: 1 },
-                        bottom: { style: 'single', size: 1 },
-                        left: { style: 'single', size: 1 },
-                        right: { style: 'single', size: 1 },
-                      },
-                      verticalAlign: 'center',
                     }),
                 ),
               })
@@ -189,21 +176,21 @@ class DocumentExporter {
           case 'h1':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 36 })] : [],
+                child instanceof TextRun ? [child] : [],
               ),
               heading: HeadingLevel.HEADING_1,
             })
           case 'h2':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 32 })] : [],
+                child instanceof TextRun ? [child] : [],
               ),
               heading: HeadingLevel.HEADING_2,
             })
           case 'h3':
             return new Paragraph({
               children: children.flatMap(child =>
-                child instanceof TextRun ? [new TextRun({ ...child, size: 28 })] : [],
+                child instanceof TextRun ? [child] : [],
               ),
               heading: HeadingLevel.HEADING_3,
             })

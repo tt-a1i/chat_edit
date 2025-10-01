@@ -77,7 +77,7 @@ function copyToClipboard() {
           {{ thought[0] }}
         </details>
         <div :class="{ 'animate-pulse': message.isStreaming || isStreaming }">
-          <Markdown :source="thought[1]" />
+          <Markdown :source="thought[1] || ''" />
         </div>
       </div>
       <button

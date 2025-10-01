@@ -4,7 +4,7 @@ import type {
   ChatResponse,
   Model,
 } from '../api/api.ts'
-import type { Message } from './database'
+import type { ChatRole, Message } from './database'
 
 import { ref } from 'vue'
 import {
@@ -29,7 +29,12 @@ export function useAI() {
       chatHistory.unshift(system)
     }
 
-    const apiMessages = chatHistory.map((msg) => {
+    interface APIMessage {
+      role: ChatRole
+      content: string | any[]
+    }
+
+    const apiMessages: APIMessage[] = chatHistory.map((msg) => {
       if (msg.role === 'user' && msg.imageUrl) {
         const contentPayload: any[] = [
           {
@@ -52,7 +57,7 @@ export function useAI() {
       }
     })
 
-    await generateChat({ model, messages: apiMessages }, (data: ChatResponse) => {
+    await generateChat({ model, messages: apiMessages as any }, (data: ChatResponse) => {
       if (!data.done && onMessage) {
         onMessage(data as ChatPartResponse)
       } else if (data.done && onDone) {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ModelSelector from '../ModelSelector.vue'
 import NavHeader from '../NavHeader.vue'
+// @ts-ignore - No type declaration available for large component
 import AIEditingComponent from './index.vue'
 </script>
 
