@@ -312,16 +312,68 @@ Chrome DevTools MCP 提供 26 个浏览器自动化和调试工具，分为以�
 将页面调整为移动端尺寸并截图
 ```
 
+### 启动带远程调试的 Chrome（支持浏览器扩展）
+
+**重要**: 默认的 Chrome MCP 启动方式不支持安装扩展。如需使用 Vue DevTools 等浏览器扩展，需要手动启动带远程调试端口的 Chrome。
+
+**MCP 配置**:
+```json
+{
+  "command": "npx",
+  "args": ["chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9222"]
+}
+```
+
+**启动命令**:
+```bash
+# 1. 关闭所有 Chrome 实例
+pkill -f "Google Chrome"
+
+# 2. 启动带远程调试端口的 Chrome
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --remote-debugging-port=9222 \
+  --user-data-dir="$HOME/.chrome-debug-profile" \
+  http://localhost:5173/ &
+```
+
+**安装浏览器扩展**:
+1. 在启动的 Chrome 中访问 Chrome Web Store
+2. 安装需要的扩展（如 Vue.js devtools）
+3. 扩展会保存在 `~/.chrome-debug-profile` 配置中
+4. 下次启动时会自动加载所有已安装的扩展
+
+**为什么需要这样做**:
+- Chrome MCP 默认启动的是隔离实例，不支持扩展
+- 使用 `--browserUrl` 连接到现有实例可以使用已安装的扩展
+- `--user-data-dir` 指定配置文件目录，保留扩展和设置
+- `--remote-debugging-port=9222` 开启远程调试协议
+
 ### 使用示例
 
+**启动流程**:
+```bash
+# 1. 启动开发服务器
+pnpm dev
+
+# 2. 启动带调试端口的 Chrome（首次需要安装扩展）
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+  --remote-debugging-port=9222 \
+  --user-data-dir="$HOME/.chrome-debug-profile" \
+  http://localhost:5173/ &
+
+# 3. Chrome MCP 会自动连接到这个实例
+```
+
+**使用 MCP 工具**:
 项目启动后，可以直接使用自然语言请求 Chrome MCP 工具：
 
 1. **打开页面**: "请打开开发服务器页面"
 2. **检查错误**: "检查浏览器控制台是否有错误"
 3. **截图**: "截取当前页面的截图"
 4. **性能**: "分析页面的 LCP 和性能指标"
+5. **列出页面**: "列出当前打开的所有页面"
 
-**注意**: Chrome MCP 会在第一次使用时自动启动 Chrome 浏览器实例。
+**注意**: 此时你可以同时使用 Chrome MCP 工具和浏览器扩展（如 Vue DevTools）。
 
 ## Testing
 
