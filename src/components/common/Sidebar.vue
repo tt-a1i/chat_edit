@@ -22,16 +22,21 @@ const { sortedChats, currentChat } = storeToRefs(chatStore)
 const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode, toggleSidebar } = appStore
 const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
 
-// 创建响应式的 discrete API，支持暗色模式
-const configProviderPropsRef = computed(() => ({
-  theme: isDarkMode.value ? darkTheme : undefined,
-}))
+// 获取响应式的 discrete API，每次调用时根据当前主题创建
+function getDiscreteApi() {
+  return createDiscreteApi(
+    ['dialog', 'message'],
+    {
+      configProviderProps: {
+        theme: isDarkMode.value ? darkTheme : undefined,
+      },
+    },
+  )
+}
 
-const { dialog } = createDiscreteApi(
-  ['dialog'],
-  {
-    configProviderProps: configProviderPropsRef,
-  },
+// 提取折叠状态下的文本样式（可复用）
+const collapsedTextClass = computed(() =>
+  isSidebarCollapsed.value ? 'opacity-0 w-0' : 'opacity-100',
 )
 
 function onNewChat() {
@@ -51,29 +56,47 @@ function checkSystemPromptPanel() {
 }
 
 // 确认删除当前会话
-function confirmDeleteChat() {
-  if (!currentChat.value) return
+async function confirmDeleteChat() {
+  const chat = currentChat.value
+  if (!chat?.id) return
+
+  const chatId = chat.id // 提取 ID 避免闭包中的类型问题
+  const { dialog, message } = getDiscreteApi()
 
   dialog.warning({
     title: '删除会话',
-    content: `确定要删除会话"${currentChat.value.name}"吗？此操作无法撤销。`,
+    content: `确定要删除会话"${chat.name}"吗？此操作无法撤销。`,
     positiveText: '删除',
     negativeText: '取消',
-    onPositiveClick: () => {
-      deleteChat(currentChat.value!.id!)
+    onPositiveClick: async () => {
+      try {
+        await deleteChat(chatId)
+        message.success('会话已删除')
+      } catch (error) {
+        console.error('删除会话失败:', error)
+        message.error('删除会话失败，请重试')
+      }
     },
   })
 }
 
 // 确认删除所有会话
-function confirmWipeDatabase() {
+async function confirmWipeDatabase() {
+  const { dialog, message } = getDiscreteApi()
+
   dialog.error({
     title: '删除所有会话',
     content: '确定要删除所有会话吗？此操作将清空所有聊天记录，且无法撤销！',
     positiveText: '确认删除',
     negativeText: '取消',
-    onPositiveClick: () => {
-      wipeDatabase()
+    onPositiveClick: async () => {
+      try {
+        await wipeDatabase()
+        message.success('所有会话已删除')
+      } catch (error) {
+        console.error('删除所有会话失败:', error)
+        message.error('删除失败，请重试')
+      }
     },
   })
 }
@@ -126,12 +149,13 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           class="flex w-full items-center justify-center gap-x-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900 overflow-hidden"
           :class="isSidebarCollapsed ? 'px-2' : 'px-4'"
           :title="isSidebarCollapsed ? 'New Chat' : ''"
+          :aria-label="isSidebarCollapsed ? '新建聊天' : undefined"
           @click="onNewChat"
         >
           <IconPlus class="h-5 w-5 flex-shrink-0" :class="isSidebarCollapsed ? 'mx-auto' : ''" />
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >New Chat</span>
         </button>
       </div>
@@ -146,12 +170,13 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
             isSidebarCollapsed ? 'justify-center px-2' : '',
           ]"
           :title="isSidebarCollapsed ? 'Chat' : ''"
+          :aria-label="isSidebarCollapsed ? '聊天' : undefined"
           @click="switchScene(SCENES.CHAT)"
         >
           <IconMessageCode class="size-5 flex-shrink-0" />
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >Chat</span>
         </button>
 
@@ -163,12 +188,13 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
             isSidebarCollapsed ? 'justify-center px-2' : '',
           ]"
           :title="isSidebarCollapsed ? 'AI Editing' : ''"
+          :aria-label="isSidebarCollapsed ? 'AI 编辑器' : undefined"
           @click="switchScene(SCENES.AI_EDITING)"
         >
           <IconEdit class="size-5 flex-shrink-0" />
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >AI Editing</span>
         </button>
       </div>
@@ -199,6 +225,7 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? (isDarkMode ? 'Light Mode' : 'Dark Mode') : ''"
+          :aria-label="isSidebarCollapsed ? (isDarkMode ? '切换到亮色模式' : '切换到暗色模式') : undefined"
           @click="toggleDarkMode"
         >
           <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
@@ -206,7 +233,7 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
 
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >Toggle dark mode</span>
         </button>
         <button
@@ -220,26 +247,28 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? 'System prompt' : ''"
+          :aria-label="isSidebarCollapsed ? '系统提示词' : undefined"
           @click="toggleSystemPromptPanel"
         >
           <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >System prompt</span>
         </button>
         <button
           class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? 'Settings' : ''"
+          :aria-label="isSidebarCollapsed ? '设置' : undefined"
           @click="toggleSettingsPanel"
         >
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
           <span
             class="whitespace-nowrap transition-all duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
+            :class="collapsedTextClass"
           >Settings</span>
         </button>        <!-- 删除当前聊天按钮 -->
         <button
