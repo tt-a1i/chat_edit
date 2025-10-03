@@ -118,8 +118,8 @@
 
 	/* 暗色模式 - 工具栏 */
 	&.dark .ql-toolbar {
-		background-color: #2a2a2a;
-		border-color: #3a3a3a;
+		background-color: #1f2937; /* 与其他面板统一背景 */
+		border-color: #374151;
 
 		.ql-stroke {
 			stroke: #9ca3af;
@@ -1089,24 +1089,41 @@
         display: none;
     }
 	.dark .floating-input {
-	background: #252526;
+		background: #1f2937; /* 更现代的暗色背景 */
+		border: 1px solid #374151;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 	}
 
 	.dark .input-container textarea {
-	background: #1e1e1e;
-	border-color: #404040;
-	color: #d4d4d4;
+		background: #111827; /* 更深的背景提升对比度 */
+		border-color: #4b5563;
+		color: #e5e7eb; /* 更亮的文本颜色 */
 	}
 
 	.dark .ai-response {
-	background: #252526;
-	border-color: #404040;
+		background: #1f2937; /* 与浮动输入框统一背景 */
+		border-color: #374151;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	}
+
+	.dark .ai-response .response-content {
+		color: #e5e7eb; /* 确保响应内容文本清晰 */
 	}
 
 	.dark .vertical-menu {
-		background: #2a2a2a;
-		border-color: #404040;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+		background: #1f2937; /* 统一的暗色背景 */
+		border: 1px solid #374151;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); /* 增强阴影深度 */
+	}
+
+	.dark .vertical-menu .menu-item {
+		color: #e5e7eb; /* 菜单项文本颜色 */
+		transition: background-color 0.2s ease, color 0.2s ease;
+	}
+
+	.dark .vertical-menu .menu-item:hover {
+		background-color: #374151; /* hover 状态 */
+		color: #f9fafb;
 	}
 
     /* 暗黑模式下的标签栏 */
@@ -1160,13 +1177,14 @@
 	}
 
 	.dark .action-buttons button {
-	background: #2d2d2d;
-	border-color: #404040;
-	color: #d4d4d4;
+		background: #374151; /* 统一的按钮背景 */
+		border-color: #4b5563;
+		color: #e5e7eb; /* 更清晰的文本 */
 	}
 
 	.dark .action-buttons button:hover {
-	background: #3e3e3e;
+		background: #4b5563; /* hover 状态更明显 */
+		border-color: #6b7280;
 	}
 
 	/* 修改暗黑模式下的选中高亮颜色 */
@@ -1522,30 +1540,11 @@
 	}
 	/* 针对暗色模式下的占位符颜色 */
 	.dark .ql-editor.ql-blank::before {
-		color: rgba(255, 255, 255, 0.6);
+		color: #6b7280; /* 更适合暗色模式的占位符颜色 */
 	}
-	.writing-editor.dark-mode,
-	.editor-container.dark {
-		background-color: #1e1e1e;
-	}
-	.dark .input-container textarea {
-		background: #1e1e1e;
-		border-color: #0078d4;
-		box-shadow: 0 0 0 1px #0078d4;
-		color: #d4d4d4;
-		border-width: 1px;
-		border-style: solid;
-		outline: none;
-		
-		// Add subtle transition
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
-		
-		&:hover {
-		  border-color: #606060;
-		}
-	}
+	/* 已移至前面统一管理，此处删除重复定义 */
 	.dark .input-container textarea::placeholder {
-		color: #666;
+		color: #9ca3af; /* 提升占位符可读性 */
 	}
 	.highlight-overlay {
 		pointer-events: none;
