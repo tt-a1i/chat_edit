@@ -215,6 +215,11 @@
 		background-color: #374151 !important;
 	}
 
+	/* 暗色模式 - 菜单分隔线 */
+	&.dark .prompt-divider {
+		background-color: #374151 !important; /* 使用统一的边框颜色 */
+	}
+
 	.ql-container .ql-editor::selection,
 	.ql-container .ql-editor *::selection {
 		background-color: #b4d5fe;
@@ -1643,10 +1648,7 @@
 		width: 100%;
 	}
 
-	/* 暗黑模式下的分隔线 */
-	.dark .prompt-divider {
-		background-color: #404040;
-	}
+	/* 分隔线样式已移至前面统一管理 */
 }
 .n-modal-container {
     z-index: 10001 !important; 
