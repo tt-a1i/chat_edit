@@ -180,11 +180,42 @@ All AI responses use Server-Sent Events (SSE). The pattern is:
 
 ## File Organization
 
-- `/src/components/`: Vue components (Messages/, History/, Inputs/, AIEditing/)
-- `/src/services/`: Business logic and state management
-- `/src/api/`: API integration layer
-- `/src/utils/`: Utility functions (darkMode, etc.)
-- `/src/assets/`: Static assets and CSS
+**优化后的目录结构**（2024-10-03 重构完成）：
+
+```
+/src/
+  ├── components/              # Vue 组件
+  │   ├── AIEditing/           # AI 编辑器模块（独立）
+  │   ├── chat/                # 聊天功能模块
+  │   │   ├── messages/        # 消息类型组件
+  │   │   │   ├── AiMessage.vue
+  │   │   │   ├── UserMessage.vue
+  │   │   │   └── SystemMessage.vue
+  │   │   ├── ChatMessage.vue  # 消息路由组件
+  │   │   ├── ChatMessages.vue # 消息列表容器
+  │   │   ├── ChatInput.vue
+  │   │   ├── ChatEmptyState.vue
+  │   │   └── SystemPrompt.vue
+  │   ├── common/              # 通用组件
+  │   ├── history/             # 历史记录组件
+  │   ├── inputs/              # 输入组件
+  │   └── settings/            # 设置模块
+  ├── services/                # 业务逻辑和状态管理
+  ├── api/                     # API 集成层
+  ├── utils/                   # 工具函数
+  │   ├── markdown.ts          # Markdown 渲染工具
+  │   ├── error-handler.ts
+  │   ├── format.ts
+  │   └── logger.ts
+  └── assets/                  # 静态资源和 CSS
+```
+
+**组织原则**：
+- 聊天相关组件统一在 `chat/` 目录下
+- 消息类型组件在 `chat/messages/` 子目录
+- 工具函数统一在 `utils/`，不在 `components/`
+- 所有目录名使用小写（除 AIEditing 保持原样）
+- 每个功能模块独立组织，便于维护
 
 ## Known Patterns
 

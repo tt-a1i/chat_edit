@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Message } from '../../services/database.ts'
+import type { Message } from '@/services/database.ts'
 
 interface Props {
   message: Message

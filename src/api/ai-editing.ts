@@ -49,7 +49,7 @@ let lastMessageWasEmpty = false
  * @param selected_text 选中的文本内容
  * @param callback 接收数据的回调函数
  * @param controller 可选的AbortController
- * @param model 可选的模型名称
+ * @param _model 可选的模型名称
  * @returns 返回对话响应
  */
 export async function streamChat(
