@@ -599,8 +599,43 @@
 		font-size: 0.8125rem; /* 减小图标大小 */
 	}
 
+	/* 暗色模式 - AI 回答区域按钮 */
+	&.dark .action-buttons {
+		border-top-color: #374151 !important;
+	}
+
+	&.dark .action-buttons button {
+		background: #1e3a5f !important; /* 深蓝色背景 */
+		border-color: #2563eb !important;
+		color: #93c5fd !important; /* 亮蓝色文本 */
+	}
+
+	&.dark .action-buttons button:hover {
+		background: #2563eb !important; /* hover 鲜明蓝色 */
+		border-color: #3b82f6 !important;
+		color: #ffffff !important;
+	}
+
+	/* 暗色模式 - 次要按钮(复制和重新生成) */
+	&.dark .action-buttons .right-buttons button {
+		background: #374151 !important;
+		border-color: #4b5563 !important;
+		color: #9ca3af !important;
+	}
+
+	&.dark .action-buttons .right-buttons button:hover {
+		background: #4b5563 !important;
+		border-color: #6b7280 !important;
+		color: #e5e7eb !important;
+	}
+
 	.highlight-selection {
 		background-color: #b4d5fe !important;
+	}
+
+	/* 暗色模式 - 高亮选中区域 */
+	&.dark .highlight-selection {
+		background-color: rgba(96, 165, 250, 0.3) !important; /* 更明显的蓝色高亮 */
 	}
 
 	.vertical-menu {
@@ -1190,21 +1225,7 @@
 	color: #d4d4d4 !important;
 	}
 
-	.dark .action-buttons button {
-		background: #374151; /* 统一的按钮背景 */
-		border-color: #4b5563;
-		color: #e5e7eb; /* 更清晰的文本 */
-	}
-
-	.dark .action-buttons button:hover {
-		background: #4b5563; /* hover 状态更明显 */
-		border-color: #6b7280;
-	}
-
-	/* 修改暗黑模式下的选中高亮颜色 */
-	.dark .highlight-selection {
-	background-color: rgba(38, 79, 120, 0.4) !important;
-	}
+	/* 按钮和高亮样式已移至前面统一管理 */
 
 	.dark .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
 	background-color: rgba(38, 79, 120, 0.4) !important;
