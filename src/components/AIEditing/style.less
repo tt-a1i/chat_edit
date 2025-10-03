@@ -935,8 +935,9 @@
 	.ql-export::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f56e"; /* 导出图标的 Unicode */
-		font-weight: 900;
-		font-size: 0.875rem;
+		font-weight: 400; /* Regular 版本，更轻量 */
+		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
+		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
 	}
 
 	.ql-export:hover {
@@ -1102,12 +1103,20 @@
 	.ql-copy-content::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f0c5";
-		font-weight: 900;
-		font-size: 0.875rem;
+		font-weight: 400; /* Regular 版本，更轻量 */
+		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
+		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
 	}
 
 	.ql-copy-content:hover {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 自定义图标 */
+	&.dark .ql-copy-content::before,
+	&.dark .ql-import::before,
+	&.dark .ql-export::before {
+		opacity: 1; /* 暗色模式下恢复完全不透明 */
 	}
 	.ql-creation-time,
 	.ql-word-count {
@@ -1143,8 +1152,9 @@
 	.ql-import::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f574"; /* 使用 file-upload 图标替换原来的 file-import */
-		font-weight: 900;
-		font-size: 0.875rem;
+		font-weight: 400; /* Regular 版本，更轻量 */
+		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
+		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
 	}
 
 	.ql-import:hover {
