@@ -88,9 +88,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
         >
           <IconPlus class="h-5 w-5 flex-shrink-0" :class="isSidebarCollapsed ? 'mx-auto' : ''" />
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >New Chat</span>
         </button>
       </div>
@@ -109,9 +108,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
         >
           <IconMessageCode class="size-5 flex-shrink-0" />
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >Chat</span>
         </button>
 
@@ -127,9 +125,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
         >
           <IconEdit class="size-5 flex-shrink-0" />
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >AI Editing</span>
         </button>
       </div>
@@ -167,9 +164,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >Toggle dark mode</span>
         </button>
         <button
@@ -188,9 +184,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >System prompt</span>
         </button>
         <button
@@ -202,9 +197,8 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
           <span
-            v-if="!isSidebarCollapsed"
-            class="whitespace-nowrap transition-opacity duration-150"
-            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+            class="whitespace-nowrap transition-all duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0 w-0' : 'opacity-100'"
           >Settings</span>
         </button>        <!-- 删除当前聊天按钮 -->
         <button
