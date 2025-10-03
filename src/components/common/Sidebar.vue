@@ -11,10 +11,9 @@ import {
   IconTrashX,
   IconUserCircle,
 } from '@tabler/icons-vue'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi, darkTheme } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-
-const { dialog } = createDiscreteApi(['dialog'])
+import { computed } from 'vue'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
@@ -22,6 +21,18 @@ const { currentScene, isDarkMode, isSystemPromptOpen, isSidebarCollapsed } = sto
 const { sortedChats, currentChat } = storeToRefs(chatStore)
 const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode, toggleSidebar } = appStore
 const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
+
+// 创建响应式的 discrete API，支持暗色模式
+const configProviderPropsRef = computed(() => ({
+  theme: isDarkMode.value ? darkTheme : undefined,
+}))
+
+const { dialog } = createDiscreteApi(
+  ['dialog'],
+  {
+    configProviderProps: configProviderPropsRef,
+  },
+)
 
 function onNewChat() {
   checkSystemPromptPanel()
