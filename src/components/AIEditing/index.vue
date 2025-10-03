@@ -324,8 +324,7 @@ async function handleExport(format: 'markdown' | 'docx' | 'pdf') {
       exportMenuRef.value.style.display = 'none'
     }
   } catch (error) {
-    const { AppError, ErrorCode } = await import('@/utils/error-handler')
-    const { ErrorHandler } = await import('@/utils/errorHandler')
+    const { AppError, ErrorCode, ErrorHandler } = await import('@/utils/error-handler')
     ErrorHandler.handle(new AppError(
       ErrorCode.EXPORT_ERROR,
       `导出为 ${format} 格式失败`,
@@ -360,9 +359,14 @@ function handlePromptKeydown(event: KeyboardEvent) {
 /**
  * 处理文件上传
  */
-async function handleFileUpload(options: { file: any }) {
+async function handleFileUpload(options: { file: { file: File | null } }) {
   const { file } = options
-  const actualFile = (file as any).file || file
+  const actualFile = file.file
+
+  if (!actualFile) {
+    window.$message?.error('未选择文件')
+    return
+  }
 
   const quill = quillInstance.value
   if (!quill) return

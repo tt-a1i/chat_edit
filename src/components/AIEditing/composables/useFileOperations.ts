@@ -2,8 +2,7 @@ import type Quill from 'quill'
 import type { Ref } from 'vue'
 import { createExporter } from '@/lib/export'
 import { createImporter } from '@/lib/export/import'
-import { AppError, ErrorCode } from '@/utils/error-handler'
-import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode, ErrorHandler } from '@/utils/error-handler'
 import { ref } from 'vue'
 
 /**

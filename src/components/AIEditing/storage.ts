@@ -1,10 +1,13 @@
 import { logger } from '@/utils/logger'
 
 // 防抖函数
-function debounce(func: (...args: any[]) => void, wait: number) {
+function debounce<T extends unknown[]>(
+  func: (...args: T) => void,
+  wait: number,
+): (...args: T) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null
 
-  return function (...args: any[]) {
+  return function (...args: T) {
     const later = () => {
       timeout = null
       func(...args)

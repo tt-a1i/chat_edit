@@ -1,6 +1,5 @@
 import type { QuillInstance } from '@/types/quill'
-import { AppError, ErrorCode } from '@/utils/error-handler'
-import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode, ErrorHandler } from '@/utils/error-handler'
 import {
   Document,
   HeadingLevel,
@@ -26,7 +25,6 @@ class DocumentExporter {
   }
 
   private convertHtmlToDocxElements(html: string): Paragraph[] {
-    // console.log("Input HTML:", html); // 打印输入的HTML
     const doc = this.parser.parseFromString(html, 'text/html')
     const elements: Paragraph[] = []
 
@@ -40,7 +38,6 @@ class DocumentExporter {
 
       if (node.nodeType === Node.ELEMENT_NODE) {
         const element = node as HTMLElement
-        // console.log("Processing element:", element.tagName, element.outerHTML); // 打印当前处理的元素
 
         // 处理Quill代码块
         if (element.classList.contains('ql-code-block-container')) {
@@ -78,16 +75,13 @@ class DocumentExporter {
 
         // 处理代码块
         if (element.tagName.toLowerCase() === 'pre') {
-          // console.log("Found pre element:", element.outerHTML); // 打印找到的pre元素
           const codeContent = element.textContent || ''
-          // console.log("Code content:", codeContent); // 打印代码内容
 
           // 尝试处理可能嵌套的code标签
           const codeElement = element.querySelector('code')
           const finalContent = codeElement
             ? codeElement.textContent || ''
             : codeContent
-          // console.log("Final code content:", finalContent); // 打印最终的代码内容
 
           return new Paragraph({
             children: [
@@ -264,7 +258,6 @@ class DocumentExporter {
       }
     })
 
-    // console.log("Generated elements:", elements); // 打印生成的元素
     return elements
   }
 

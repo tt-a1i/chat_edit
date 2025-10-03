@@ -7,8 +7,7 @@
 
 import type Quill from 'quill'
 import { createExporter } from '@/lib/export'
-import { AppError, ErrorCode } from '@/utils/error-handler'
-import { ErrorHandler } from '@/utils/errorHandler'
+import { AppError, ErrorCode, ErrorHandler } from '@/utils/error-handler'
 import MarkdownIt from 'markdown-it'
 
 export interface InsertContentParams {
@@ -81,7 +80,6 @@ export function renderMarkdownToQuill({
       .replace(/<p>\s+/g, '<p>') // 移除<p>标签后的空白
       .replace(/\s+<\/p>/g, '</p>') // 移除</p>标签前的空白
       .replace(/<br>\n\s*/g, '<br>') // 移除<br>标签后的换行和空格
-    // console.log("🚀 ~ renderMarkdown ~ html:", html);
 
     // 获取插入位置
     const insertPosition = cursorPosition ?? quill.getLength()

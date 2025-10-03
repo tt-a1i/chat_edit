@@ -3,6 +3,8 @@
  * 统一管理所有环境变量，提供类型安全的访问接口
  */
 
+import { logger } from '@/utils/logger'
+
 interface EnvConfig {
   // API 配置
   apiBaseUrl: string
@@ -68,10 +70,12 @@ export function validateEnv(): void {
   }
 
   if (missingKeys.length > 0) {
-    console.warn(
-      '⚠️ 缺少必需的环境变量:',
-      missingKeys.join(', '),
-      '\n请在 .env.local 文件中配置',
+    logger.warn(
+      '⚠️ 缺少必需的环境变量',
+      {
+        missing: missingKeys,
+        message: '请在 .env.local 文件中配置',
+      },
     )
   }
 }

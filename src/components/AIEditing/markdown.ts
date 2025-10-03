@@ -1,10 +1,31 @@
+import type MarkdownIt from 'markdown-it'
 import { logger } from '@/utils/logger'
 import hljs from 'highlight.js'
 import katex from 'katex'
-import MarkdownIt from 'markdown-it'
+import MarkdownItConstructor from 'markdown-it'
 import mdLinkAttrs from 'markdown-it-link-attributes'
 import mdKatex from 'markdown-it-texmath'
 import 'highlight.js/styles/github.css'
+
+// markdown-it 状态接口
+interface MarkdownItState {
+  src: string
+  pos: number
+  posMax: number
+  push: (type: string, tag: string, nesting: number) => MarkdownItToken
+  bMarks: number[]
+  eMarks: number[]
+  tShift: number[]
+  getLines: (begin: number, end: number, indent: number, keepLastLF: boolean) => string
+  line: number
+}
+
+interface MarkdownItToken {
+  content: string
+  markup: string
+  block?: boolean
+  map?: [number, number]
+}
 
 // 配置数学公式渲染规则
 function renderKatex(latex: string, displayMode = false): string {
@@ -22,7 +43,7 @@ function renderKatex(latex: string, displayMode = false): string {
 
 // 初始化 markdown-it 实例
 export function createMarkdownRenderer(): MarkdownIt {
-  const md = new MarkdownIt({
+  const md = new MarkdownItConstructor({
     html: true,
     breaks: true,
     linkify: true,
@@ -56,7 +77,7 @@ export function createMarkdownRenderer(): MarkdownIt {
   // 添加数学公式支持
   md.use((md: MarkdownIt) => {
     // 行内公式
-    const inlineRule = (state: any, silent: boolean): boolean => {
+    const inlineRule = (state: MarkdownItState, silent: boolean): boolean => {
       const start = state.pos
       const max = state.posMax
 
@@ -91,7 +112,7 @@ export function createMarkdownRenderer(): MarkdownIt {
     }
 
     // 块级公式
-    const blockRule = (state: any, startLine: number, endLine: number, silent: boolean): boolean => {
+    const blockRule = (state: MarkdownItState, startLine: number, endLine: number, silent: boolean): boolean => {
       const start = state.bMarks[startLine] + state.tShift[startLine]
       const max = state.eMarks[startLine]
 
@@ -143,11 +164,11 @@ export function createMarkdownRenderer(): MarkdownIt {
       alt: ['paragraph', 'reference', 'blockquote', 'list'],
     })
 
-    md.renderer.rules.math_inline = (tokens: any[], idx: number): string => {
+    md.renderer.rules.math_inline = (tokens: MarkdownItToken[], idx: number): string => {
       return renderKatex(tokens[idx].content, false)
     }
 
-    md.renderer.rules.math_block = (tokens: any[], idx: number): string => {
+    md.renderer.rules.math_block = (tokens: MarkdownItToken[], idx: number): string => {
       return renderKatex(tokens[idx].content, true)
     }
   })
