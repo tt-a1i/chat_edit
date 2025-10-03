@@ -225,6 +225,13 @@
 	.input-container textarea:focus {
 		outline: none;
 		border-color: #409eff;
+		box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+	}
+
+	/* 暗色模式 - 输入框焦点 */
+	&.dark .input-container textarea:focus {
+		border-color: #60a5fa;
+		box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
 	}
 
 	.send-btn {
@@ -730,15 +737,39 @@
 		border-radius: 0.25rem;
 		z-index: 1000;
 	}
-	
+
+	/* 暗色模式 - 导出菜单 */
+	&.dark .export-menu {
+		background: #2a2a2a;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	}
+
 	.export-menu-item {
 		padding: 0.5rem 1rem;
 		cursor: pointer;
 		white-space: nowrap;
+		transition: background-color 0.2s ease;
+	}
+
+	.export-menu-item:hover {
+		background-color: #f5f5f5;
+	}
+
+	/* 暗色模式 - 导出菜单项 */
+	&.dark .export-menu-item {
+		color: #e5e7eb;
+	}
+
+	&.dark .export-menu-item:hover {
+		background-color: #3a3a3a;
 	}
 
 	.export-menu-item + .export-menu-item {
 		border-top: 1px solid #eee;
+	}
+
+	&.dark .export-menu-item + .export-menu-item {
+		border-top-color: #404040;
 	}
 
 	.ql-export {
@@ -852,6 +883,12 @@
 		border: 2px solid #4a8eff; /* Add border to the diff editor wrapper */
 	}
 
+	/* 暗色模式 - Diff 编辑器 */
+	&.dark #diffWrapper {
+		background: #1e1e1e;
+		border-color: #60a5fa;
+	}
+
 	#diffEditor {
 		flex: 1;
 	}
@@ -863,7 +900,12 @@
 		gap: 0.75rem;
 		background: #fffffe;
 		border-top: 2px solid #0078d4;
+	}
 
+	/* 暗色模式 - Diff 操作按钮区域 */
+	&.dark .diff-actions {
+		background: #1e1e1e;
+		border-top-color: #60a5fa;
 	}
 
 	.diff-btn {
@@ -924,6 +966,13 @@
 		font-size: 0.875rem;
 		color: #777;
 		line-height: 1.5rem;
+		transition: color 0.3s ease;
+	}
+
+	/* 暗色模式 - 状态栏 */
+	&.dark .ql-creation-time,
+	&.dark .ql-word-count {
+		color: #9ca3af;
 	}
 
 	.ai-response-copy-btn,
@@ -1055,8 +1104,9 @@
 	}
 
 	.dark .vertical-menu {
-	background: #4b5563;
-	border-color: #404040;
+		background: #2a2a2a;
+		border-color: #404040;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 	}
 
     /* 暗黑模式下的标签栏 */
