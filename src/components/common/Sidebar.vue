@@ -22,21 +22,21 @@ const { sortedChats, currentChat } = storeToRefs(chatStore)
 const { switchScene, toggleSettingsPanel, toggleSystemPromptPanel, toggleDarkMode, toggleSidebar } = appStore
 const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
 
-// 获取响应式的 discrete API，每次调用时根据当前主题创建
-function getDiscreteApi() {
-  return createDiscreteApi(
+// 缓存响应式的 discrete API，根据暗色模式自动更新主题
+const discreteApi = computed(() =>
+  createDiscreteApi(
     ['dialog', 'message'],
     {
       configProviderProps: {
         theme: isDarkMode.value ? darkTheme : undefined,
       },
     },
-  )
-}
+  ),
+)
 
 // 提取折叠状态下的文本样式（可复用）
 const collapsedTextClass = computed(() =>
-  isSidebarCollapsed.value ? 'opacity-0 w-0' : 'opacity-100',
+  isSidebarCollapsed.value ? 'opacity-0 w-0' : 'opacity-100 w-auto',
 )
 
 function onNewChat() {
@@ -58,10 +58,14 @@ function checkSystemPromptPanel() {
 // 确认删除当前会话
 async function confirmDeleteChat() {
   const chat = currentChat.value
-  if (!chat?.id) return
+  const { dialog, message } = discreteApi.value
 
-  const chatId = chat.id // 提取 ID 避免闭包中的类型问题
-  const { dialog, message } = getDiscreteApi()
+  if (!chat?.id) {
+    message.warning('未找到要删除的会话')
+    return
+  }
+
+  const chatId: number = chat.id // 提取 ID 避免闭包中的类型问题
 
   dialog.warning({
     title: '删除会话',
@@ -74,7 +78,10 @@ async function confirmDeleteChat() {
         message.success('会话已删除')
       } catch (error) {
         console.error('删除会话失败:', error)
-        message.error('删除会话失败，请重试')
+        const errorMessage = error instanceof Error
+          ? error.message
+          : '删除会话失败，请重试'
+        message.error(errorMessage)
       }
     },
   })
@@ -82,7 +89,7 @@ async function confirmDeleteChat() {
 
 // 确认删除所有会话
 async function confirmWipeDatabase() {
-  const { dialog, message } = getDiscreteApi()
+  const { dialog, message } = discreteApi.value
 
   dialog.error({
     title: '删除所有会话',
@@ -95,7 +102,10 @@ async function confirmWipeDatabase() {
         message.success('所有会话已删除')
       } catch (error) {
         console.error('删除所有会话失败:', error)
-        message.error('删除失败，请重试')
+        const errorMessage = error instanceof Error
+          ? error.message
+          : '删除失败，请重试'
+        message.error(errorMessage)
       }
     },
   })
