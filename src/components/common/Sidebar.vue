@@ -81,13 +81,17 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
     >
       <div class="mx-2 mb-2">
         <button
-          class="flex w-full items-center justify-center gap-x-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900"
+          class="flex w-full items-center justify-center gap-x-2 rounded-md bg-blue-600 px-4 py-3 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-offset-gray-900 overflow-hidden"
           :class="isSidebarCollapsed ? 'px-2' : 'px-4'"
           :title="isSidebarCollapsed ? 'New Chat' : ''"
           @click="onNewChat"
         >
-          <IconPlus class="h-5 w-5" :class="isSidebarCollapsed ? 'mx-auto' : ''" />
-          <span v-if="!isSidebarCollapsed">New Chat</span>
+          <IconPlus class="h-5 w-5 flex-shrink-0" :class="isSidebarCollapsed ? 'mx-auto' : ''" />
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >New Chat</span>
         </button>
       </div>
 
@@ -95,7 +99,7 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
       <div class="flex flex-col gap-2 p-2 border-b border-gray-200 dark:border-gray-800">
         <button
           type="button"
-          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 overflow-hidden"
           :class="[
             { 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.CHAT },
             isSidebarCollapsed ? 'justify-center px-2' : '',
@@ -103,13 +107,17 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           :title="isSidebarCollapsed ? 'Chat' : ''"
           @click="switchScene(SCENES.CHAT)"
         >
-          <IconMessageCode class="size-5" />
-          <span v-if="!isSidebarCollapsed">Chat</span>
+          <IconMessageCode class="size-5 flex-shrink-0" />
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >Chat</span>
         </button>
 
         <button
           type="button"
-          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+          class="flex items-center gap-2 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 overflow-hidden"
           :class="[
             { 'bg-gray-100 dark:bg-gray-800': currentScene === SCENES.AI_EDITING },
             isSidebarCollapsed ? 'justify-center px-2' : '',
@@ -117,8 +125,12 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           :title="isSidebarCollapsed ? 'AI Editing' : ''"
           @click="switchScene(SCENES.AI_EDITING)"
         >
-          <IconEdit class="size-5" />
-          <span v-if="!isSidebarCollapsed">AI Editing</span>
+          <IconEdit class="size-5 flex-shrink-0" />
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >AI Editing</span>
         </button>
       </div>
 
@@ -146,15 +158,19 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
         </button>
       </div>      <div class="mt-auto w-full space-y-2 px-2 py-4">
         <button
-          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? (isDarkMode ? 'Light Mode' : 'Dark Mode') : ''"
           @click="toggleDarkMode"
         >
-          <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80" />
-          <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80" />
+          <IconSun v-if="isDarkMode" class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
+          <IconMoon v-else class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
-          <span v-if="!isSidebarCollapsed">Toggle dark mode</span>
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >Toggle dark mode</span>
         </button>
         <button
           v-if="false"
@@ -164,24 +180,32 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
           User
         </button>
         <button
-          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? 'System prompt' : ''"
           @click="toggleSystemPromptPanel"
         >
-          <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80" />
+          <IconMessageCode class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
-          <span v-if="!isSidebarCollapsed">System prompt</span>
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >System prompt</span>
         </button>
         <button
-          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500"
+          class="group flex w-full items-center gap-x-2 rounded-md px-3 py-2 text-left text-sm font-medium text-gray-900 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-300 dark:hover:bg-gray-700 dark:focus:ring-blue-500 overflow-hidden"
           :class="isSidebarCollapsed ? 'justify-center px-2' : ''"
           :title="isSidebarCollapsed ? 'Settings' : ''"
           @click="toggleSettingsPanel"
         >
-          <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80" />
+          <IconSettings2 class="size-4 opacity-50 group-hover:opacity-80 flex-shrink-0" />
 
-          <span v-if="!isSidebarCollapsed">Settings</span>
+          <span
+            v-if="!isSidebarCollapsed"
+            class="whitespace-nowrap transition-opacity duration-150"
+            :class="isSidebarCollapsed ? 'opacity-0' : 'opacity-100'"
+          >Settings</span>
         </button>        <!-- 删除当前聊天按钮 -->
         <button
           v-if="currentChat && !isSidebarCollapsed"
