@@ -1,13 +1,13 @@
-import type { APIMessage, MultiModalContent } from '@/types/api'
 import type {
   ChatCompletedResponse,
   ChatPartResponse,
   ChatResponse,
   Model,
-} from '../api/api.ts'
+} from '@/api/api'
+import type { APIMessage, MultiModalContent } from '@/types/api'
 import type { Message } from './database'
+import { useApi } from '@/api/api'
 import { ref } from 'vue'
-import { useApi } from '../api/api.ts'
 
 type ChatRole = 'user' | 'assistant' | 'system'
 

@@ -12,7 +12,6 @@ const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
 const appStore = useAppStore()
 const chatStore = useChatStore()
 const { currentModel } = storeToRefs(appStore)
-const { currentMessages } = storeToRefs(chatStore)
 
 const { availableModels } = useAI()
 const { addSystemMessage, addUserMessage, abort } = chatStore

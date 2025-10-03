@@ -1,5 +1,5 @@
+import type { Message } from '@/services/database'
 import type { APIMessage } from '@/types/api'
-import type { Message } from '../services/database.ts'
 
 // 聊天相关接口
 export interface ChatRequest {
