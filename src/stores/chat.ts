@@ -312,13 +312,35 @@ export const useChatStore = defineStore('chat', () => {
         data => handleAiCompletion(data, chatId),
       )
     } catch (err) {
+      // 处理取消请求
       if (err instanceof Error && err.name === 'AbortError') {
+        const aiMessage = ongoingAiMessages.value.get(chatId)
+        if (aiMessage?.id) {
+          await db.messages.update(aiMessage.id, {
+            content: '生成已取消',
+            isStreaming: false,
+          })
+        }
         ongoingAiMessages.value.delete(chatId)
+        await loadMessages(chatId)
         return
       }
+
+      // 处理其他错误
+      const aiMessage = ongoingAiMessages.value.get(chatId)
+      if (aiMessage?.id) {
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        await db.messages.update(aiMessage.id, {
+          content: `生成失败：${errorMsg}`,
+          isStreaming: false,
+        })
+      }
+      ongoingAiMessages.value.delete(chatId)
+      await loadMessages(chatId)
+
       error.value = err instanceof Error ? err : new Error(String(err))
       logger.error('添加用户消息失败', err)
-      showError('添加用户消息失败')
+      showError('生成失败，请重试')
     }
   }
 
@@ -407,13 +429,35 @@ export const useChatStore = defineStore('chat', () => {
         data => handleAiCompletion(data, chatId),
       )
     } catch (err) {
+      // 处理取消请求
       if (err instanceof Error && err.name === 'AbortError') {
+        const aiMessage = ongoingAiMessages.value.get(chatId)
+        if (aiMessage?.id) {
+          await db.messages.update(aiMessage.id, {
+            content: '生成已取消',
+            isStreaming: false,
+          })
+        }
         ongoingAiMessages.value.delete(chatId)
+        await loadMessages(chatId)
         return
       }
+
+      // 处理其他错误
+      const aiMessage = ongoingAiMessages.value.get(chatId)
+      if (aiMessage?.id) {
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        await db.messages.update(aiMessage.id, {
+          content: `生成失败：${errorMsg}`,
+          isStreaming: false,
+        })
+      }
+      ongoingAiMessages.value.delete(chatId)
+      await loadMessages(chatId)
+
       error.value = err instanceof Error ? err : new Error(String(err))
       logger.error('重新生成响应失败', err)
-      showError('重新生成响应失败')
+      showError('生成失败，请重试')
     }
   }
 

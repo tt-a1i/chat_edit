@@ -78,7 +78,7 @@ onMounted(() => {
 
         <div v-else class="flex h-screen w-full flex-col">
           <!-- 现代化顶部栏 - 全宽但内容居中 -->
-          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-10">
+          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-[60]">
             <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
               <!-- 左侧：会话信息 -->
               <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
@@ -95,10 +95,19 @@ onMounted(() => {
                   v-if="!isEditingChatName"
                   type="button"
                   title="点击重命名会话"
-                  class="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs"
+                  class="group relative rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs cursor-pointer"
                   @click.prevent="startEditing"
                 >
                   {{ currentChat.name }}
+                  <!-- 编辑图标 - hover 时显示 -->
+                  <svg
+                    class="inline-block ml-1 h-3.5 w-3.5 opacity-0 transition-opacity duration-200 group-hover:opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
                 </button>
                 <div v-else class="flex items-center gap-2">
                   <TextInput

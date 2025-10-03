@@ -4,7 +4,7 @@ import { useAppStore, useChatStore } from '@/stores'
 import { simplifyModelName } from '@/utils/format'
 import { IconCheck, IconChevronDown, IconRefresh, IconSearch, IconSparkles, IconStar } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()
@@ -16,6 +16,8 @@ const { refreshModels, availableModels } = useAI()
 const isOpen = ref(false)
 const searchQuery = ref('')
 const refreshingModel = ref(false)
+const buttonRef = ref<HTMLButtonElement | null>(null)
+const dropdownPosition = ref({ top: 0, left: 0, width: 0 })
 
 // 常用模型列表（可以根据用户使用频率动态调整）
 const favoriteModels = [
@@ -82,10 +84,23 @@ function handleClickOutside(event: MouseEvent) {
   }
 }
 
+// 计算下拉菜单位置
+function updateDropdownPosition() {
+  if (buttonRef.value) {
+    const rect = buttonRef.value.getBoundingClientRect()
+    dropdownPosition.value = {
+      top: rect.bottom + 8,
+      left: rect.right - 288, // 288px = w-72
+      width: rect.width,
+    }
+  }
+}
+
 // 添加和移除全局点击监听
 function toggleDropdown() {
   isOpen.value = !isOpen.value
   if (isOpen.value) {
+    updateDropdownPosition()
     setTimeout(() => {
       document.addEventListener('click', handleClickOutside)
     }, 0)
@@ -94,12 +109,31 @@ function toggleDropdown() {
     searchQuery.value = ''
   }
 }
+
+// 监听窗口大小变化
+function handleResize() {
+  if (isOpen.value) {
+    updateDropdownPosition()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+  window.addEventListener('scroll', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+  window.removeEventListener('scroll', handleResize)
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
   <div class="model-selector-container relative">
     <!-- 触发按钮 -->
     <button
+      ref="buttonRef"
       class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
       :class="isOpen ? 'bg-gray-100 dark:bg-gray-700' : ''"
       @click="toggleDropdown"
@@ -113,120 +147,126 @@ function toggleDropdown() {
       />
     </button>
 
-    <!-- 下拉菜单 -->
-    <Transition
-      enter-active-class="transition ease-out duration-100"
-      enter-from-class="transform opacity-0 scale-95"
-      enter-to-class="transform opacity-100 scale-100"
-      leave-active-class="transition ease-in duration-75"
-      leave-from-class="transform opacity-100 scale-100"
-      leave-to-class="transform opacity-0 scale-95"
-    >
-      <div
-        v-if="isOpen"
-        class="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
-        style="max-height: 70vh;"
+    <!-- 下拉菜单 - 使用 Teleport 渲染到 body -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-100"
+        enter-from-class="transform opacity-0 scale-95"
+        enter-to-class="transform opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-75"
+        leave-from-class="transform opacity-100 scale-100"
+        leave-to-class="transform opacity-0 scale-95"
       >
-        <!-- 搜索框 -->
-        <div class="sticky top-0 z-10 border-b bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
-          <div class="relative">
-            <IconSearch
-              :size="16"
-              class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="搜索模型..."
-              class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-blue-500 focus:bg-white dark:border-gray-600 dark:bg-gray-700 dark:focus:border-blue-500 dark:focus:bg-gray-600"
-            >
-          </div>
-        </div>
-
-        <!-- 模型列表 -->
-        <div class="max-h-[calc(70vh-120px)] overflow-y-auto">
-          <!-- 常用模型 -->
-          <div v-if="filteredFavorites.length > 0" class="p-2">
-            <div class="mb-1 flex items-center gap-1.5 px-2 py-1">
-              <IconStar :size="14" class="text-yellow-500" />
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">常用模型</span>
+        <div
+          v-if="isOpen"
+          class="fixed z-[100] w-72 overflow-hidden rounded-xl border bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+          :style="{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            maxHeight: '70vh',
+          }"
+        >
+          <!-- 搜索框 -->
+          <div class="sticky top-0 z-10 border-b bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
+            <div class="relative">
+              <IconSearch
+                :size="16"
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="搜索模型..."
+                class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-blue-500 focus:bg-white dark:border-gray-600 dark:bg-gray-700 dark:focus:border-blue-500 dark:focus:bg-gray-600"
+              >
             </div>
-            <button
-              v-for="model in filteredFavorites"
-              :key="model.name"
-              class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-              :class="selectedModel === model.name ? 'bg-blue-50 dark:bg-blue-900/20' : ''"
-              @click="selectModel(model.name)"
-            >
-              <div class="flex items-center gap-2">
+          </div>
+
+          <!-- 模型列表 -->
+          <div class="max-h-[calc(70vh-120px)] overflow-y-auto">
+            <!-- 常用模型 -->
+            <div v-if="filteredFavorites.length > 0" class="p-2">
+              <div class="mb-1 flex items-center gap-1.5 px-2 py-1">
+                <IconStar :size="14" class="text-yellow-500" />
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">常用模型</span>
+              </div>
+              <button
+                v-for="model in filteredFavorites"
+                :key="model.name"
+                class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                :class="selectedModel === model.name ? 'bg-blue-50 dark:bg-blue-900/20' : ''"
+                @click="selectModel(model.name)"
+              >
+                <div class="flex items-center gap-2">
+                  <span
+                    class="text-gray-700 dark:text-gray-200"
+                    :class="selectedModel === model.name ? 'font-medium text-blue-600 dark:text-blue-400' : ''"
+                  >
+                    {{ simplifyModelName(model.name) }}
+                  </span>
+                </div>
+                <IconCheck
+                  v-if="selectedModel === model.name"
+                  :size="16"
+                  class="text-blue-600 dark:text-blue-400"
+                />
+              </button>
+            </div>
+
+            <!-- 分隔线 -->
+            <div v-if="filteredFavorites.length > 0 && filteredOthers.length > 0" class="my-1 border-t border-gray-200 dark:border-gray-700" />
+
+            <!-- 所有模型 -->
+            <div v-if="filteredOthers.length > 0" class="p-2">
+              <div class="mb-1 px-2 py-1">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">所有模型</span>
+              </div>
+              <button
+                v-for="model in filteredOthers"
+                :key="model.name"
+                class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                :class="selectedModel === model.name ? 'bg-blue-50 dark:bg-blue-900/20' : ''"
+                @click="selectModel(model.name)"
+              >
                 <span
                   class="text-gray-700 dark:text-gray-200"
                   :class="selectedModel === model.name ? 'font-medium text-blue-600 dark:text-blue-400' : ''"
                 >
                   {{ simplifyModelName(model.name) }}
                 </span>
-              </div>
-              <IconCheck
-                v-if="selectedModel === model.name"
-                :size="16"
-                class="text-blue-600 dark:text-blue-400"
-              />
-            </button>
-          </div>
-
-          <!-- 分隔线 -->
-          <div v-if="filteredFavorites.length > 0 && filteredOthers.length > 0" class="my-1 border-t border-gray-200 dark:border-gray-700" />
-
-          <!-- 所有模型 -->
-          <div v-if="filteredOthers.length > 0" class="p-2">
-            <div class="mb-1 px-2 py-1">
-              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">所有模型</span>
+                <IconCheck
+                  v-if="selectedModel === model.name"
+                  :size="16"
+                  class="text-blue-600 dark:text-blue-400"
+                />
+              </button>
             </div>
+
+            <!-- 无搜索结果 -->
+            <div v-if="filteredModels.length === 0" class="p-6 text-center">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                未找到匹配的模型
+              </p>
+            </div>
+          </div>
+
+          <!-- 底部操作 -->
+          <div class="sticky bottom-0 border-t bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800/95">
             <button
-              v-for="model in filteredOthers"
-              :key="model.name"
-              class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-              :class="selectedModel === model.name ? 'bg-blue-50 dark:bg-blue-900/20' : ''"
-              @click="selectModel(model.name)"
+              class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+              @click="handleRefresh"
             >
-              <span
-                class="text-gray-700 dark:text-gray-200"
-                :class="selectedModel === model.name ? 'font-medium text-blue-600 dark:text-blue-400' : ''"
-              >
-                {{ simplifyModelName(model.name) }}
-              </span>
-              <IconCheck
-                v-if="selectedModel === model.name"
+              <IconRefresh
                 :size="16"
-                class="text-blue-600 dark:text-blue-400"
+                class="text-gray-500"
+                :class="{ 'animate-spin': refreshingModel }"
               />
+              <span>刷新模型列表</span>
             </button>
           </div>
-
-          <!-- 无搜索结果 -->
-          <div v-if="filteredModels.length === 0" class="p-6 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              未找到匹配的模型
-            </p>
-          </div>
         </div>
-
-        <!-- 底部操作 -->
-        <div class="sticky bottom-0 border-t bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800/95">
-          <button
-            class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
-            @click="handleRefresh"
-          >
-            <IconRefresh
-              :size="16"
-              class="text-gray-500"
-              :class="{ 'animate-spin': refreshingModel }"
-            />
-            <span>刷新模型列表</span>
-          </button>
-        </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 

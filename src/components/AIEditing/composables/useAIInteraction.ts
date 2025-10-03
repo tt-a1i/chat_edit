@@ -1,3 +1,4 @@
+import type { ChatResponse } from '@/types/ai-editing'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
 import { ref } from 'vue'
@@ -19,15 +20,20 @@ export function useAIInteraction(quill: Ref<Quill | null>) {
    */
   async function sendPrompt(
     promptValue: string,
-    currentRange: any,
+    currentRange: { index: number, length: number } | null,
     aiResponseRef: HTMLElement,
     actionButtonsRef: HTMLElement,
-    onResponse: (response: any) => void,
+    onResponse: (response: ChatResponse) => void,
   ) {
     if (!quill.value) return
 
+    // 创建一个虚拟的 input 元素来满足 handleSend 的接口要求
+    const dummyInput = document.createElement('input') as HTMLInputElement
+    dummyInput.value = ''
+    dummyInput.placeholder = ''
+
     await handleSend({
-      promptInputRef: null as any,
+      promptInputRef: dummyInput,
       promptValue,
       currentRange,
       quill: quill.value,

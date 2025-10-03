@@ -139,7 +139,6 @@ export function hideAIUI({
   actionButtonsRef,
   promptInputRef,
 }: HideAIUIParams) {
-  // console.log("HideAIUI执行了");
   floatingInputRef.style.display = 'none'
   verticalMenuRef.style.display = 'none'
   aiResponseRef.style.display = 'none'

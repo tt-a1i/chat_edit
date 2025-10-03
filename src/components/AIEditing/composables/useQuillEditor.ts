@@ -48,14 +48,14 @@ export function useQuillEditor() {
             ['export'],
           ],
           handlers: {
-            'undo': function (this: any) {
+            'undo': function (this: { quill: Quill }) {
               const quill = this.quill
               quill.history.undo()
               setTimeout(() => {
                 document.querySelectorAll('.highlight-overlay').forEach(el => el.remove())
               }, 0)
             },
-            'redo': function (this: any) {
+            'redo': function (this: { quill: Quill }) {
               const quill = this.quill
               quill.history.redo()
               setTimeout(() => {
@@ -67,11 +67,12 @@ export function useQuillEditor() {
                 showExportMenu({ exportMenuRef })
               }
             },
-            'table': function (this: any) {
+            'table': function (this: { quill: Quill }) {
               const quill = this.quill
-              quill.getModule('table').insertTable(3, 3)
+              const tableModule = quill.getModule('table') as { insertTable: (rows: number, cols: number) => void }
+              tableModule.insertTable(3, 3)
             },
-            'copy-content': function (this: any) {
+            'copy-content': function (this: { quill: Quill }) {
               const quill = this.quill
               copyAsMarkdown(quill)
             },
@@ -160,7 +161,7 @@ export function useQuillEditor() {
    */
   function getToolbar(): HTMLElement | null {
     if (!quillInstance.value) return null
-    const toolbar = quillInstance.value.getModule('toolbar') as any
+    const toolbar = quillInstance.value.getModule('toolbar') as { container?: HTMLElement }
     return toolbar?.container || null
   }
 
