@@ -935,13 +935,22 @@
 	.ql-export::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f56e"; /* 导出图标的 Unicode */
-		font-weight: 400; /* Regular 版本，更轻量 */
-		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
-		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
+		font-weight: 900;
+		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-export:hover {
+	.ql-export:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 导出按钮 */
+	&.dark .ql-export::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-export:hover::before {
+		color: #60a5fa !important;
 	}
 
 	/* 表格按钮样式 */
@@ -952,9 +961,20 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: #444; /* 默认颜色 */
 	}
+
 	.ql-table:hover {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 表格按钮 */
+	&.dark .ql-table {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-table:hover {
+		color: #60a5fa !important;
 	}
 
 	.test-markdown-btn:hover {
@@ -993,6 +1013,7 @@
 		content: "\f0e2"; /* undo 图标 */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
 	.ql-redo::before {
@@ -1000,11 +1021,23 @@
 		content: "\f01e"; /* redo 图标 */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-undo:hover,
-	.ql-redo:hover {
+	.ql-undo:hover::before,
+	.ql-redo:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 撤销/重做按钮 */
+	&.dark .ql-undo::before,
+	&.dark .ql-redo::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-undo:hover::before,
+	&.dark .ql-redo:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-editor td[data-header="true"] {
 		font-weight: bold;
@@ -1103,20 +1136,22 @@
 	.ql-copy-content::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f0c5";
-		font-weight: 400; /* Regular 版本，更轻量 */
-		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
-		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
+		font-weight: 900;
+		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-copy-content:hover {
+	.ql-copy-content:hover::before {
 		color: #06c;
 	}
 
-	/* 暗色模式 - 自定义图标 */
-	&.dark .ql-copy-content::before,
-	&.dark .ql-import::before,
-	&.dark .ql-export::before {
-		opacity: 1; /* 暗色模式下恢复完全不透明 */
+	/* 暗色模式 - 复制按钮 */
+	&.dark .ql-copy-content::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-copy-content:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-creation-time,
 	.ql-word-count {
@@ -1152,13 +1187,22 @@
 	.ql-import::before {
 		font-family: "Font Awesome 5 Free";
 		content: "\f574"; /* 使用 file-upload 图标替换原来的 file-import */
-		font-weight: 400; /* Regular 版本，更轻量 */
-		font-size: 0.8rem; /* 稍微缩小与 SVG 图标协调 */
-		opacity: 0.85; /* 降低不透明度，视觉上更轻 */
+		font-weight: 900;
+		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-import:hover {
+	.ql-import:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 导入按钮 */
+	&.dark .ql-import::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-import:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-editor .ql-code-block-container {
 		background: white !important;
