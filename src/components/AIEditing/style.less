@@ -84,6 +84,11 @@
 		right: 30px;
 	}
 
+	/* 暗色模式 - Quill 编辑器占位符 (提前定义) */
+	&.dark .ql-editor.ql-blank::before {
+		color: #6b7280 !important;
+	}
+
 	/* 针对不同级别标题的字体大小调整 */
 	.ql-editor h1 {
 		font-size: 2em;
@@ -169,10 +174,27 @@
 		border-radius: 4px;
 		padding: 0.625rem;
 		z-index: 9999;
-		width: calc(100% - 40px); 
-		max-width: 920px; 
-		min-width: 560px; 
-		transition: none;
+		width: calc(100% - 40px);
+		max-width: 920px;
+		min-width: 560px;
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 浮动输入框 (提前定义以确保优先级) */
+	&.dark .floating-input {
+		background: #1f2937 !important;
+		border: 1px solid #374151 !important;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+	}
+
+	&.dark .input-container textarea {
+		background: #111827 !important;
+		border-color: #4b5563 !important;
+		color: #e5e7eb !important;
+	}
+
+	&.dark .input-container textarea::placeholder {
+		color: #9ca3af !important;
 	}
 
 	.input-container {
@@ -313,6 +335,18 @@
 		left: 0; /* 添加这行确保左对齐 */
 		right: 0; /* 添加这行确保宽度与父元素相同 */
 		z-index: 9997;
+	}
+
+	/* 暗色模式 - AI 响应区域 (提前定义) */
+	&.dark .ai-response {
+		background: #1f2937 !important;
+		border-color: #374151 !important;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+		color: #e5e7eb !important;
+	}
+
+	&.dark .ai-response .response-content {
+		color: #e5e7eb !important;
 	}
 
 	.ai-response::-webkit-scrollbar {
@@ -586,8 +620,24 @@
 		max-height: min(500px, 40vh); /* 增加一点高度 */
 		min-height: min(300px, 25vh); /* 增加一点高度 */
 		overflow-y: auto;
-		transition: none;
-        padding-top: 0; /* 移除顶部内边距，为标签腾出空间 */
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+		padding-top: 0; /* 移除顶部内边距，为标签腾出空间 */
+	}
+
+	/* 暗色模式 - 垂直菜单 (提前定义) */
+	&.dark .vertical-menu {
+		background: #1f2937 !important;
+		border: 1px solid #374151 !important;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+	}
+
+	&.dark .vertical-menu .menu-item {
+		color: #e5e7eb !important;
+	}
+
+	&.dark .vertical-menu .menu-item:hover {
+		background-color: #374151 !important;
+		color: #f9fafb !important;
 	}
 
 	/* 标签切换样式 */
@@ -1088,43 +1138,7 @@
     .ql-picker-item:hover ~ .tooltip::after {
         display: none;
     }
-	.dark .floating-input {
-		background: #1f2937; /* 更现代的暗色背景 */
-		border: 1px solid #374151;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-	}
-
-	.dark .input-container textarea {
-		background: #111827; /* 更深的背景提升对比度 */
-		border-color: #4b5563;
-		color: #e5e7eb; /* 更亮的文本颜色 */
-	}
-
-	.dark .ai-response {
-		background: #1f2937; /* 与浮动输入框统一背景 */
-		border-color: #374151;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-	}
-
-	.dark .ai-response .response-content {
-		color: #e5e7eb; /* 确保响应内容文本清晰 */
-	}
-
-	.dark .vertical-menu {
-		background: #1f2937; /* 统一的暗色背景 */
-		border: 1px solid #374151;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6); /* 增强阴影深度 */
-	}
-
-	.dark .vertical-menu .menu-item {
-		color: #e5e7eb; /* 菜单项文本颜色 */
-		transition: background-color 0.2s ease, color 0.2s ease;
-	}
-
-	.dark .vertical-menu .menu-item:hover {
-		background-color: #374151; /* hover 状态 */
-		color: #f9fafb;
-	}
+	/* 重复定义已移至前面统一管理(使用 !important 确保优先级) */
 
     /* 暗黑模式下的标签栏 */
     .dark .menu-tabs {
@@ -1538,14 +1552,7 @@
 	.ql-color.ql-expanded.tooltip:hover::after {
 		display: none;
 	}
-	/* 针对暗色模式下的占位符颜色 */
-	.dark .ql-editor.ql-blank::before {
-		color: #6b7280; /* 更适合暗色模式的占位符颜色 */
-	}
-	/* 已移至前面统一管理，此处删除重复定义 */
-	.dark .input-container textarea::placeholder {
-		color: #9ca3af; /* 提升占位符可读性 */
-	}
+	/* 占位符样式已移至前面统一管理(使用 !important 确保优先级) */
 	.highlight-overlay {
 		pointer-events: none;
 		border-radius: 2px;
