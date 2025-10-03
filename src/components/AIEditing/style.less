@@ -15,8 +15,14 @@
 		background-color: #f9fafd;
 		height: 100%;
 		overflow: auto;
-		position: relative; 
+		position: relative;
 		scroll-behavior: smooth; /* 使容器滚动更平滑 */
+		transition: background-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 编辑器容器 */
+	&.dark .editor-container {
+		background-color: #1a1a1a;
 	}
 
 	.ql-container {
@@ -34,6 +40,9 @@
 		margin: 0 auto;
 		padding: 30px;
 		height: 100vh;
+		color: #1a1a1a;
+		transition: color 0.3s ease, background-color 0.3s ease;
+
 		/* 确保滚动条样式不会影响功能 */
 		&::-webkit-scrollbar {
 			width: 8px;
@@ -49,6 +58,24 @@
 
 		&::-webkit-scrollbar-thumb:hover {
 			background: #a8a8a8;
+		}
+	}
+
+	/* 暗色模式 - Quill 编辑器 */
+	&.dark .ql-editor {
+		color: #e5e7eb;
+		background-color: #1a1a1a;
+
+		&::-webkit-scrollbar-track {
+			background: #2a2a2a;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #4a4a4a;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: #5a5a5a;
 		}
 	}
 
@@ -86,6 +113,45 @@
 		top: 0;
 		z-index: 10;
 		background-color: #ffffff;
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 工具栏 */
+	&.dark .ql-toolbar {
+		background-color: #2a2a2a;
+		border-color: #3a3a3a;
+
+		.ql-stroke {
+			stroke: #9ca3af;
+		}
+
+		.ql-fill {
+			fill: #9ca3af;
+		}
+
+		.ql-picker-label {
+			color: #9ca3af;
+		}
+
+		button:hover .ql-stroke {
+			stroke: #e5e7eb;
+		}
+
+		button:hover .ql-fill {
+			fill: #e5e7eb;
+		}
+
+		.ql-picker-label:hover {
+			color: #e5e7eb;
+		}
+
+		.ql-active .ql-stroke {
+			stroke: #60a5fa;
+		}
+
+		.ql-active .ql-fill {
+			fill: #60a5fa;
+		}
 	}
 
 	.ql-container .ql-editor::selection,
@@ -547,7 +613,7 @@
         background-color: #f5f5f5;
     }
 	/* 暗黑模式下的标签栏 */
-	.dark-mode .menu-tabs {
+	.dark .menu-tabs {
 		background: #3a3a3a;
 		border-bottom-color: #505050;
 	}
@@ -919,39 +985,39 @@
 	}
 
 	/* Dark Mode Styles */
-	.dark-mode .editor-container {
+	.dark .editor-container {
 	background-color: #1e1e1e;
 	scroll-behavior: smooth;
 	}
 
-	.dark-mode .ql-toolbar.ql-snow {
+	.dark .ql-toolbar.ql-snow {
 	background-color: #252526;
 	border-color: #404040;
 	}
 
-	.dark-mode .ql-container.ql-snow {
+	.dark .ql-container.ql-snow {
 	background-color: #1e1e1e;
 	}
 
-	.dark-mode .ql-editor {
+	.dark .ql-editor {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .ql-editor h1,
-	.dark-mode .ql-editor h2,
-	.dark-mode .ql-editor h3 {
+	.dark .ql-editor h1,
+	.dark .ql-editor h2,
+	.dark .ql-editor h3 {
 	color: #e0e0e0;
 	}
 
-	.dark-mode .ql-snow .ql-stroke {
+	.dark .ql-snow .ql-stroke {
 	stroke: #d4d4d4;
 	}
 
-	.dark-mode .ql-snow .ql-fill {
+	.dark .ql-snow .ql-fill {
 	fill: #d4d4d4;
 	}
 
-	.dark-mode .ql-snow .ql-picker {
+	.dark .ql-snow .ql-picker {
 	color: #d4d4d4;
 	}
 	.ql-picker-options {
@@ -973,170 +1039,170 @@
     .ql-picker-item:hover ~ .tooltip::after {
         display: none;
     }
-	.dark-mode .floating-input {
+	.dark .floating-input {
 	background: #252526;
 	}
 
-	.dark-mode .input-container textarea {
+	.dark .input-container textarea {
 	background: #1e1e1e;
 	border-color: #404040;
 	color: #d4d4d4;
 	}
 
-	.dark-mode .ai-response {
+	.dark .ai-response {
 	background: #252526;
 	border-color: #404040;
 	}
 
-	.dark-mode .vertical-menu {
+	.dark .vertical-menu {
 	background: #4b5563;
 	border-color: #404040;
 	}
 
     /* 暗黑模式下的标签栏 */
-    .dark-mode .menu-tabs {
+    .dark .menu-tabs {
         background: #3a3a3a;
         border-bottom-color: #505050;
     }
 
-    .dark-mode .menu-tab {
+    .dark .menu-tab {
         color: #d4d4d4;
     }
 
-    .dark-mode .menu-tab.active {
+    .dark .menu-tab.active {
         color: #0078d4;
         border-bottom-color: #0078d4;
     }
 
-    .dark-mode .menu-tab:hover:not(.active) {
+    .dark .menu-tab:hover:not(.active) {
         background-color: #4b5563;
     }
 
-    .dark-mode .custom-prompts-header {
+    .dark .custom-prompts-header {
         background: #4b5563;
     }
 
-    .dark-mode .empty-prompts {
+    .dark .empty-prompts {
         color: #a0a0a0;
     }
 
-    .dark-mode .prompt-action {
+    .dark .prompt-action {
         color: #a0a0a0;
     }
 
-    .dark-mode .prompt-action:hover {
+    .dark .prompt-action:hover {
         background-color: #505050;
         color: #d4d4d4;
     }
 
-	.dark-mode .menu-item {
+	.dark .menu-item {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .menu-item:hover {
+	.dark .menu-item:hover {
 	background-color: #323233;
 	}
 
-	.dark-mode .ql-editor pre.ql-syntax,
-	.dark-mode .ql-editor .ql-code-block-container {
+	.dark .ql-editor pre.ql-syntax,
+	.dark .ql-editor .ql-code-block-container {
 	background: #2d2d2d !important;
 	color: #d4d4d4 !important;
 	}
 
-	.dark-mode .action-buttons button {
+	.dark .action-buttons button {
 	background: #2d2d2d;
 	border-color: #404040;
 	color: #d4d4d4;
 	}
 
-	.dark-mode .action-buttons button:hover {
+	.dark .action-buttons button:hover {
 	background: #3e3e3e;
 	}
 
 	/* 修改暗黑模式下的选中高亮颜色 */
-	.dark-mode .highlight-selection {
+	.dark .highlight-selection {
 	background-color: rgba(38, 79, 120, 0.4) !important;
 	}
 
-	.dark-mode .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
+	.dark .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
 	background-color: rgba(38, 79, 120, 0.4) !important;
 	}
 
-	.dark-mode .ql-container .ql-editor::selection,
-	.dark-mode .ql-container .ql-editor *::selection {
+	.dark .ql-container .ql-editor::selection,
+	.dark .ql-container .ql-editor *::selection {
 	background-color: #264f78;
 	}
 
 	/* 修改暗黑模式下 AI 回答区域的文本颜色 */
-	.dark-mode .response-content {
+	.dark .response-content {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown {
+	.dark .response-content.markdown {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown code {
+	.dark .response-content.markdown code {
 	background: #2d2d2d;
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown blockquote {
+	.dark .response-content.markdown blockquote {
 	color: #a0aec0;
 	}
 
 	/* 确保代码块在暗黑模式下也保持正确的颜色 */
-	.dark-mode .response-content.markdown-body pre code {
+	.dark .response-content.markdown-body pre code {
 	color: #d4d4d4;
 	background: transparent !important;
 	}
 
 	/* 确保暗黑模式下内联代码的背景色和文字颜色 */
-	.dark-mode .response-content.markdown-body code:not(pre code) {
+	.dark .response-content.markdown-body code:not(pre code) {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: #d4d4d4;
 	}
 
 	/* 修改暗黑模式下 AI 回答区域的代码块样式 */
-	.dark-mode .response-content.markdown pre,
-	.dark-mode .response-content.markdown-body pre {
+	.dark .response-content.markdown pre,
+	.dark .response-content.markdown-body pre {
 	background: #1e1e1e !important;
 	border: 1px solid #404040;
 	}
 
-	.dark-mode .response-content.markdown pre code,
-	.dark-mode .response-content.markdown-body pre code {
+	.dark .response-content.markdown pre code,
+	.dark .response-content.markdown-body pre code {
 	color: #d4d4d4 !important;
 	background: transparent !important;
 	}
 
 	/* 修改代码块内的语法高亮颜色 */
-	.dark-mode .response-content.markdown-body .hljs {
+	.dark .response-content.markdown-body .hljs {
 	color: #d4d4d4;
 	background: #1e1e1e;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-keyword {
+	.dark .response-content.markdown-body .hljs-keyword {
 	color: #569cd6;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-string {
+	.dark .response-content.markdown-body .hljs-string {
 	color: #ce9178;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-comment {
+	.dark .response-content.markdown-body .hljs-comment {
 	color: #6a9955;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-function {
+	.dark .response-content.markdown-body .hljs-function {
 	color: #dcdcaa;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-number {
+	.dark .response-content.markdown-body .hljs-number {
 	color: #b5cea8;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-literal {
+	.dark .response-content.markdown-body .hljs-literal {
 	color: #569cd6;
 	}
 
@@ -1174,7 +1240,7 @@
 		margin-top: 1em;
 		margin-bottom: 0.5em;
 	} */
-	.dark-mode .editor-container {
+	.dark .editor-container {
 		&::-webkit-scrollbar-track {
 			background: #2d2d2d;
 		}
@@ -1188,49 +1254,49 @@
 		}
 	}
 	/* Dark Mode Table Styles */
-	.dark-mode .ql-editor table {
+	.dark .ql-editor table {
 		border-collapse: collapse;
 		width: 100%;
 		margin-bottom: 1em;
 	}
 
-	.dark-mode .ql-editor table td,
-	.dark-mode .ql-editor table th {
+	.dark .ql-editor table td,
+	.dark .ql-editor table th {
 		border: 1px solid #d4d4d4;
 		padding: 8px;
 	}
 
-	.dark-mode .ql-editor table th {
+	.dark .ql-editor table th {
 		background-color: #2d2d2d;
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-editor table tr:nth-child(even) {
+	.dark .ql-editor table tr:nth-child(even) {
 		background-color: #252526;
 	}
 
-	.dark-mode .ql-editor table tr:hover {
+	.dark .ql-editor table tr:hover {
 		background-color: #323233;
 	}
-	.dark-mode .ql-table-menu {
+	.dark .ql-table-menu {
 		background-color: #252526;
 		border: 1px solid #404040;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 	}
 
-	.dark-mode .ql-table-menu__item {
+	.dark .ql-table-menu__item {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-table-menu__item:hover {
+	.dark .ql-table-menu__item:hover {
 		background-color: #323233;
 	}
 
-	.dark-mode .ql-table-menu__item-text {
+	.dark .ql-table-menu__item-text {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-table-menu__item-icon svg path[fill="#595959"] {
+	.dark .ql-table-menu__item-icon svg path[fill="#595959"] {
 		fill: #d4d4d4;
 	}
 	/* Tooltip */
@@ -1253,7 +1319,7 @@
 		z-index: 1000;
 	}
 
-	.dark-mode .tooltip:hover::after {
+	.dark .tooltip:hover::after {
 		background: rgba(255, 255, 255, 0.9);
 		color: black;
 	}
@@ -1293,11 +1359,11 @@
         transform: scale(1.1); 
     }
 
-    .dark-mode .ql-color .ql-picker-label svg .ql-stroke {
+    .dark .ql-color .ql-picker-label svg .ql-stroke {
         stroke: #d4d4d4;
     }
     
-    .dark-mode .ql-color .ql-picker-options {
+    .dark .ql-color .ql-picker-options {
         background-color: #252526;
         border-color: #404040;
     }
@@ -1326,54 +1392,54 @@
 	}
 
 	/* 暗黑模式下的分隔线颜色 */
-	.dark-mode .ql-header:before {
+	.dark .ql-header:before {
 		background-color: #404040;
 	}
 	 /* 所有下拉菜单在暗黑模式下的样式 */
-	.dark-mode .ql-picker.ql-expanded .ql-picker-label {
+	.dark .ql-picker.ql-expanded .ql-picker-label {
         color: #d4d4d4;
     }
 
     /* 暗黑模式下拉菜单样式统一处理 */
-    .dark-mode .ql-picker-options {
+    .dark .ql-picker-options {
         background-color: #252526;
         border-color: #404040;
     }
     
-    .dark-mode .ql-picker-item {
+    .dark .ql-picker-item {
         color: #d4d4d4;
     }
     
-    .dark-mode .ql-picker-item:hover {
+    .dark .ql-picker-item:hover {
         color: #ffffff;
     }
     
-    .dark-mode .ql-picker-item.ql-selected {
+    .dark .ql-picker-item.ql-selected {
         color: #409eff;
     }
     
     /* 标题选择器特别处理 */
-    .dark-mode .ql-header .ql-picker-label,
-    .dark-mode .ql-header .ql-picker-item {
+    .dark .ql-header .ql-picker-label,
+    .dark .ql-header .ql-picker-item {
         color: #d4d4d4;
     }
     
-    .dark-mode .ql-header .ql-picker-label::before,
-    .dark-mode .ql-header .ql-picker-item::before {
+    .dark .ql-header .ql-picker-label::before,
+    .dark .ql-header .ql-picker-item::before {
         color: #d4d4d4;
     }
     
-    .dark-mode .ql-header .ql-picker-item:hover {
+    .dark .ql-header .ql-picker-item:hover {
         color: #ffffff;
     }
     
-    .dark-mode .ql-header .ql-picker-item.ql-selected,
-    .dark-mode .ql-header .ql-picker-label.ql-selected {
+    .dark .ql-header .ql-picker-item.ql-selected,
+    .dark .ql-header .ql-picker-label.ql-selected {
         color: #409eff;
     }
     
     /* 确保下拉箭头颜色在暗黑模式下能看清 */
-    .dark-mode .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
+    .dark .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
         fill: #d4d4d4;
     }
     
@@ -1405,14 +1471,14 @@
 		display: none;
 	}
 	/* 针对暗色模式下的占位符颜色 */
-	.dark-mode .ql-editor.ql-blank::before {
+	.dark .ql-editor.ql-blank::before {
 		color: rgba(255, 255, 255, 0.6);
 	}
 	.writing-editor.dark-mode,
-	.editor-container.dark-mode {
+	.editor-container.dark {
 		background-color: #1e1e1e;
 	}
-	.dark-mode .input-container textarea {
+	.dark .input-container textarea {
 		background: #1e1e1e;
 		border-color: #0078d4;
 		box-shadow: 0 0 0 1px #0078d4;
@@ -1428,7 +1494,7 @@
 		  border-color: #606060;
 		}
 	}
-	.dark-mode .input-container textarea::placeholder {
+	.dark .input-container textarea::placeholder {
 		color: #666;
 	}
 	.highlight-overlay {
@@ -1436,7 +1502,7 @@
 		border-radius: 2px;
 		transition: opacity 0.2s ease;
 	}
-	.dark-mode .ql-header .ql-picker-options {
+	.dark .ql-header .ql-picker-options {
     	background-color: #4b5563;
 	}
 
@@ -1446,7 +1512,7 @@
 	}
   
 	/* 确保暗黑模式下的样式一致 */
-	&.dark-mode .ql-tooltip.ql-editing[data-mode="link"] {
+	&.dark .ql-tooltip.ql-editing[data-mode="link"] {
 		background-color: #252526;
 		border-color: #404040;
 		color: #d4d4d4;
@@ -1459,20 +1525,20 @@
 	.ql-editor.hiding-placeholder::before {
 		display: none !important;
 	}
-	.dark-mode .menu-tab {
+	.dark .menu-tab {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .menu-tab.active {
+	.dark .menu-tab.active {
 		color: #0078d4;
 		border-bottom-color: #0078d4;
 	}
 
-	.dark-mode .menu-tab:hover:not(.active) {
+	.dark .menu-tab:hover:not(.active) {
 		background-color: #4b5563;
 	}
 
-	.dark-mode .empty-prompts {
+	.dark .empty-prompts {
 		color: #a0a0a0;
 	}
 	.prompt-divider {
@@ -1483,7 +1549,7 @@
 	}
 
 	/* 暗黑模式下的分隔线 */
-	.dark-mode .prompt-divider {
+	.dark .prompt-divider {
 		background-color: #404040;
 	}
 }
