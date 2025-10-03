@@ -15,8 +15,14 @@
 		background-color: #f9fafd;
 		height: 100%;
 		overflow: auto;
-		position: relative; 
+		position: relative;
 		scroll-behavior: smooth; /* 使容器滚动更平滑 */
+		transition: background-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 编辑器容器 */
+	&.dark .editor-container {
+		background-color: #1a1a1a;
 	}
 
 	.ql-container {
@@ -34,6 +40,9 @@
 		margin: 0 auto;
 		padding: 30px;
 		height: 100vh;
+		color: #1a1a1a;
+		transition: color 0.3s ease, background-color 0.3s ease;
+
 		/* 确保滚动条样式不会影响功能 */
 		&::-webkit-scrollbar {
 			width: 8px;
@@ -52,9 +61,32 @@
 		}
 	}
 
+	/* 暗色模式 - Quill 编辑器 */
+	&.dark .ql-editor {
+		color: #e5e7eb;
+		background-color: #1a1a1a;
+
+		&::-webkit-scrollbar-track {
+			background: #2a2a2a;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #4a4a4a;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background: #5a5a5a;
+		}
+	}
+
 	.ql-editor.ql-blank::before{
 		left: 30px;
 		right: 30px;
+	}
+
+	/* 暗色模式 - Quill 编辑器占位符 (提前定义) */
+	&.dark .ql-editor.ql-blank::before {
+		color: #6b7280 !important;
 	}
 
 	/* 针对不同级别标题的字体大小调整 */
@@ -86,6 +118,106 @@
 		top: 0;
 		z-index: 10;
 		background-color: #ffffff;
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 工具栏 */
+	&.dark .ql-toolbar {
+		background-color: #1f2937 !important; /* 与其他面板统一背景 */
+		border-color: #374151 !important;
+
+		.ql-stroke {
+			stroke: #9ca3af !important;
+		}
+
+		.ql-fill {
+			fill: #9ca3af !important;
+		}
+
+		.ql-picker-label {
+			color: #9ca3af !important;
+		}
+
+		button:hover .ql-stroke {
+			stroke: #e5e7eb !important;
+		}
+
+		button:hover .ql-fill {
+			fill: #e5e7eb !important;
+		}
+
+		.ql-picker-label:hover {
+			color: #e5e7eb !important;
+		}
+
+		.ql-active .ql-stroke {
+			stroke: #60a5fa !important;
+		}
+
+		.ql-active .ql-fill {
+			fill: #60a5fa !important;
+		}
+	}
+
+	/* 暗色模式 - 工具栏下拉选择器 */
+	&.dark .ql-snow .ql-picker {
+		color: #e5e7eb !important;
+	}
+
+	&.dark .ql-picker-options {
+		background-color: #1f2937 !important;
+		border-color: #374151 !important;
+	}
+
+	&.dark .ql-picker-item {
+		color: #e5e7eb !important;
+	}
+
+	&.dark .ql-picker-item:hover {
+		color: #ffffff !important;
+		background-color: #374151 !important;
+	}
+
+	&.dark .ql-picker-item.ql-selected {
+		color: #60a5fa !important;
+	}
+
+	&.dark .ql-header .ql-picker-options {
+		background-color: #1f2937 !important;
+	}
+
+	&.dark .ql-header .ql-picker-label,
+	&.dark .ql-header .ql-picker-item {
+		color: #e5e7eb !important;
+	}
+
+	&.dark .ql-header .ql-picker-item:hover {
+		color: #ffffff !important;
+		background-color: #374151 !important;
+	}
+
+	&.dark .ql-header .ql-picker-item.ql-selected,
+	&.dark .ql-header .ql-picker-label.ql-selected {
+		color: #60a5fa !important;
+	}
+
+	/* 暗色模式 - 下拉箭头颜色 */
+	&.dark .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
+		fill: #9ca3af !important;
+	}
+
+	/* 暗色模式 - 工具栏按钮 hover 状态 */
+	&.dark .ql-toolbar button:hover {
+		background-color: #374151 !important;
+	}
+
+	&.dark .ql-toolbar .ql-picker-label:hover {
+		background-color: #374151 !important;
+	}
+
+	/* 暗色模式 - 菜单分隔线 */
+	&.dark .prompt-divider {
+		background-color: #374151 !important; /* 使用统一的边框颜色 */
 	}
 
 	.ql-container .ql-editor::selection,
@@ -103,10 +235,27 @@
 		border-radius: 4px;
 		padding: 0.625rem;
 		z-index: 9999;
-		width: calc(100% - 40px); 
-		max-width: 920px; 
-		min-width: 560px; 
-		transition: none;
+		width: calc(100% - 40px);
+		max-width: 920px;
+		min-width: 560px;
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+	}
+
+	/* 暗色模式 - 浮动输入框 (提前定义以确保优先级) */
+	&.dark .floating-input {
+		background: #1f2937 !important;
+		border: 1px solid #374151 !important;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+	}
+
+	&.dark .input-container textarea {
+		background: #111827 !important;
+		border-color: #4b5563 !important;
+		color: #e5e7eb !important;
+	}
+
+	&.dark .input-container textarea::placeholder {
+		color: #9ca3af !important;
 	}
 
 	.input-container {
@@ -159,6 +308,13 @@
 	.input-container textarea:focus {
 		outline: none;
 		border-color: #409eff;
+		box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
+	}
+
+	/* 暗色模式 - 输入框焦点 */
+	&.dark .input-container textarea:focus {
+		border-color: #60a5fa;
+		box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
 	}
 
 	.send-btn {
@@ -240,6 +396,18 @@
 		left: 0; /* 添加这行确保左对齐 */
 		right: 0; /* 添加这行确保宽度与父元素相同 */
 		z-index: 9997;
+	}
+
+	/* 暗色模式 - AI 响应区域 (提前定义) */
+	&.dark .ai-response {
+		background: #1f2937 !important;
+		border-color: #374151 !important;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+		color: #e5e7eb !important;
+	}
+
+	&.dark .ai-response .response-content {
+		color: #e5e7eb !important;
 	}
 
 	.ai-response::-webkit-scrollbar {
@@ -492,8 +660,43 @@
 		font-size: 0.8125rem; /* 减小图标大小 */
 	}
 
+	/* 暗色模式 - AI 回答区域按钮 */
+	&.dark .action-buttons {
+		border-top-color: #374151 !important;
+	}
+
+	&.dark .action-buttons button {
+		background: #1e3a5f !important; /* 深蓝色背景 */
+		border-color: #2563eb !important;
+		color: #93c5fd !important; /* 亮蓝色文本 */
+	}
+
+	&.dark .action-buttons button:hover {
+		background: #2563eb !important; /* hover 鲜明蓝色 */
+		border-color: #3b82f6 !important;
+		color: #ffffff !important;
+	}
+
+	/* 暗色模式 - 次要按钮(复制和重新生成) */
+	&.dark .action-buttons .right-buttons button {
+		background: #374151 !important;
+		border-color: #4b5563 !important;
+		color: #9ca3af !important;
+	}
+
+	&.dark .action-buttons .right-buttons button:hover {
+		background: #4b5563 !important;
+		border-color: #6b7280 !important;
+		color: #e5e7eb !important;
+	}
+
 	.highlight-selection {
 		background-color: #b4d5fe !important;
+	}
+
+	/* 暗色模式 - 高亮选中区域 */
+	&.dark .highlight-selection {
+		background-color: rgba(96, 165, 250, 0.3) !important; /* 更明显的蓝色高亮 */
 	}
 
 	.vertical-menu {
@@ -513,8 +716,24 @@
 		max-height: min(500px, 40vh); /* 增加一点高度 */
 		min-height: min(300px, 25vh); /* 增加一点高度 */
 		overflow-y: auto;
-		transition: none;
-        padding-top: 0; /* 移除顶部内边距，为标签腾出空间 */
+		transition: background-color 0.3s ease, border-color 0.3s ease;
+		padding-top: 0; /* 移除顶部内边距，为标签腾出空间 */
+	}
+
+	/* 暗色模式 - 垂直菜单 (提前定义) */
+	&.dark .vertical-menu {
+		background: #1f2937 !important;
+		border: 1px solid #374151 !important;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+	}
+
+	&.dark .vertical-menu .menu-item {
+		color: #e5e7eb !important;
+	}
+
+	&.dark .vertical-menu .menu-item:hover {
+		background-color: #374151 !important;
+		color: #f9fafb !important;
 	}
 
 	/* 标签切换样式 */
@@ -547,7 +766,7 @@
         background-color: #f5f5f5;
     }
 	/* 暗黑模式下的标签栏 */
-	.dark-mode .menu-tabs {
+	.dark .menu-tabs {
 		background: #3a3a3a;
 		border-bottom-color: #505050;
 	}
@@ -572,6 +791,11 @@
 
 	.menu-item + .menu-item {
 		border-top: 1px solid #eee;
+	}
+
+	/* 暗色模式 - 菜单项之间的分隔线 */
+	&.dark .menu-item + .menu-item {
+		border-top-color: #374151 !important;
 	}
 
     /* 自定义提示词面板样式 */
@@ -664,15 +888,39 @@
 		border-radius: 0.25rem;
 		z-index: 1000;
 	}
-	
+
+	/* 暗色模式 - 导出菜单 */
+	&.dark .export-menu {
+		background: #2a2a2a;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+	}
+
 	.export-menu-item {
 		padding: 0.5rem 1rem;
 		cursor: pointer;
 		white-space: nowrap;
+		transition: background-color 0.2s ease;
+	}
+
+	.export-menu-item:hover {
+		background-color: #f5f5f5;
+	}
+
+	/* 暗色模式 - 导出菜单项 */
+	&.dark .export-menu-item {
+		color: #e5e7eb;
+	}
+
+	&.dark .export-menu-item:hover {
+		background-color: #3a3a3a;
 	}
 
 	.export-menu-item + .export-menu-item {
 		border-top: 1px solid #eee;
+	}
+
+	&.dark .export-menu-item + .export-menu-item {
+		border-top-color: #404040;
 	}
 
 	.ql-export {
@@ -689,10 +937,20 @@
 		content: "\f56e"; /* 导出图标的 Unicode */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-export:hover {
+	.ql-export:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 导出按钮 */
+	&.dark .ql-export::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-export:hover::before {
+		color: #60a5fa !important;
 	}
 
 	/* 表格按钮样式 */
@@ -703,9 +961,20 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: #444; /* 默认颜色 */
 	}
+
 	.ql-table:hover {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 表格按钮 */
+	&.dark .ql-table {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-table:hover {
+		color: #60a5fa !important;
 	}
 
 	.test-markdown-btn:hover {
@@ -744,6 +1013,7 @@
 		content: "\f0e2"; /* undo 图标 */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
 	.ql-redo::before {
@@ -751,11 +1021,23 @@
 		content: "\f01e"; /* redo 图标 */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-undo:hover,
-	.ql-redo:hover {
+	.ql-undo:hover::before,
+	.ql-redo:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 撤销/重做按钮 */
+	&.dark .ql-undo::before,
+	&.dark .ql-redo::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-undo:hover::before,
+	&.dark .ql-redo:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-editor td[data-header="true"] {
 		font-weight: bold;
@@ -786,6 +1068,12 @@
 		border: 2px solid #4a8eff; /* Add border to the diff editor wrapper */
 	}
 
+	/* 暗色模式 - Diff 编辑器 */
+	&.dark #diffWrapper {
+		background: #1e1e1e;
+		border-color: #60a5fa;
+	}
+
 	#diffEditor {
 		flex: 1;
 	}
@@ -797,7 +1085,12 @@
 		gap: 0.75rem;
 		background: #fffffe;
 		border-top: 2px solid #0078d4;
+	}
 
+	/* 暗色模式 - Diff 操作按钮区域 */
+	&.dark .diff-actions {
+		background: #1e1e1e;
+		border-top-color: #60a5fa;
 	}
 
 	.diff-btn {
@@ -845,10 +1138,20 @@
 		content: "\f0c5";
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-copy-content:hover {
+	.ql-copy-content:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 复制按钮 */
+	&.dark .ql-copy-content::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-copy-content:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-creation-time,
 	.ql-word-count {
@@ -858,6 +1161,13 @@
 		font-size: 0.875rem;
 		color: #777;
 		line-height: 1.5rem;
+		transition: color 0.3s ease;
+	}
+
+	/* 暗色模式 - 状态栏 */
+	&.dark .ql-creation-time,
+	&.dark .ql-word-count {
+		color: #9ca3af;
 	}
 
 	.ai-response-copy-btn,
@@ -879,10 +1189,20 @@
 		content: "\f574"; /* 使用 file-upload 图标替换原来的 file-import */
 		font-weight: 900;
 		font-size: 0.875rem;
+		color: #444; /* 默认颜色 */
 	}
 
-	.ql-import:hover {
+	.ql-import:hover::before {
 		color: #06c;
+	}
+
+	/* 暗色模式 - 导入按钮 */
+	&.dark .ql-import::before {
+		color: #9ca3af !important;
+	}
+
+	&.dark .ql-import:hover::before {
+		color: #60a5fa !important;
 	}
 	.ql-editor .ql-code-block-container {
 		background: white !important;
@@ -919,41 +1239,39 @@
 	}
 
 	/* Dark Mode Styles */
-	.dark-mode .editor-container {
+	.dark .editor-container {
 	background-color: #1e1e1e;
 	scroll-behavior: smooth;
 	}
 
-	.dark-mode .ql-toolbar.ql-snow {
+	.dark .ql-toolbar.ql-snow {
 	background-color: #252526;
 	border-color: #404040;
 	}
 
-	.dark-mode .ql-container.ql-snow {
+	.dark .ql-container.ql-snow {
 	background-color: #1e1e1e;
 	}
 
-	.dark-mode .ql-editor {
+	.dark .ql-editor {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .ql-editor h1,
-	.dark-mode .ql-editor h2,
-	.dark-mode .ql-editor h3 {
+	.dark .ql-editor h1,
+	.dark .ql-editor h2,
+	.dark .ql-editor h3 {
 	color: #e0e0e0;
 	}
 
-	.dark-mode .ql-snow .ql-stroke {
+	.dark .ql-snow .ql-stroke {
 	stroke: #d4d4d4;
 	}
 
-	.dark-mode .ql-snow .ql-fill {
+	.dark .ql-snow .ql-fill {
 	fill: #d4d4d4;
 	}
 
-	.dark-mode .ql-snow .ql-picker {
-	color: #d4d4d4;
-	}
+	/* 已移至前面统一管理 */
 	.ql-picker-options {
         z-index: 20; /* 确保下拉菜单在tooltip上方 */
     }
@@ -973,170 +1291,139 @@
     .ql-picker-item:hover ~ .tooltip::after {
         display: none;
     }
-	.dark-mode .floating-input {
-	background: #252526;
-	}
-
-	.dark-mode .input-container textarea {
-	background: #1e1e1e;
-	border-color: #404040;
-	color: #d4d4d4;
-	}
-
-	.dark-mode .ai-response {
-	background: #252526;
-	border-color: #404040;
-	}
-
-	.dark-mode .vertical-menu {
-	background: #4b5563;
-	border-color: #404040;
-	}
+	/* 重复定义已移至前面统一管理(使用 !important 确保优先级) */
 
     /* 暗黑模式下的标签栏 */
-    .dark-mode .menu-tabs {
+    .dark .menu-tabs {
         background: #3a3a3a;
         border-bottom-color: #505050;
     }
 
-    .dark-mode .menu-tab {
+    .dark .menu-tab {
         color: #d4d4d4;
     }
 
-    .dark-mode .menu-tab.active {
+    .dark .menu-tab.active {
         color: #0078d4;
         border-bottom-color: #0078d4;
     }
 
-    .dark-mode .menu-tab:hover:not(.active) {
+    .dark .menu-tab:hover:not(.active) {
         background-color: #4b5563;
     }
 
-    .dark-mode .custom-prompts-header {
+    .dark .custom-prompts-header {
         background: #4b5563;
     }
 
-    .dark-mode .empty-prompts {
+    .dark .empty-prompts {
         color: #a0a0a0;
     }
 
-    .dark-mode .prompt-action {
+    .dark .prompt-action {
         color: #a0a0a0;
     }
 
-    .dark-mode .prompt-action:hover {
+    .dark .prompt-action:hover {
         background-color: #505050;
         color: #d4d4d4;
     }
 
-	.dark-mode .menu-item {
+	.dark .menu-item {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .menu-item:hover {
+	.dark .menu-item:hover {
 	background-color: #323233;
 	}
 
-	.dark-mode .ql-editor pre.ql-syntax,
-	.dark-mode .ql-editor .ql-code-block-container {
+	.dark .ql-editor pre.ql-syntax,
+	.dark .ql-editor .ql-code-block-container {
 	background: #2d2d2d !important;
 	color: #d4d4d4 !important;
 	}
 
-	.dark-mode .action-buttons button {
-	background: #2d2d2d;
-	border-color: #404040;
-	color: #d4d4d4;
-	}
+	/* 按钮和高亮样式已移至前面统一管理 */
 
-	.dark-mode .action-buttons button:hover {
-	background: #3e3e3e;
-	}
-
-	/* 修改暗黑模式下的选中高亮颜色 */
-	.dark-mode .highlight-selection {
+	.dark .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
 	background-color: rgba(38, 79, 120, 0.4) !important;
 	}
 
-	.dark-mode .ql-editor [style*="background-color: rgb(180, 213, 254)"] {
-	background-color: rgba(38, 79, 120, 0.4) !important;
-	}
-
-	.dark-mode .ql-container .ql-editor::selection,
-	.dark-mode .ql-container .ql-editor *::selection {
+	.dark .ql-container .ql-editor::selection,
+	.dark .ql-container .ql-editor *::selection {
 	background-color: #264f78;
 	}
 
 	/* 修改暗黑模式下 AI 回答区域的文本颜色 */
-	.dark-mode .response-content {
+	.dark .response-content {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown {
+	.dark .response-content.markdown {
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown code {
+	.dark .response-content.markdown code {
 	background: #2d2d2d;
 	color: #d4d4d4;
 	}
 
-	.dark-mode .response-content.markdown blockquote {
+	.dark .response-content.markdown blockquote {
 	color: #a0aec0;
 	}
 
 	/* 确保代码块在暗黑模式下也保持正确的颜色 */
-	.dark-mode .response-content.markdown-body pre code {
+	.dark .response-content.markdown-body pre code {
 	color: #d4d4d4;
 	background: transparent !important;
 	}
 
 	/* 确保暗黑模式下内联代码的背景色和文字颜色 */
-	.dark-mode .response-content.markdown-body code:not(pre code) {
+	.dark .response-content.markdown-body code:not(pre code) {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: #d4d4d4;
 	}
 
 	/* 修改暗黑模式下 AI 回答区域的代码块样式 */
-	.dark-mode .response-content.markdown pre,
-	.dark-mode .response-content.markdown-body pre {
+	.dark .response-content.markdown pre,
+	.dark .response-content.markdown-body pre {
 	background: #1e1e1e !important;
 	border: 1px solid #404040;
 	}
 
-	.dark-mode .response-content.markdown pre code,
-	.dark-mode .response-content.markdown-body pre code {
+	.dark .response-content.markdown pre code,
+	.dark .response-content.markdown-body pre code {
 	color: #d4d4d4 !important;
 	background: transparent !important;
 	}
 
 	/* 修改代码块内的语法高亮颜色 */
-	.dark-mode .response-content.markdown-body .hljs {
+	.dark .response-content.markdown-body .hljs {
 	color: #d4d4d4;
 	background: #1e1e1e;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-keyword {
+	.dark .response-content.markdown-body .hljs-keyword {
 	color: #569cd6;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-string {
+	.dark .response-content.markdown-body .hljs-string {
 	color: #ce9178;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-comment {
+	.dark .response-content.markdown-body .hljs-comment {
 	color: #6a9955;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-function {
+	.dark .response-content.markdown-body .hljs-function {
 	color: #dcdcaa;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-number {
+	.dark .response-content.markdown-body .hljs-number {
 	color: #b5cea8;
 	}
 
-	.dark-mode .response-content.markdown-body .hljs-literal {
+	.dark .response-content.markdown-body .hljs-literal {
 	color: #569cd6;
 	}
 
@@ -1174,7 +1461,7 @@
 		margin-top: 1em;
 		margin-bottom: 0.5em;
 	} */
-	.dark-mode .editor-container {
+	.dark .editor-container {
 		&::-webkit-scrollbar-track {
 			background: #2d2d2d;
 		}
@@ -1188,49 +1475,49 @@
 		}
 	}
 	/* Dark Mode Table Styles */
-	.dark-mode .ql-editor table {
+	.dark .ql-editor table {
 		border-collapse: collapse;
 		width: 100%;
 		margin-bottom: 1em;
 	}
 
-	.dark-mode .ql-editor table td,
-	.dark-mode .ql-editor table th {
+	.dark .ql-editor table td,
+	.dark .ql-editor table th {
 		border: 1px solid #d4d4d4;
 		padding: 8px;
 	}
 
-	.dark-mode .ql-editor table th {
+	.dark .ql-editor table th {
 		background-color: #2d2d2d;
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-editor table tr:nth-child(even) {
+	.dark .ql-editor table tr:nth-child(even) {
 		background-color: #252526;
 	}
 
-	.dark-mode .ql-editor table tr:hover {
+	.dark .ql-editor table tr:hover {
 		background-color: #323233;
 	}
-	.dark-mode .ql-table-menu {
+	.dark .ql-table-menu {
 		background-color: #252526;
 		border: 1px solid #404040;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 	}
 
-	.dark-mode .ql-table-menu__item {
+	.dark .ql-table-menu__item {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-table-menu__item:hover {
+	.dark .ql-table-menu__item:hover {
 		background-color: #323233;
 	}
 
-	.dark-mode .ql-table-menu__item-text {
+	.dark .ql-table-menu__item-text {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .ql-table-menu__item-icon svg path[fill="#595959"] {
+	.dark .ql-table-menu__item-icon svg path[fill="#595959"] {
 		fill: #d4d4d4;
 	}
 	/* Tooltip */
@@ -1253,7 +1540,7 @@
 		z-index: 1000;
 	}
 
-	.dark-mode .tooltip:hover::after {
+	.dark .tooltip:hover::after {
 		background: rgba(255, 255, 255, 0.9);
 		color: black;
 	}
@@ -1293,11 +1580,11 @@
         transform: scale(1.1); 
     }
 
-    .dark-mode .ql-color .ql-picker-label svg .ql-stroke {
+    .dark .ql-color .ql-picker-label svg .ql-stroke {
         stroke: #d4d4d4;
     }
     
-    .dark-mode .ql-color .ql-picker-options {
+    .dark .ql-color .ql-picker-options {
         background-color: #252526;
         border-color: #404040;
     }
@@ -1326,56 +1613,20 @@
 	}
 
 	/* 暗黑模式下的分隔线颜色 */
-	.dark-mode .ql-header:before {
+	.dark .ql-header:before {
 		background-color: #404040;
 	}
 	 /* 所有下拉菜单在暗黑模式下的样式 */
-	.dark-mode .ql-picker.ql-expanded .ql-picker-label {
+	.dark .ql-picker.ql-expanded .ql-picker-label {
         color: #d4d4d4;
     }
 
     /* 暗黑模式下拉菜单样式统一处理 */
-    .dark-mode .ql-picker-options {
-        background-color: #252526;
-        border-color: #404040;
-    }
+    /* picker 样式已移至前面统一管理 */
+
+    /* 标题选择器样式已移至前面统一管理 */
     
-    .dark-mode .ql-picker-item {
-        color: #d4d4d4;
-    }
-    
-    .dark-mode .ql-picker-item:hover {
-        color: #ffffff;
-    }
-    
-    .dark-mode .ql-picker-item.ql-selected {
-        color: #409eff;
-    }
-    
-    /* 标题选择器特别处理 */
-    .dark-mode .ql-header .ql-picker-label,
-    .dark-mode .ql-header .ql-picker-item {
-        color: #d4d4d4;
-    }
-    
-    .dark-mode .ql-header .ql-picker-label::before,
-    .dark-mode .ql-header .ql-picker-item::before {
-        color: #d4d4d4;
-    }
-    
-    .dark-mode .ql-header .ql-picker-item:hover {
-        color: #ffffff;
-    }
-    
-    .dark-mode .ql-header .ql-picker-item.ql-selected,
-    .dark-mode .ql-header .ql-picker-label.ql-selected {
-        color: #409eff;
-    }
-    
-    /* 确保下拉箭头颜色在暗黑模式下能看清 */
-    .dark-mode .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
-        fill: #d4d4d4;
-    }
+    /* 下拉箭头样式已移至前面统一管理 */
     
 	/* 针对颜色选择器本身的悬停效果 */
 	.ql-color.ql-picker:hover .ql-picker-label .ql-stroke {
@@ -1404,39 +1655,13 @@
 	.ql-color.ql-expanded.tooltip:hover::after {
 		display: none;
 	}
-	/* 针对暗色模式下的占位符颜色 */
-	.dark-mode .ql-editor.ql-blank::before {
-		color: rgba(255, 255, 255, 0.6);
-	}
-	.writing-editor.dark-mode,
-	.editor-container.dark-mode {
-		background-color: #1e1e1e;
-	}
-	.dark-mode .input-container textarea {
-		background: #1e1e1e;
-		border-color: #0078d4;
-		box-shadow: 0 0 0 1px #0078d4;
-		color: #d4d4d4;
-		border-width: 1px;
-		border-style: solid;
-		outline: none;
-		
-		// Add subtle transition
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
-		
-		&:hover {
-		  border-color: #606060;
-		}
-	}
-	.dark-mode .input-container textarea::placeholder {
-		color: #666;
-	}
+	/* 占位符样式已移至前面统一管理(使用 !important 确保优先级) */
 	.highlight-overlay {
 		pointer-events: none;
 		border-radius: 2px;
 		transition: opacity 0.2s ease;
 	}
-	.dark-mode .ql-header .ql-picker-options {
+	.dark .ql-header .ql-picker-options {
     	background-color: #4b5563;
 	}
 
@@ -1446,7 +1671,7 @@
 	}
   
 	/* 确保暗黑模式下的样式一致 */
-	&.dark-mode .ql-tooltip.ql-editing[data-mode="link"] {
+	&.dark .ql-tooltip.ql-editing[data-mode="link"] {
 		background-color: #252526;
 		border-color: #404040;
 		color: #d4d4d4;
@@ -1459,20 +1684,20 @@
 	.ql-editor.hiding-placeholder::before {
 		display: none !important;
 	}
-	.dark-mode .menu-tab {
+	.dark .menu-tab {
 		color: #d4d4d4;
 	}
 
-	.dark-mode .menu-tab.active {
+	.dark .menu-tab.active {
 		color: #0078d4;
 		border-bottom-color: #0078d4;
 	}
 
-	.dark-mode .menu-tab:hover:not(.active) {
+	.dark .menu-tab:hover:not(.active) {
 		background-color: #4b5563;
 	}
 
-	.dark-mode .empty-prompts {
+	.dark .empty-prompts {
 		color: #a0a0a0;
 	}
 	.prompt-divider {
@@ -1482,10 +1707,7 @@
 		width: 100%;
 	}
 
-	/* 暗黑模式下的分隔线 */
-	.dark-mode .prompt-divider {
-		background-color: #404040;
-	}
+	/* 分隔线样式已移至前面统一管理 */
 }
 .n-modal-container {
     z-index: 10001 !important; 

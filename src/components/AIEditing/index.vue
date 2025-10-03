@@ -4,7 +4,9 @@ import type { editor } from 'monaco-editor'
 import { SYSTEM_PROMPTS } from '@/constants/prompts'
 import { createImporter } from '@/lib/export/import'
 import { initMonaco } from '@/lib/monaco/config'
+import { useAppStore } from '@/stores'
 import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
+import { storeToRefs } from 'pinia'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAIEditorActions } from './composables/useAIEditorActions'
 import { useAIInteraction } from './composables/useAIInteraction'
@@ -29,6 +31,10 @@ import 'quill-table-ui/dist/index.css'
 import 'quill/dist/quill.snow.css'
 
 // ==================== Composables 初始化 ====================
+// 获取暗色模式状态
+const appStore = useAppStore()
+const { isDarkMode } = storeToRefs(appStore)
+
 const { quillInstance, initQuillEditor: initEditor, getToolbar } = useQuillEditor()
 const quillInstanceRef = computed(() => quillInstance.value)
 
@@ -410,7 +416,7 @@ async function handleFileUpload(options: { file: { file: File | null } }) {
   </NModal>
 
   <!-- 主编辑器容器 -->
-  <div class="writing-editor flex-1 overflow-hidden flex flex-col notranslate">
+  <div :class="{ dark: isDarkMode }" class="writing-editor flex-1 overflow-hidden flex flex-col notranslate">
     <div class="editor-container flex-1 overflow-auto">
       <!-- Quill 编辑器 -->
       <div id="editor" />
