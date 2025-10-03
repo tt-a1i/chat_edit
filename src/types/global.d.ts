@@ -2,6 +2,7 @@
  * 全局类型定义
  */
 
+import type { DialogApiInjection } from 'naive-ui/es/dialog/src/DialogProvider'
 import type { MessageApiInjection } from 'naive-ui/es/message/src/MessageProvider'
 
 declare global {
@@ -11,6 +12,12 @@ declare global {
      * 用于全局消息提示
      */
     $message?: MessageApiInjection
+
+    /**
+     * Naive UI Dialog API
+     * 用于全局对话框
+     */
+    $dialog?: DialogApiInjection
 
     /**
      * Monaco Editor 环境配置
