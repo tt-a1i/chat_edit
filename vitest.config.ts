@@ -11,6 +11,14 @@ export default defineConfig({
     // 全局变量
     globals: true,
 
+    // 并行执行配置（提升性能）
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+      },
+    },
+
     // 包含的测试文件
     include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
 

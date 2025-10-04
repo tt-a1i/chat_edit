@@ -30,18 +30,19 @@ test.describe('应用启动和基础功能', () => {
     const darkModeButton = page.getByRole('button', { name: /toggle dark mode/i })
     await expect(darkModeButton).toBeVisible()
 
+    // 获取初始状态
+    const html = page.locator('html')
+    const initialHasDarkClass = await html.evaluate(el => el.classList.contains('dark'))
+
     // 点击切换
     await darkModeButton.click()
 
-    // 等待一小段时间让 UI 更新
-    await page.waitForTimeout(300)
-
-    // 验证 HTML 元素的 class 变化（通常暗色模式会添加 'dark' class）
-    const html = page.locator('html')
-    const hasDarkClass = await html.evaluate(el => el.classList.contains('dark'))
-
-    // 点击后应该切换状态
-    expect(typeof hasDarkClass).toBe('boolean')
+    // 等待 class 变化
+    if (initialHasDarkClass) {
+      await expect(html).not.toHaveClass(/dark/)
+    } else {
+      await expect(html).toHaveClass(/dark/)
+    }
   })
 })
 
@@ -67,13 +68,9 @@ test.describe('场景切换', () => {
     await expect(aiEditingButton).toBeVisible()
     await aiEditingButton.click()
 
-    // 等待编辑器加载
-    await page.waitForTimeout(1000)
-
-    // 验证编辑器界面元素存在
-    // Quill 编辑器通常有 .ql-editor 类
+    // 验证编辑器界面元素存在（等待 Quill 编辑器加载）
     const editor = page.locator('.ql-editor')
-    await expect(editor).toBeVisible({ timeout: 3000 })
+    await expect(editor).toBeVisible({ timeout: 5000 })
   })
 })
 
@@ -93,7 +90,16 @@ test.describe('侧边栏功能', () => {
 
     if (await collapseButton.count() > 0) {
       await collapseButton.first().click()
-      await page.waitForTimeout(500)
+
+      // 等待过渡动画完成（通过 CSS transition）
+      await page.waitForFunction(
+        (initial) => {
+          const sidebar = document.querySelector('aside')
+          return sidebar && sidebar.offsetWidth !== initial
+        },
+        initialWidth,
+        { timeout: 2000 },
+      )
 
       // 验证宽度变化
       const newWidth = await sidebar.evaluate(el => el.offsetWidth)

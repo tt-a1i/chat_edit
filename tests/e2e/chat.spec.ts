@@ -58,12 +58,9 @@ test.describe('新建聊天', () => {
     const newChatButton = page.getByRole('button', { name: /new chat/i })
     await newChatButton.click()
 
-    // 等待页面更新
-    await page.waitForTimeout(500)
-
-    // 验证聊天输入框可见
+    // 验证聊天输入框可见（等待页面更新）
     const chatInput = page.locator('textarea').first()
-    await expect(chatInput).toBeVisible()
+    await expect(chatInput).toBeVisible({ timeout: 2000 })
   })
 })
 
@@ -106,15 +103,16 @@ test.describe('系统提示', () => {
     const systemPromptButton = page.getByRole('button', { name: /system prompt/i })
     await systemPromptButton.click()
 
-    // 等待面板打开
-    await page.waitForTimeout(500)
+    // 等待面板内容出现（至少有一个 textarea 或相关元素）
+    const systemPromptPanel = page.locator('textarea').first()
 
-    // 验证系统提示面板元素（可能包含 textarea）
-    const systemPromptPanel = page.locator('textarea[placeholder*="系统"]')
-      .or(page.locator('textarea').filter({ hasText: /system|系统/ }))
-
-    const panelCount = await systemPromptPanel.count()
-    expect(panelCount).toBeGreaterThanOrEqual(0) // 可能需要 API key 才能显示
+    // 验证面板是否打开（可能需要 API key 才能显示完整内容）
+    await page.waitForFunction(() => {
+      const textareas = document.querySelectorAll('textarea')
+      return textareas.length > 0
+    }, { timeout: 2000 }).catch(() => {
+      // 面板可能未打开，这是预期行为（没有 API key）
+    })
   })
 })
 
@@ -126,8 +124,10 @@ test.describe('设置面板', () => {
     const settingsButton = page.getByRole('button', { name: /settings/i })
     await settingsButton.click()
 
-    // 等待面板打开
-    await page.waitForTimeout(500)
+    // 等待设置面板的输入框出现
+    const settingsInput = page.locator('input[type="text"]').first().or(page.locator('input[type="number"]').first())
+
+    await expect(settingsInput).toBeVisible({ timeout: 2000 })
 
     // 验证设置面板包含配置项
     const settingsPanel = page.locator('input[type="text"]')

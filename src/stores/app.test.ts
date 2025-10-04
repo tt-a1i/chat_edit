@@ -1,6 +1,7 @@
 /**
  * App Store 测试
  */
+import { setupLocalStorageMock } from '@/../tests/helpers/setup'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { SCENES, useAppStore } from './app'
@@ -11,27 +12,7 @@ describe('useAppStore', () => {
     setActivePinia(createPinia())
 
     // Mock localStorage
-    const localStorageMock = (() => {
-      let store: Record<string, string> = {}
-
-      return {
-        getItem: (key: string) => store[key] || null,
-        setItem: (key: string, value: string) => {
-          store[key] = value.toString()
-        },
-        removeItem: (key: string) => {
-          delete store[key]
-        },
-        clear: () => {
-          store = {}
-        },
-      }
-    })()
-
-    Object.defineProperty(window, 'localStorage', {
-      value: localStorageMock,
-      writable: true,
-    })
+    setupLocalStorageMock()
   })
 
   describe('初始化', () => {
