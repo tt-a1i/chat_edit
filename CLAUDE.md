@@ -46,11 +46,22 @@ pnpm preview
 pnpm lint
 pnpm lint:fix
 
-# Code formatting
-pnpm format
+# Type checking
+pnpm typecheck
+
+# Testing
+pnpm test              # Unit tests (watch mode)
+pnpm test:run          # Unit tests (single run)
+pnpm test:coverage     # Unit tests with coverage
+pnpm test:ui           # Vitest UI
+pnpm test:e2e          # E2E tests
+pnpm test:e2e:ui       # Playwright UI
+pnpm test:all          # Run all tests
 ```
 
 **Package Manager**: This project uses `pnpm` (version 10.6.4 specified in package.json).
+
+**Testing**: 详见 [TESTING.md](./TESTING.md) 查看完整测试指南。
 
 ## Architecture
 
@@ -247,26 +258,23 @@ Both chat and AI editing maintain abort controllers for canceling ongoing reques
 以下是需要优先处理的已知问题:
 
 **安全性问题**:
-- API密钥硬编码在 `services/appConfig.ts:24` - 需要移至环境变量或安全存储
-
-**错误处理**:
-- 大部分错误仅 console.error，缺少用户友好的错误提示
-- 缺少统一的错误处理机制
+- API密钥已通过环境变量管理 (`config/env.ts`)，确保 `.env.local` 不提交到代码库
 
 **代码质量**:
-- `components/AIEditing/index.vue` 超过1000行，需要拆分
-- 部分组件混用 Composition API 和 Options API
-- 缺少 TypeScript 类型定义的地方（特别是事件处理函数）
+- `components/AIEditing/index.vue` 约550行，已部分重构为 composables，可继续拆分 UI 逻辑
+- 7个文件有 TODO/FIXME 标记需处理
+- 20处第三方库类型 `any`（可接受，低优先级）
 
 **性能优化点**:
-- Quill 编辑器重渲染优化
-- 大文档导入/导出性能
+- Monaco Editor 真正懒加载（目前仅代码分割）
+- Quill 编辑器大文档性能优化
+- 组件级别懒加载（Settings/History 等非核心组件）
 - IndexedDB 查询优化
 
 **功能完善**:
 - 国际化 (i18n) 未完全实现
 - 移动端适配不完整
-- 缺少单元测试和E2E测试
+- 需要扩展测试覆盖率（见下文"Testing"）
 
 ## Chrome DevTools MCP 调试工具
 
@@ -411,13 +419,54 @@ pnpm dev
 
 ## Testing
 
-No test framework currently configured. No test files exist in the repository.
+### 测试框架
 
-**测试建议**:
-- 考虑引入 Vitest 作为单元测试框架
-- 使用 Playwright 或 Cypress 进行 E2E 测试
-- 优先为核心业务逻辑（`services/chat.ts`, `services/useAI.ts`）编写测试
-- 使用 Chrome DevTools MCP 进行手动集成测试和调试
+项目已配置完整的测试框架：
+
+- **单元测试**: Vitest + @vue/test-utils
+- **E2E 测试**: Playwright
+- **代码覆盖率**: Vitest Coverage (v8)
+
+### 已有测试覆盖
+
+**单元测试 (53 个测试)** ✅
+- `src/utils/format.test.ts` - 22 个测试（工具函数）
+- `src/utils/logger.test.ts` - 12 个测试（日志系统）
+- `src/stores/app.test.ts` - 19 个测试（应用状态管理）
+
+**E2E 测试** ✅
+- `tests/e2e/app.spec.ts` - 应用基础功能
+- `tests/e2e/chat.spec.ts` - 聊天功能
+
+### 运行测试
+
+```bash
+pnpm test              # 单元测试（watch 模式）
+pnpm test:run          # 单元测试（单次运行）
+pnpm test:coverage     # 代码覆盖率报告
+pnpm test:e2e          # E2E 测试
+pnpm test:all          # 运行所有测试
+```
+
+### 下一步测试计划
+
+建议为以下模块添加测试：
+
+1. **核心业务逻辑**
+   - `stores/chat.ts` - 聊天状态管理
+   - `services/ai.ts` - AI 服务交互
+   - `services/database.ts` - 数据库操作
+
+2. **关键组件**
+   - `components/chat/ChatInput.vue`
+   - `components/chat/ChatMessages.vue`
+   - `components/AIEditing/index.vue`
+
+3. **API 集成**
+   - `api/api.ts` - API 调用和错误处理
+   - SSE 流处理
+
+详见 [TESTING.md](./TESTING.md) 查看完整测试指南。
 
 ## Git 和 PR 配置
 
