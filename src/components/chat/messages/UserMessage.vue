@@ -12,7 +12,7 @@ interface Props {
 
 const { message } = defineProps<Props>()
 const appStore = useAppStore()
-const { avatarUrl, enableMarkdown } = storeToRefs(appStore)
+const { enableMarkdown } = storeToRefs(appStore)
 const copied = ref(false)
 
 function copyToClipboard() {
@@ -28,14 +28,7 @@ function copyToClipboard() {
 <template>
   <div class="group flex flex-row-reverse items-start gap-3 sm:gap-4 py-1">
     <!-- 头像 -->
-    <img
-      v-if="avatarUrl"
-      :src="avatarUrl"
-      class="h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 rounded-full object-cover shadow-sm ring-2 ring-white dark:ring-gray-700 mt-1"
-      alt="avatar"
-    >
     <div
-      v-else
       class="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white shadow-sm mt-1"
     >
       U

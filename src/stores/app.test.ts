@@ -139,23 +139,6 @@ describe('useAppStore', () => {
     })
   })
 
-  describe('avatarUrl', () => {
-    it('当未设置 email 时应该返回 null', () => {
-      const store = useAppStore()
-      store.gravatarEmail = ''
-
-      expect(store.avatarUrl).toBeNull()
-    })
-
-    it('当设置 email 时应该生成 Gravatar URL', () => {
-      const store = useAppStore()
-      store.gravatarEmail = 'test@example.com'
-
-      expect(store.avatarUrl).toBeTruthy()
-      expect(store.avatarUrl).toContain('gravatar.com')
-    })
-  })
-
   describe('用户设置', () => {
     it('应该能够更新历史消息长度', () => {
       const store = useAppStore()

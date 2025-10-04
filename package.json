@@ -32,7 +32,6 @@
     "dexie": "^3.2.4",
     "docx": "^9.3.0",
     "github-markdown-css": "^5.8.1",
-    "gravatar-url": "^4.0.1",
     "highlight.js": "^11.11.1",
     "html2pdf.js": "^0.10.3",
     "katex": "^0.16.21",

@@ -1,11 +1,10 @@
 import { env } from '@/config/env'
 import { useLocalStorage } from '@vueuse/core'
-import gravatarUrl from 'gravatar-url'
 /**
  * 应用配置状态管理 Store
  */
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 // Scene 常量
 export const SCENES = {
@@ -21,7 +20,6 @@ export const useAppStore = defineStore('app', () => {
 
   // User settings
   const currentModel = useLocalStorage('currentModel', 'moonshot-v1-8k')
-  const gravatarEmail = useLocalStorage('gravatarEmail', '')
   const historyMessageLength = useLocalStorage('historyMessageLength', 10)
   const enableMarkdown = useLocalStorage('markdown', env.enableMarkdown)
   const showSystem = useLocalStorage('systemMessages', env.showSystemMessages)
@@ -36,13 +34,6 @@ export const useAppStore = defineStore('app', () => {
   const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
   const isAIEditingOpen = ref(false)
   const isSidebarCollapsed = useLocalStorage('sidebarCollapsed', false) // 侧边栏折叠状态
-
-  // Computed
-  const avatarUrl = computed(() => {
-    return gravatarEmail.value
-      ? gravatarUrl(gravatarEmail.value, { size: 200, default: '/avatar.png' })
-      : null
-  })
 
   // Actions
   function switchScene(scene: SceneType) {
@@ -76,11 +67,9 @@ export const useAppStore = defineStore('app', () => {
 
     // User settings
     currentModel,
-    gravatarEmail,
     historyMessageLength,
     enableMarkdown,
     showSystem,
-    avatarUrl,
 
     // API settings
     baseUrl,
