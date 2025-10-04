@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SCENES, useAppStore, useChatStore } from '@/stores'
 import { formatSmartTime, simplifyModelName } from '@/utils/format'
+import { logger } from '@/utils/logger'
 import {
   IconEdit,
   IconMessageCode,
@@ -77,7 +78,7 @@ async function confirmDeleteChat() {
         await deleteChat(chatId)
         message.success('会话已删除')
       } catch (error) {
-        console.error('删除会话失败:', error)
+        logger.error('删除会话失败', error)
         const errorMessage = error instanceof Error
           ? error.message
           : '删除会话失败，请重试'
@@ -101,7 +102,7 @@ async function confirmWipeDatabase() {
         await wipeDatabase()
         message.success('所有会话已删除')
       } catch (error) {
-        console.error('删除所有会话失败:', error)
+        logger.error('删除所有会话失败', error)
         const errorMessage = error instanceof Error
           ? error.message
           : '删除失败，请重试'
