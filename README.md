@@ -49,12 +49,12 @@
 ### 环境要求
 
 - Node.js >= 18
-- pnpm >= 8
+- Bun >= 1.3.0
 
 ### 安装依赖
 
 \`\`\`bash
-pnpm install
+bun install
 \`\`\`
 
 ### 配置环境变量
@@ -75,7 +75,7 @@ VITE_API_KEY=your_api_key_here
 ### 开发
 
 \`\`\`bash
-pnpm dev
+bun dev
 \`\`\`
 
 访问 http://localhost:5173/
@@ -83,13 +83,13 @@ pnpm dev
 ### 构建
 
 \`\`\`bash
-pnpm build
+bun build
 \`\`\`
 
 ### 预览生产构建
 
 \`\`\`bash
-pnpm preview
+bun preview
 \`\`\`
 
 ## 代码规范
@@ -98,16 +98,16 @@ pnpm preview
 
 \`\`\`bash
 # 检查代码
-pnpm lint
+bun lint
 
 # 自动修复
-pnpm lint:fix
+bun lint:fix
 \`\`\`
 
 ### 类型检查
 
 \`\`\`bash
-pnpm typecheck
+bun typecheck
 \`\`\`
 
 ## 项目结构
@@ -138,7 +138,7 @@ src/
 
 \`\`\`bash
 # 启动开发服务器
-pnpm dev
+bun dev
 
 # 启动带扩展的 Chrome 调试实例
 /Applications/Google\\ Chrome.app/Contents/MacOS/Google\\ Chrome \\
