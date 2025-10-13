@@ -1,4 +1,4 @@
-import type { Message } from '../services/database.ts'
+import type { ModelInfo } from '@/types/api'
 import type {
   ChatPartResponse,
   ChatRequest,
@@ -19,17 +19,30 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
+import { useAppStore } from '@/stores'
+import { toError } from '@/utils/error-handler'
+import { logger } from '@/utils/logger'
 import { ref } from 'vue'
-import { apiKey, baseUrl } from '../services/appConfig.ts'
+
+export type {
+  ChatCompletedResponse,
+  ChatPartResponse,
+  ChatResponse,
+  Model,
+} from './types.ts'
 
 // 定义获取完整 API URL 的方法
-export const getApiUrl = (path: string) => `${baseUrl.value}${path}`
+export function getApiUrl(path: string): string {
+  const appStore = useAppStore()
+  return `${appStore.baseUrl}${path}`
+}
 
 // 定义获取请求头的方法
-export function getHeaders() {
+export function getHeaders(): Record<string, string> {
+  const appStore = useAppStore()
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey.value}`,
+    'Authorization': `Bearer ${appStore.apiKey}`,
   }
 }
 
@@ -42,7 +55,7 @@ function createAbortController() {
     controller.value.abort()
     controller.value = new AbortController()
     signal.value = controller.value.signal
-    console.log('请求已中止并重置控制器')
+    logger.debug('请求已中止并重置控制器')
   }
 
   return { controller, signal, abort }
@@ -50,7 +63,7 @@ function createAbortController() {
 
 // 导出 API 钩子函数
 export function useApi() {
-  const error = ref(null)
+  const error = ref<Error | null>(null)
   const { signal, abort } = createAbortController()
 
   // 聊天相关 API
@@ -58,7 +71,7 @@ export function useApi() {
     // 生成聊天内容
     generateChat: async (
       request: ChatRequest,
-      onDataReceived: (data: any) => void,
+      onDataReceived: (data: ChatResponse) => void,
     ): Promise<ChatResponse[]> => {
       try {
         const messages = request.messages?.map(msg => ({
@@ -83,10 +96,9 @@ export function useApi() {
         }
 
         return await processStreamResponse(response, request.model, onDataReceived)
-      }
-      catch (err) {
-        console.error('生成聊天内容时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('生成聊天内容时出错', err)
+        error.value = toError(err)
         return []
       }
     },
@@ -110,10 +122,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('创建模型时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('创建模型时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -133,16 +144,15 @@ export function useApi() {
         const data = await response.json()
 
         return {
-          models: (data.data || []).map((model: any) => ({
+          models: (data.data || []).map((model: ModelInfo) => ({
             name: model.id,
             modified_at: new Date().toISOString(),
             size: 0,
           })),
         }
-      }
-      catch (err) {
-        console.error('获取模型列表时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('获取模型列表时出错', err)
+        error.value = toError(err)
         // 返回默认模型列表以防止完全失败
         return {
           models: [
@@ -177,10 +187,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('获取模型信息时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('获取模型信息时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -199,10 +208,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('复制模型时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('复制模型时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -223,10 +231,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('删除模型时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('删除模型时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -245,10 +252,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('下载模型时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('下载模型时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -267,10 +273,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('上传模型时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('上传模型时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -294,10 +299,9 @@ export function useApi() {
         }
 
         return await response.json()
-      }
-      catch (err) {
-        console.error('生成嵌入向量时出错:', err)
-        error.value = err
+      } catch (err) {
+        logger.error('生成嵌入向量时出错', err)
+        error.value = toError(err)
         throw err
       }
     },
@@ -307,16 +311,17 @@ export function useApi() {
   async function processStreamResponse(
     response: Response,
     modelName: string,
-    onDataReceived: (data: any) => void,
+    onDataReceived: (data: ChatResponse) => void,
   ): Promise<ChatResponse[]> {
     const reader = response.body?.getReader()
-    let results: ChatResponse[] = []
+    const results: ChatResponse[] = []
 
     if (reader) {
       while (true) {
         const { done, value } = await reader.read()
-        if (done)
+        if (done) {
           break
+        }
 
         const chunk = new TextDecoder().decode(value)
         const lines = chunk.split('\n').filter(line => line.trim() !== '')
@@ -369,9 +374,8 @@ export function useApi() {
                 }
                 onDataReceived(completedResponse)
               }
-            }
-            catch (e) {
-              console.error('解析 SSE 消息失败:', e)
+            } catch (e) {
+              logger.error('解析 SSE 消息失败', e, { line, model: modelName })
             }
           }
         }

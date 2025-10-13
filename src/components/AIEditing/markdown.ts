@@ -1,9 +1,31 @@
-import MarkdownIt from 'markdown-it'
-import mdKatex from 'markdown-it-texmath'
-import mdLinkAttrs from 'markdown-it-link-attributes'
+import type MarkdownIt from 'markdown-it'
+import { logger } from '@/utils/logger'
 import hljs from 'highlight.js'
-import 'highlight.js/styles/github.css'
 import katex from 'katex'
+import MarkdownItConstructor from 'markdown-it'
+import mdLinkAttrs from 'markdown-it-link-attributes'
+import mdKatex from 'markdown-it-texmath'
+import 'highlight.js/styles/github.css'
+
+// markdown-it 状态接口
+interface MarkdownItState {
+  src: string
+  pos: number
+  posMax: number
+  push: (type: string, tag: string, nesting: number) => MarkdownItToken
+  bMarks: number[]
+  eMarks: number[]
+  tShift: number[]
+  getLines: (begin: number, end: number, indent: number, keepLastLF: boolean) => string
+  line: number
+}
+
+interface MarkdownItToken {
+  content: string
+  markup: string
+  block?: boolean
+  map?: [number, number]
+}
 
 // 配置数学公式渲染规则
 function renderKatex(latex: string, displayMode = false): string {
@@ -13,29 +35,28 @@ function renderKatex(latex: string, displayMode = false): string {
       throwOnError: false,
       strict: false,
     })
-  }
-  catch (error) {
-    console.error('KaTeX error:', error)
+  } catch (error) {
+    logger.error('KaTeX error:', error)
     return latex
   }
 }
 
 // 初始化 markdown-it 实例
-export function createMarkdownRenderer() {
-  const md = new MarkdownIt({
+export function createMarkdownRenderer(): MarkdownIt {
+  const md = new MarkdownItConstructor({
     html: true,
     breaks: true,
     linkify: true,
-    listIndent: 2,
     typographer: true,
-    highlight(str, lang) {
+    highlight(str: string, lang: string): string {
       if (lang && hljs.getLanguage(lang)) {
         try {
           return `<pre class="hljs"><code class="language-${lang}">${
             hljs.highlight(str, { language: lang }).value
           }</code></pre>`
+        } catch {
+          // 忽略高亮错误
         }
-        catch {}
       }
       return `<pre class="hljs"><code>${md.utils.escapeHtml(str)}</code></pre>`
     },
@@ -54,14 +75,15 @@ export function createMarkdownRenderer() {
   } */
 
   // 添加数学公式支持
-  md.use((md) => {
+  md.use((md: MarkdownIt) => {
     // 行内公式
-    const inlineRule = (state: any, silent: boolean) => {
+    const inlineRule = (state: MarkdownItState, silent: boolean): boolean => {
       const start = state.pos
       const max = state.posMax
 
-      if (state.src[start] !== '$')
+      if (state.src[start] !== '$') {
         return false
+      }
 
       let pos = start + 1
       let found = false
@@ -74,8 +96,9 @@ export function createMarkdownRenderer() {
         pos++
       }
 
-      if (!found || pos === start + 1)
+      if (!found || pos === start + 1) {
         return false
+      }
 
       const content = state.src.slice(start + 1, pos)
       if (!silent) {
@@ -89,26 +112,29 @@ export function createMarkdownRenderer() {
     }
 
     // 块级公式
-    const blockRule = (state: any, startLine: number, endLine: number, silent: boolean) => {
+    const blockRule = (state: MarkdownItState, startLine: number, endLine: number, silent: boolean): boolean => {
       const start = state.bMarks[startLine] + state.tShift[startLine]
       const max = state.eMarks[startLine]
 
-      if (state.src.slice(start, start + 2) !== '$$')
+      if (state.src.slice(start, start + 2) !== '$$') {
         return false
+      }
 
       const pos = start + 2
       let firstLine = state.src.slice(pos, max)
 
-      if (silent)
+      if (silent) {
         return true
+      }
 
       let nextLine = startLine
       let endPos = -1
 
       while (nextLine < endLine) {
         nextLine++
-        if (nextLine >= endLine)
+        if (nextLine >= endLine) {
           break
+        }
 
         const lineStart = state.bMarks[nextLine] + state.tShift[nextLine]
         const lineMax = state.eMarks[nextLine]
@@ -138,11 +164,11 @@ export function createMarkdownRenderer() {
       alt: ['paragraph', 'reference', 'blockquote', 'list'],
     })
 
-    md.renderer.rules.math_inline = (tokens, idx) => {
+    md.renderer.rules.math_inline = (tokens: MarkdownItToken[], idx: number): string => {
       return renderKatex(tokens[idx].content, false)
     }
 
-    md.renderer.rules.math_block = (tokens, idx) => {
+    md.renderer.rules.math_block = (tokens: MarkdownItToken[], idx: number): string => {
       return renderKatex(tokens[idx].content, true)
     }
   })

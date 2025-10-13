@@ -1,9 +1,10 @@
-import type { Message } from '../services/database.ts'
+import type { Message } from '@/services/database'
+import type { APIMessage } from '@/types/api'
 
 // 聊天相关接口
 export interface ChatRequest {
   model: string
-  messages?: Message[]
+  messages?: Message[] | APIMessage[]
 }
 
 export interface ChatMessage {
@@ -105,7 +106,7 @@ export interface PushModelResponse {
 export interface GenerateEmbeddingsRequest {
   model: string
   prompt: string
-  options?: Record<string, any>
+  options?: Record<string, unknown>
 }
 
 export interface GenerateEmbeddingsResponse {

@@ -1,28 +1,27 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
-import AIEditingMain from './components/AIEditing/AIEditingMain.vue'
-import ChatInput from './components/ChatInput.vue'
-import ChatMessages from './components/ChatMessages.vue'
-import TextInput from './components/Inputs/TextInput.vue'
-import ModelSelector from './components/ModelSelector.vue'
-import NavHeader from './components/NavHeader.vue'
-import Settings from './components/Settings.vue'
-import Sidebar from './components/Sidebar.vue'
-import SystemPrompt from './components/SystemPrompt.vue'
-import {
-  currentModel,
-  currentScene,
-  isDarkMode,
-  isSettingsOpen,
-  isSystemPromptOpen,
-  SCENES,
-} from './services/appConfig.ts'
-import { useChats } from './services/chat.ts'
-import { useAI } from './services/useAI.ts'
-import { applyDarkModeToDocument, syncSystemDarkMode } from './utils/darkMode.ts'
+import AIEditingMain from './components/AIEditing/index.vue'
+import ChatInput from './components/chat/ChatInput.vue'
+import ChatMessages from './components/chat/ChatMessages.vue'
+import SystemPrompt from './components/chat/SystemPrompt.vue'
+import CompactModelSelector from './components/common/CompactModelSelector.vue'
+import Sidebar from './components/common/Sidebar.vue'
+import TextInput from './components/inputs/TextInput.vue'
+import Settings from './components/settings/Settings.vue'
+import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
+import { useAI } from './services/ai.ts'
+import { SCENES, useAppStore, useChatStore } from './stores'
 
+// Stores
+const appStore = useAppStore()
+const chatStore = useChatStore()
+const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = storeToRefs(appStore)
+const { currentChat } = storeToRefs(chatStore)
+
+// Services
 const { refreshModels, availableModels } = useAI()
-const { activeChat, renameChat, switchModel, initialize } = useChats()
+const { renameChat, initialize } = chatStore
 const isEditingChatName = ref(false)
 const editedChatName = ref('')
 const chatNameInput = ref()
@@ -33,10 +32,11 @@ applyDarkModeToDocument()
 
 function startEditing() {
   isEditingChatName.value = true
-  editedChatName.value = activeChat.value?.name || ''
+  editedChatName.value = currentChat.value?.name || ''
   nextTick(() => {
-    if (!chatNameInput.value)
+    if (!chatNameInput.value) {
       return
+    }
     const input = chatNameInput.value.$el.querySelector('input')
     input.focus()
     input.select()
@@ -49,7 +49,7 @@ function cancelEditing() {
 }
 
 function confirmRename() {
-  if (activeChat.value && editedChatName.value) {
+  if (currentChat.value && editedChatName.value) {
     renameChat(editedChatName.value)
     isEditingChatName.value = false
   }
@@ -58,7 +58,9 @@ function confirmRename() {
 onMounted(() => {
   refreshModels().then(async () => {
     await initialize()
-    await switchModel(currentModel.value ?? availableModels.value[0].name)
+    if (!currentModel.value && availableModels.value.length > 0) {
+      appStore.currentModel = availableModels.value[0].name
+    }
   })
 })
 </script>
@@ -70,41 +72,78 @@ onMounted(() => {
 
       <!-- Chat Scene -->
       <div v-if="currentScene === SCENES.CHAT" class="mx-auto flex h-screen w-full flex-col">
-        <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
+        <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-4xl flex-col gap-4 px-4 pb-4">
           <SystemPrompt />
         </div>
 
-        <div v-else class="mx-auto flex h-screen w-full max-w-7xl flex-col gap-4 px-4 pb-4">
-          <div class="flex w-full flex-row items-center justify-center gap-4 rounded-b-xl bg-gray-100 px-4 py-2 dark:bg-gray-800/95 border-b dark:border-gray-700">
-            <div v-if="activeChat" class="mr-auto flex h-full items-center">
-              <div>
-                <div v-if="isEditingChatName">
+        <div v-else class="flex h-screen w-full flex-col">
+          <!-- 现代化顶部栏 - 全宽但内容居中 -->
+          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-[60]">
+            <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
+              <!-- 左侧：会话信息 -->
+              <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Chat</span>
+                </div>
+                <div class="hidden sm:block h-4 w-px bg-gray-300 dark:bg-gray-600" />
+                <CompactModelSelector />
+              </div>
+
+              <!-- 右侧：会话名称 -->
+              <div v-if="currentChat" class="flex items-center gap-2 ml-2 sm:ml-4">
+                <button
+                  v-if="!isEditingChatName"
+                  type="button"
+                  title="点击重命名会话"
+                  class="group relative rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs cursor-pointer"
+                  @click.prevent="startEditing"
+                >
+                  {{ currentChat.name }}
+                  <!-- 编辑图标 - hover 时显示 -->
+                  <svg
+                    class="inline-block ml-1 h-3.5 w-3.5 opacity-0 transition-opacity duration-200 group-hover:opacity-60"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                </button>
+                <div v-else class="flex items-center gap-2">
                   <TextInput
                     id="chat-name"
                     ref="chatNameInput"
                     v-model="editedChatName"
+                    class="w-48 text-sm"
                     @keyup.enter="confirmRename"
                     @keyup.esc="cancelEditing"
-                    @blur="cancelEditing"
                   />
+                  <button
+                    class="rounded-lg px-2 py-1 text-sm text-green-600 hover:bg-green-50 font-medium dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+                    @click="confirmRename"
+                  >
+                    确认
+                  </button>
+                  <button
+                    class="rounded-lg px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                    @click="cancelEditing"
+                  >
+                    取消
+                  </button>
                 </div>
-
-                <button
-                  v-else
-                  type="button"
-                  class="block h-full rounded border-none p-2 text-gray-900 decoration-gray-400 decoration-dashed outline-none hover:underline focus:ring-2 focus:ring-blue-600 dark:text-gray-100 dark:focus:ring-blue-600"
-                  @click.prevent="startEditing"
-                >
-                  {{ activeChat.name }}
-                </button>
               </div>
             </div>
-
-            <ModelSelector />
           </div>
 
-          <ChatMessages />
-          <ChatInput />
+          <!-- 消息区域 - 全宽滚动，内容居中 -->
+          <ChatMessages class="flex-1" />
+
+          <!-- 输入区域 - 全宽但内容居中 -->
+          <div class="w-full border-t bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-700">
+            <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-2">
+              <ChatInput />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -113,9 +152,23 @@ onMounted(() => {
         <AIEditingMain />
       </div>
 
-      <transition name="slide">
-        <Settings v-if="isSettingsOpen" />
-      </transition>
+      <!-- 设置模态窗口 -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isSettingsOpen"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          @click.self="appStore.toggleSettingsPanel()"
+        >
+          <Settings />
+        </div>
+      </Transition>
     </main>
   </div>
 </template>
@@ -151,10 +204,23 @@ onMounted(() => {
   scrollbar-color: rgba(156, 163, 175, 0.7) transparent;
 }
 
+/* 统一亮色和暗色模式的边距 */
+.dark .prose > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.dark .prose p {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
 /* 改进暗色模式下的代码块样式 */
 .dark .prose pre {
   background-color: rgba(30, 41, 59, 0.95) !important;
   border-color: rgba(71, 85, 105, 0.5) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 .dark .prose code {

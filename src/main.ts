@@ -1,7 +1,13 @@
+import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import App from './App.vue'
+import './styles/tokens.css'
 import './style.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import './assets/markdown-dark.css'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+const pinia = createPinia()
+
+app.use(pinia)
+app.mount('#app')

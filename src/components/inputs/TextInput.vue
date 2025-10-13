@@ -1,0 +1,37 @@
+<script setup lang="ts">
+interface Props {
+  id?: string
+  label?: string
+  type?: string
+  placeholder?: string
+  modelValue: string
+  small?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
+  type: 'text',
+})
+
+defineEmits<{
+  (event: 'update:modelValue', value: string): void
+  (event: 'blur'): void
+}>()
+</script>
+
+<template>
+  <div>
+    <label v-if="label" :for="id" class="mt-4 mb-2 block px-2 text-sm font-medium">
+      {{ label }}
+    </label>
+    <input
+      :id="id"
+      :value="modelValue"
+      :type="type"
+      :class="small ? 'text-xs' : 'text-sm'"
+      class="block w-full rounded-lg text-gray-900 dark:text-gray-100 bg-gray-100 p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
+      :placeholder="placeholder"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      @blur="$emit('blur')"
+    />
+  </div>
+</template>
