@@ -142,6 +142,10 @@ async function initQuillEditor() {
       creationTimeDisplay.value = elements.creationTimeDisplay
       wordCountDisplay.value = elements.wordCountDisplay
       updateCreationTimeDisplay(creationTimeDisplay.value)
+      // 初始化时也更新一次字数，避免首次为空
+      if (wordCountDisplay.value) {
+        updateWordCountDisplay(wordCountDisplay.value, quill)
+      }
     }
   }
 
