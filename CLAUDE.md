@@ -34,32 +34,32 @@ Built with Vue 3 + TypeScript + Vite, using Moonshot AI API for LLM capabilities
 
 ```bash
 # Development server
-pnpm dev
+bun dev
 
 # Build (includes TypeScript type checking)
-pnpm build
+bun build
 
 # Preview production build
-pnpm preview
+bun preview
 
 # Linting
-pnpm lint
-pnpm lint:fix
+bun lint
+bun lint:fix
 
 # Type checking
-pnpm typecheck
+bun typecheck
 
 # Testing
-pnpm test              # Unit tests (watch mode)
-pnpm test:run          # Unit tests (single run)
-pnpm test:coverage     # Unit tests with coverage
-pnpm test:ui           # Vitest UI
-pnpm test:e2e          # E2E tests
-pnpm test:e2e:ui       # Playwright UI
-pnpm test:all          # Run all tests
+bun test              # Unit tests (watch mode)
+bun test:run          # Unit tests (single run)
+bun test:coverage     # Unit tests with coverage
+bun test:ui           # Vitest UI
+bun test:e2e          # E2E tests
+bun test:e2e:ui       # Playwright UI
+bun test:all          # Run all tests
 ```
 
-**Package Manager**: This project uses `pnpm` (version 10.6.4 specified in package.json).
+**Package Manager**: This project uses `bun` (version 1.2.14 specified in package.json).
 
 **Testing**: 详见 [TESTING.md](./TESTING.md) 查看完整测试指南。
 

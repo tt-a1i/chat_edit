@@ -28,8 +28,10 @@ dist-ssr
 *.sw?
 
 
-# As long as you live under my roof, you will use yarn and enjoy it.
+# Package manager files
 package-lock.json
+pnpm-lock.yaml
+yarn.lock
 .vercel
 .aider*
 CLAUDE.md
