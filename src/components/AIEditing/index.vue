@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { PromptTemplate } from '@/constants/prompts'
 import type { editor } from 'monaco-editor'
+import type { PromptTemplate } from '@/constants/prompts'
+import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { SYSTEM_PROMPTS } from '@/constants/prompts'
 import { createImporter } from '@/lib/export/import'
 import { initMonaco } from '@/lib/monaco/config'
 import { useAppStore } from '@/stores'
-import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
-import { storeToRefs } from 'pinia'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAIEditorActions } from './composables/useAIEditorActions'
 import { useAIInteraction } from './composables/useAIInteraction'
 import { useDOMRefs } from './composables/useDOMRefs'
@@ -155,13 +155,14 @@ async function initQuillEditor() {
   quill.on('selection-change', (range, _oldRange, _source) => {
     if (range && range.length > 0) {
       // 清除旧的高亮（如果选区变化了）
-      if (currentRange.value) {
-        if (
+      if (
+        currentRange.value
+        && (
           currentRange.value.index !== range.index
           || currentRange.value.length !== range.length
-        ) {
-          clearHighlight(quill, currentRange.value)
-        }
+        )
+      ) {
+        clearHighlight(quill, currentRange.value)
       }
 
       // 保存新的选区并高亮
