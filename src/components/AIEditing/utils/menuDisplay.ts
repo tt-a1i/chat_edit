@@ -42,7 +42,8 @@ export function showAndPositionMenus(
     applyMenuPosition(verticalMenuRef, position, {
       leftOffset: 30,
       topOffset: floatingInputRef.offsetHeight + 10,
-      bottomOffset: floatingInputRef.offsetHeight * 2 + 10,
+      // 反向显示时仅保留与输入框等高的偏移，避免出现大面积空隙
+      bottomOffset: floatingInputRef.offsetHeight + 10,
     })
   }
 
