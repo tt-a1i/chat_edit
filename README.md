@@ -6,7 +6,9 @@
 
 ## 预览
 
-[在线演示](#) <!-- 如有部署链接可填入 -->
+![聊天场景](screenshots/chat.png)
+
+![AI 编辑场景](screenshots/ai-editing.png)
 
 ## 功能特性
 
