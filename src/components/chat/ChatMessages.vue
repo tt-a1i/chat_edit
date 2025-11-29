@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
-import { useAppStore, useChatStore } from '@/stores'
+import { env } from '@/config/env'
+import { useChatStore } from '@/stores'
 import ChatEmptyState from './ChatEmptyState.vue'
 import ChatMessage from './ChatMessage.vue'
 
-const appStore = useAppStore()
 const chatStore = useChatStore()
-const { showSystem } = storeToRefs(appStore)
 const { messages } = storeToRefs(chatStore)
+
+// 从环境变量获取 showSystem 配置
+const showSystem = env.showSystemMessages
 const chatElement = ref<HTMLElement>()
 const userInterferedWithScroll = ref(false)
 
@@ -53,7 +55,7 @@ watch(messages, () => {
 onUnmounted(() => chatElement.value?.removeEventListener('scroll', handleUserScroll))
 
 const visibleMessages = computed(() =>
-  showSystem.value ? messages?.value : messages?.value.filter(m => m.role !== 'system'),
+  showSystem ? messages?.value : messages?.value.filter(m => m.role !== 'system'),
 )
 
 // Ensure we scroll during streaming

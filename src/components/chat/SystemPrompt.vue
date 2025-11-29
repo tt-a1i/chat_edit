@@ -2,14 +2,12 @@
 import { IconWritingSign } from '@tabler/icons-vue'
 import { useTextareaAutosize } from '@vueuse/core'
 import { createDiscreteApi } from 'naive-ui'
-import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
-import { useAppStore, useConfigStore } from '@/stores'
-import ModelSelector from '../common/ModelSelector.vue'
+import { env } from '@/config/env'
+import { useConfigStore } from '@/stores'
 
-const appStore = useAppStore()
 const configStore = useConfigStore()
-const { currentModel } = storeToRefs(appStore)
+const currentModel = env.model
 const { textarea } = useTextareaAutosize()
 const configInput = ref('')
 const defaultConfigInput = ref('')
@@ -21,25 +19,22 @@ onMounted(() => {
 })
 
 async function initialize() {
-  const configs = await configStore.initializeConfig(currentModel.value)
+  const configs = await configStore.initializeConfig(currentModel)
   configInput.value = configs?.modelConfig?.systemPrompt ?? ''
   defaultConfigInput.value = configs?.defaultConfig?.systemPrompt ?? ''
 }
 
 async function onSubmit() {
-  const model = currentModel.value
   await configStore.setConfig({
     model: 'default',
     systemPrompt: defaultConfigInput.value.trim(),
     createdAt: new Date(),
   })
-  if (model) {
-    await configStore.setConfig({
-      model,
-      systemPrompt: configInput.value.trim(),
-      createdAt: new Date(),
-    })
-  }
+  await configStore.setConfig({
+    model: currentModel,
+    systemPrompt: configInput.value.trim(),
+    createdAt: new Date(),
+  })
   message.success('保存成功！')
 }
 
@@ -69,7 +64,10 @@ function onKeydown(event: KeyboardEvent) {
           </span>
         </div>
       </div>
-      <ModelSelector :disabled="false" @change="initialize" />
+      <!-- 显示当前模型名称 -->
+      <div class="rounded-lg bg-teal-50 px-3 py-1.5 text-sm font-medium text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
+        {{ currentModel }}
+      </div>
     </div>
 
     <div class="flex flex-col overflow-y-auto space-y-6 px-4">

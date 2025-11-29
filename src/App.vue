@@ -5,22 +5,20 @@ import AIEditingMain from './components/AIEditing/index.vue'
 import ChatInput from './components/chat/ChatInput.vue'
 import ChatMessages from './components/chat/ChatMessages.vue'
 import SystemPrompt from './components/chat/SystemPrompt.vue'
-import CompactModelSelector from './components/common/CompactModelSelector.vue'
+import ModelDisplay from './components/common/ModelDisplay.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/inputs/TextInput.vue'
 import Settings from './components/settings/Settings.vue'
 import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
-import { useAI } from './services/ai.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
 
 // Stores
 const appStore = useAppStore()
 const chatStore = useChatStore()
-const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen, currentModel } = storeToRefs(appStore)
+const { currentScene, isDarkMode, isSettingsOpen, isSystemPromptOpen } = storeToRefs(appStore)
 const { currentChat } = storeToRefs(chatStore)
 
 // Services
-const { refreshModels, availableModels } = useAI()
 const { renameChat, initialize } = chatStore
 const isEditingChatName = ref(false)
 const editedChatName = ref('')
@@ -55,13 +53,8 @@ function confirmRename() {
   }
 }
 
-onMounted(() => {
-  refreshModels().then(async () => {
-    await initialize()
-    if (!currentModel.value && availableModels.value.length > 0) {
-      appStore.currentModel = availableModels.value[0].name
-    }
-  })
+onMounted(async () => {
+  await initialize()
 })
 </script>
 
@@ -86,7 +79,7 @@ onMounted(() => {
                   <span class="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide">Chat</span>
                 </div>
                 <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700" />
-                <CompactModelSelector />
+                <ModelDisplay />
               </div>
 
               <!-- 右侧：会话名称 -->

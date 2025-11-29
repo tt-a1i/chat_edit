@@ -3,8 +3,22 @@ import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
+import { getAIEditingConfig } from '@/config/env'
 import { logger } from '@/utils/logger'
-import { getApiUrl, getHeaders } from './api'
+
+// AI Editing 专用的 API URL 和 Headers
+function getAIEditingApiUrl(path: string): string {
+  const { baseUrl } = getAIEditingConfig()
+  return `${baseUrl}${path}`
+}
+
+function getAIEditingHeaders(): Record<string, string> {
+  const { apiKey } = getAIEditingConfig()
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  }
+}
 
 /**
  * HTTP 错误类
@@ -66,11 +80,13 @@ export async function streamChat(
 
   const _controller = controller || new AbortController()
 
-  await fetchEventSource(getApiUrl('/v1/chat/completions'), {
+  const { model } = getAIEditingConfig()
+
+  await fetchEventSource(getAIEditingApiUrl('/v1/chat/completions'), {
     method: 'POST',
-    headers: getHeaders(),
+    headers: getAIEditingHeaders(),
     body: JSON.stringify({
-      model: 'moonshot-v1-32k',
+      model,
       messages: [
         {
           role: 'user',

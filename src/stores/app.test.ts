@@ -2,6 +2,8 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 /**
  * App Store 测试
+ * 注意：API 配置（baseUrl、apiKey、model、enableMarkdown、showSystem、historyMessageLength）
+ * 已移至环境变量，不再由 appStore 管理
  */
 import { setupLocalStorageMock } from '@/../tests/helpers/setup'
 import { SCENES, useAppStore } from './app'
@@ -121,15 +123,6 @@ describe('useAppStore', () => {
   })
 
   describe('localStorage 持久化', () => {
-    it('应该能够持久化当前模型设置', () => {
-      const store = useAppStore()
-      store.currentModel = 'moonshot-v1-32k'
-
-      // 创建新的 store 实例模拟页面刷新
-      const newStore = useAppStore()
-      expect(newStore.currentModel).toBe('moonshot-v1-32k')
-    })
-
     it('应该能够持久化暗色模式设置', () => {
       const store = useAppStore()
       store.isDarkMode = false
@@ -137,44 +130,13 @@ describe('useAppStore', () => {
       const newStore = useAppStore()
       expect(newStore.isDarkMode).toBe(false)
     })
-  })
 
-  describe('用户设置', () => {
-    it('应该能够更新历史消息长度', () => {
+    it('应该能够持久化侧边栏折叠状态', () => {
       const store = useAppStore()
-      store.historyMessageLength = 20
+      store.isSidebarCollapsed = true
 
-      expect(store.historyMessageLength).toBe(20)
-    })
-
-    it('应该能够切换 Markdown 启用状态', () => {
-      const store = useAppStore()
-      store.enableMarkdown = false
-
-      expect(store.enableMarkdown).toBe(false)
-    })
-
-    it('应该能够切换系统消息显示', () => {
-      const store = useAppStore()
-      store.showSystem = false
-
-      expect(store.showSystem).toBe(false)
-    })
-  })
-
-  describe('aPI 设置', () => {
-    it('应该能够更新 API 基础 URL', () => {
-      const store = useAppStore()
-      store.baseUrl = 'https://custom-api.example.com'
-
-      expect(store.baseUrl).toBe('https://custom-api.example.com')
-    })
-
-    it('应该能够更新 API Key', () => {
-      const store = useAppStore()
-      store.apiKey = 'test-api-key-123'
-
-      expect(store.apiKey).toBe('test-api-key-123')
+      const newStore = useAppStore()
+      expect(newStore.isSidebarCollapsed).toBe(true)
     })
   })
 })

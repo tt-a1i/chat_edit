@@ -1,16 +1,20 @@
 import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
 /**
  * 聊天状态管理 Store
+ * 模型配置已移至环境变量 (env.ts)
  */
 import type { Chat, Message } from '@/services/database'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useApi } from '@/api/api'
 import { showError } from '@/composables/useToast'
+import { env, getChatConfig } from '@/config/env'
 import { useAI } from '@/services/ai'
 import { db } from '@/services/database'
 import { logger } from '@/utils/logger'
-import { useAppStore } from './app'
+
+// 获取当前模型名称
+const { model: currentModel } = getChatConfig()
 
 interface ChatExport extends Chat {
   messages: Message[]
@@ -186,10 +190,9 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function startNewChat(name: string) {
-    const appStore = useAppStore()
     const newChat: Omit<Chat, 'id'> = {
       name,
-      model: appStore.currentModel || 'moonshot-v1-8k',
+      model: currentModel,
       createdAt: new Date(),
     }
 
@@ -211,8 +214,7 @@ export const useChatStore = defineStore('chat', () => {
       const chat = await db.chats.get(chatId)
       if (chat) {
         await setCurrentChat(chatId)
-        const appStore = useAppStore()
-        appStore.currentModel = chat.model
+        // 模型配置已移至环境变量，不再需要切换
       }
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
@@ -230,11 +232,7 @@ export const useChatStore = defineStore('chat', () => {
       } else {
         await switchChat(sortedChats.value[0].id!)
       }
-
-      const appStore = useAppStore()
-      if (!appStore.currentModel || appStore.currentModel === 'none') {
-        appStore.currentModel = 'moonshot-v1-8k'
-      }
+      // 模型配置已移至环境变量，不再需要初始化
     } catch (err) {
       error.value = err instanceof Error ? err : new Error(String(err))
       logger.error('初始化聊天失败', err)
@@ -273,7 +271,6 @@ export const useChatStore = defineStore('chat', () => {
 
     const chatId = currentChatId.value
     const { generate } = useAI()
-    const appStore = useAppStore()
 
     const message: Omit<Message, 'id'> = {
       chatId,
@@ -304,10 +301,10 @@ export const useChatStore = defineStore('chat', () => {
 
       // 调用 AI 生成
       await generate(
-        appStore.currentModel,
+        currentModel,
         messages.value.slice(0, -1),
         systemPrompt.value,
-        appStore.historyMessageLength,
+        env.historyMessageLength,
         data => handleAiPartialResponse(data, chatId),
         data => handleAiCompletion(data, chatId),
       )
@@ -379,7 +376,6 @@ export const useChatStore = defineStore('chat', () => {
 
     const chatId = currentChatId.value
     const { generate } = useAI()
-    const appStore = useAppStore()
 
     // 如果指定了 messageId，删除该消息及之后的所有消息
     if (messageId) {
@@ -421,10 +417,10 @@ export const useChatStore = defineStore('chat', () => {
     try {
       // 发送给 API 时排除最后一条空的 AI 消息
       await generate(
-        appStore.currentModel,
+        currentModel,
         messages.value.slice(0, -1),
         systemPrompt.value,
-        appStore.historyMessageLength,
+        env.historyMessageLength,
         data => handleAiPartialResponse(data, chatId),
         data => handleAiCompletion(data, chatId),
       )

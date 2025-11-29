@@ -1,10 +1,10 @@
 import { useLocalStorage } from '@vueuse/core'
 /**
  * 应用配置状态管理 Store
+ * 注意：API 配置（baseUrl, apiKey, model）已移至 env.ts 环境变量
  */
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { env } from '@/config/env'
 
 // Scene 常量
 export const SCENES = {
@@ -18,22 +18,12 @@ export const useAppStore = defineStore('app', () => {
   // Scene management
   const currentScene = ref<SceneType>(SCENES.CHAT)
 
-  // User settings
-  const currentModel = useLocalStorage('currentModel', 'moonshot-v1-8k')
-  const historyMessageLength = useLocalStorage('historyMessageLength', 10)
-  const enableMarkdown = useLocalStorage('markdown', env.enableMarkdown)
-  const showSystem = useLocalStorage('systemMessages', env.showSystemMessages)
-
-  // API settings
-  const baseUrl = useLocalStorage('baseUrl', env.apiBaseUrl)
-  const apiKey = useLocalStorage('apiKey', env.apiKey)
-
   // UI state
   const isDarkMode = useLocalStorage('darkMode', true)
-  const isSettingsOpen = useLocalStorage('settingsPanelOpen', false) // 默认关闭设置面板
+  const isSettingsOpen = useLocalStorage('settingsPanelOpen', false)
   const isSystemPromptOpen = useLocalStorage('systemPromptOpen', false)
   const isAIEditingOpen = ref(false)
-  const isSidebarCollapsed = useLocalStorage('sidebarCollapsed', false) // 侧边栏折叠状态
+  const isSidebarCollapsed = useLocalStorage('sidebarCollapsed', false)
 
   // Actions
   function switchScene(scene: SceneType) {
@@ -64,16 +54,6 @@ export const useAppStore = defineStore('app', () => {
     SCENES,
     currentScene,
     switchScene,
-
-    // User settings
-    currentModel,
-    historyMessageLength,
-    enableMarkdown,
-    showSystem,
-
-    // API settings
-    baseUrl,
-    apiKey,
 
     // UI state
     isDarkMode,

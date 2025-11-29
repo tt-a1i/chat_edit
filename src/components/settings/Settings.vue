@@ -1,24 +1,19 @@
 <script setup lang="ts">
+/**
+ * Settings 面板 - 简化版
+ * API 配置已移至环境变量 (env.ts)
+ * 只保留数据管理功能
+ */
 import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
 import { ref } from 'vue'
 import ExportButton from '@/components/history/ExportButton.vue'
 import ImportButton from '@/components/history/ImportButton.vue'
-import TextInput from '@/components/inputs/TextInput.vue'
-import ToggleInput from '@/components/inputs/ToggleInput.vue'
 import { useAppStore, useChatStore } from '@/stores'
 
 // Stores
 const appStore = useAppStore()
 const chatStore = useChatStore()
 const { toggleSettingsPanel } = appStore
-const {
-  apiKey,
-  baseUrl,
-  enableMarkdown,
-  historyMessageLength,
-  showSystem,
-} = appStore
-
 const { wipeDatabase } = chatStore
 
 const showConfirmDialog = ref(false)
@@ -86,75 +81,7 @@ function handleConfirmWipe() {
         </h2>
       </div>
 
-      <!-- More Settings -->
-      <div
-        class="mb-4 border-t border-gray-200 px-2 py-4 text-gray-900 dark:border-gray-700 dark:text-gray-100"
-      >
-        <div>
-          <ToggleInput v-model="enableMarkdown" label="Enable Markdown" />
-          <ToggleInput v-model="showSystem" label="Show System messages" />
-        </div>
-
-        <TextInput id="base-url" v-model="baseUrl" label="Base URL" />
-        <TextInput id="api-key" v-model="apiKey" label="API Key" />
-
-        <div>
-          <label for="chat-history-length" class="mb-2 mt-4 block px-2 text-sm font-medium">
-            Conversation History Size
-          </label>
-          <input
-            id="chat-history-length"
-            v-model="historyMessageLength"
-            type="number"
-            min="0"
-            max="100"
-            class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
-            placeholder="2048"
-          >
-        </div>
-
-        <div v-if="false">
-          <div>
-            <label for="max-tokens" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Max tokens
-            </label>
-            <input
-              id="max-tokens"
-              type="number"
-              disabled
-              class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
-              placeholder="2048"
-            >
-          </div>
-
-          <div>
-            <label for="temperature" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Temperature
-            </label>
-            <input
-              id="temperature"
-              type="number"
-              disabled
-              class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
-              placeholder="0.7"
-            >
-          </div>
-
-          <div>
-            <label for="top-p" class="mb-2 mt-4 block px-2 text-sm font-medium">
-              Top P
-            </label>
-            <input
-              id="top-p"
-              type="number"
-              disabled
-              class="block w-full rounded-lg bg-gray-100 p-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:placeholder-gray-300 dark:focus:ring-blue-600"
-              placeholder="1"
-            >
-          </div>
-        </div>
-      </div>
-
+      <!-- 数据管理 -->
       <div
         class="mt-auto px-2 space-y-2 text-gray-900 dark:text-gray-100"
       >

@@ -10,7 +10,6 @@ import type {
   DeleteModelResponse,
   GenerateEmbeddingsRequest,
   GenerateEmbeddingsResponse,
-  ListLocalModelsResponse,
   PullModelRequest,
   PullModelResponse,
   PushModelRequest,
@@ -18,9 +17,8 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
-import type { ModelInfo } from '@/types/api'
 import { ref } from 'vue'
-import { useAppStore } from '@/stores'
+import { getChatConfig } from '@/config/env'
 import { toError } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
 
@@ -31,18 +29,18 @@ export type {
   Model,
 } from './types.ts'
 
-// 定义获取完整 API URL 的方法
+// 定义获取完整 API URL 的方法（使用 Chat 配置）
 export function getApiUrl(path: string): string {
-  const appStore = useAppStore()
-  return `${appStore.baseUrl}${path}`
+  const { baseUrl } = getChatConfig()
+  return `${baseUrl}${path}`
 }
 
-// 定义获取请求头的方法
+// 定义获取请求头的方法（使用 Chat 配置）
 export function getHeaders(): Record<string, string> {
-  const appStore = useAppStore()
+  const { apiKey } = getChatConfig()
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${appStore.apiKey}`,
+    'Authorization': `Bearer ${apiKey}`,
   }
 }
 
@@ -126,48 +124,6 @@ export function useApi() {
         logger.error('创建模型时出错', err)
         error.value = toError(err)
         throw err
-      }
-    },
-
-    // 列出本地模型
-    listLocalModels: async (): Promise<ListLocalModelsResponse> => {
-      try {
-        const response = await fetch(getApiUrl('/v1/models'), {
-          method: 'GET',
-          headers: getHeaders(),
-        })
-
-        if (!response.ok) {
-          throw new Error(`获取模型列表失败: ${response.status}`)
-        }
-
-        const data = await response.json()
-
-        return {
-          models: (data.data || []).map((model: ModelInfo) => ({
-            name: model.id,
-            modified_at: new Date().toISOString(),
-            size: 0,
-          })),
-        }
-      } catch (err) {
-        logger.error('获取模型列表时出错', err)
-        error.value = toError(err)
-        // 返回默认模型列表以防止完全失败
-        return {
-          models: [
-            {
-              name: 'moonshot-v1-8k',
-              modified_at: new Date().toISOString(),
-              size: 0,
-            },
-            {
-              name: 'moonshot-v1-32k',
-              modified_at: new Date().toISOString(),
-              size: 0,
-            },
-          ],
-        }
       }
     },
 

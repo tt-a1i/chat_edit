@@ -88,14 +88,6 @@ function handleExampleClick(prompt: string) {
         </div>
       </button>
     </div>
-
-    <!-- 底部提示 -->
-    <div class="mt-12 text-center animate-fade-in" style="animation-delay: 400ms;">
-      <p class="text-sm text-gray-500 dark:text-gray-500 flex items-center justify-center gap-2">
-        <span>Powered by</span>
-        <span class="font-semibold text-gray-700 dark:text-gray-400">Moonshot AI</span>
-      </p>
-    </div>
   </div>
 </template>
 
