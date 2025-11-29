@@ -22,9 +22,7 @@ export default defineConfig({
           // Markdown 渲染相关库（~5MB）
           'markdown': [
             'markdown-it',
-            'markdown-it-anchor',
             'markdown-it-link-attributes',
-            'markdown-it-highlightjs',
             'markdown-it-texmath',
             'katex',
             'highlight.js',

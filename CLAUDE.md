@@ -10,17 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **当前状态**: 这是一个处于持续开发阶段的项目，代码库正在进行重构和优化。
 
-**未来规划**:
-- 代码重构: 改进代码组织结构、提升可维护性
-- 性能优化: 优化渲染性能、减少不必要的重渲染
-- 新功能开发: 持续添加新的AI辅助编辑功能
-- 架构改进: 完善状态管理、错误处理机制
+## Skill 使用规范
 
-**开发指导原则**:
-- 在进行重构时，保持向后兼容性
-- 新功能开发需要考虑与现有架构的整合
-- 优先处理已知的技术债务（见下文"Known Issues"）
-- 代码审查时关注可维护性和扩展性
+- **页面开发或 UI 修改时**：使用 `frontend-design` skill
+- **代码审查时**：使用 `code-review-excellence` skill
 
 ## Project Overview
 
@@ -221,13 +214,6 @@ All AI responses use Server-Sent Events (SSE). The pattern is:
   └── assets/                  # 静态资源和 CSS
 ```
 
-**组织原则**：
-- 聊天相关组件统一在 `chat/` 目录下
-- 消息类型组件在 `chat/messages/` 子目录
-- 工具函数统一在 `utils/`，不在 `components/`
-- 所有目录名使用小写（除 AIEditing 保持原样）
-- 每个功能模块独立组织，便于维护
-
 ## Known Patterns
 
 ### Quill Content Manipulation
@@ -260,22 +246,6 @@ Both chat and AI editing maintain abort controllers for canceling ongoing reques
 **安全性问题**:
 - API密钥已通过环境变量管理 (`config/env.ts`)，确保 `.env.local` 不提交到代码库
 
-**代码质量**:
-- `components/AIEditing/index.vue` 约550行，已部分重构为 composables，可继续拆分 UI 逻辑
-- 7个文件有 TODO/FIXME 标记需处理
-- 20处第三方库类型 `any`（可接受，低优先级）
-
-**性能优化点**:
-- Monaco Editor 真正懒加载（目前仅代码分割）
-- Quill 编辑器大文档性能优化
-- 组件级别懒加载（Settings/History 等非核心组件）
-- IndexedDB 查询优化
-
-**功能完善**:
-- 国际化 (i18n) 未完全实现
-- 移动端适配不完整
-- 需要扩展测试覆盖率（见下文"Testing"）
-
 ## Chrome DevTools MCP 调试工具
 
 **MCP 服务器配置**: Chrome DevTools MCP 已安装并配置
@@ -287,7 +257,7 @@ Both chat and AI editing maintain abort controllers for canceling ongoing reques
 pnpm dev  # 默认运行在 http://localhost:5173/
 ```
 
-**2. 使用 Chrome MCP 工具**:
+**2. 如果用户要求了，使用 Chrome MCP 工具**:
 
 Chrome DevTools MCP 提供 26 个浏览器自动化和调试工具，分为以下类别：
 
@@ -403,19 +373,7 @@ pnpm dev
   --user-data-dir="$HOME/.chrome-debug-profile" \
   http://localhost:5173/ &
 
-# 3. Chrome MCP 会自动连接到这个实例
 ```
-
-**使用 MCP 工具**:
-项目启动后，可以直接使用自然语言请求 Chrome MCP 工具：
-
-1. **打开页面**: "请打开开发服务器页面"
-2. **检查错误**: "检查浏览器控制台是否有错误"
-3. **截图**: "截取当前页面的截图"
-4. **性能**: "分析页面的 LCP 和性能指标"
-5. **列出页面**: "列出当前打开的所有页面"
-
-**注意**: 此时你可以同时使用 Chrome MCP 工具和浏览器扩展（如 Vue DevTools）。
 
 ## Testing
 
@@ -448,45 +406,11 @@ pnpm test:e2e          # E2E 测试
 pnpm test:all          # 运行所有测试
 ```
 
-### 下一步测试计划
-
-建议为以下模块添加测试：
-
-1. **核心业务逻辑**
-   - `stores/chat.ts` - 聊天状态管理
-   - `services/ai.ts` - AI 服务交互
-   - `services/database.ts` - 数据库操作
-
-2. **关键组件**
-   - `components/chat/ChatInput.vue`
-   - `components/chat/ChatMessages.vue`
-   - `components/AIEditing/index.vue`
-
-3. **API 集成**
-   - `api/api.ts` - API 调用和错误处理
-   - SSE 流处理
-
-详见 [TESTING.md](./TESTING.md) 查看完整测试指南。
-
-## Git 和 PR 配置
-
-### Commit 消息格式
-
-创建 commit 时，**不要**包含 Claude Code 相关信息。使用简洁的 commit 消息格式：
-
-```
-feat: 功能描述
-
-- 修改点 1
-- 修改点 2
-```
-
 **❌ 不要包含**:
 - `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 - `Co-Authored-By: Claude <noreply@anthropic.com>`
 
 ### Pull Request 格式
 
-创建 PR 时，使用以下格式，**不要**包含 Claude Code 信息：
+创建 PR 时，，**不要**包含 Claude Code 信息：
 
-**保持简洁专业，不包含任何工具生成标记。**
