@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import {
+  IconAlertTriangle,
   IconEdit,
   IconMessageCode,
   IconMoon,
   IconPlus,
   IconSettings2,
   IconSun,
+  IconTrash,
   IconTrashX,
   IconUserCircle,
 } from '@tabler/icons-vue'
@@ -26,7 +28,7 @@ const { switchChat, deleteChat, startNewChat, wipeDatabase } = chatStore
 // 缓存响应式的 discrete API，根据暗色模式自动更新主题
 const discreteApi = computed(() =>
   createDiscreteApi(
-    ['dialog', 'message'],
+    ['message'],
     {
       configProviderProps: {
         theme: isDarkMode.value ? darkTheme : undefined,
@@ -34,6 +36,11 @@ const discreteApi = computed(() =>
     },
   ),
 )
+
+// 删除对话框状态
+const showDeleteDialog = ref(false)
+const deleteDialogType = ref<'current' | 'all'>('current')
+const isDeleting = ref(false)
 
 const sidebarBodyRef = ref<HTMLElement | null>(null)
 const showSidebarText = ref(!isSidebarCollapsed.value)
@@ -99,61 +106,78 @@ function checkSystemPromptPanel() {
   appStore.isSystemPromptOpen = false
 }
 
-// 确认删除当前会话
-async function confirmDeleteChat() {
+// 打开删除当前会话对话框
+function openDeleteCurrentDialog() {
   const chat = currentChat.value
-  const { dialog, message } = discreteApi.value
+  const { message } = discreteApi.value
 
   if (!chat?.id) {
     message.warning('未找到要删除的会话')
     return
   }
 
-  const chatId: number = chat.id // 提取 ID 避免闭包中的类型问题
+  deleteDialogType.value = 'current'
+  showDeleteDialog.value = true
+}
 
-  dialog.warning({
-    title: '删除会话',
-    content: `确定要删除会话"${chat.name}"吗？此操作无法撤销。`,
-    positiveText: '删除',
-    negativeText: '取消',
-    onPositiveClick: async () => {
-      try {
+// 打开删除所有会话对话框
+function openDeleteAllDialog() {
+  deleteDialogType.value = 'all'
+  showDeleteDialog.value = true
+}
+
+// 关闭删除对话框
+function closeDeleteDialog() {
+  showDeleteDialog.value = false
+  isDeleting.value = false
+}
+
+// 执行删除操作
+async function handleConfirmDelete() {
+  const { message } = discreteApi.value
+  isDeleting.value = true
+
+  try {
+    if (deleteDialogType.value === 'current') {
+      const chatId = currentChat.value?.id
+      if (chatId) {
         await deleteChat(chatId)
         message.success('会话已删除')
-      } catch (error) {
-        logger.error('删除会话失败', error)
-        const errorMessage = error instanceof Error
-          ? error.message
-          : '删除会话失败，请重试'
-        message.error(errorMessage)
       }
-    },
-  })
+    } else {
+      await wipeDatabase()
+      message.success('所有会话已删除')
+    }
+    closeDeleteDialog()
+  } catch (error) {
+    logger.error(`删除${deleteDialogType.value === 'current' ? '会话' : '所有会话'}失败`, error)
+    const errorMessage = error instanceof Error
+      ? error.message
+      : '删除失败，请重试'
+    message.error(errorMessage)
+    isDeleting.value = false
+  }
 }
 
-// 确认删除所有会话
-async function confirmWipeDatabase() {
-  const { dialog, message } = discreteApi.value
-
-  dialog.error({
+// 获取删除对话框的配置
+const deleteDialogConfig = computed(() => {
+  if (deleteDialogType.value === 'current') {
+    return {
+      title: '删除当前会话',
+      description: `确定要删除会话「${currentChat.value?.name || ''}」吗？此操作无法撤销。`,
+      icon: IconTrash,
+      iconClass: 'warning',
+      confirmText: '删除',
+    }
+  }
+  return {
     title: '删除所有会话',
-    content: '确定要删除所有会话吗？此操作将清空所有聊天记录，且无法撤销！',
-    positiveText: '确认删除',
-    negativeText: '取消',
-    onPositiveClick: async () => {
-      try {
-        await wipeDatabase()
-        message.success('所有会话已删除')
-      } catch (error) {
-        logger.error('删除所有会话失败', error)
-        const errorMessage = error instanceof Error
-          ? error.message
-          : '删除失败，请重试'
-        message.error(errorMessage)
-      }
-    },
-  })
-}
+    description: '此操作将永久删除所有聊天记录，且无法恢复。请确认您已备份重要数据。',
+    icon: IconAlertTriangle,
+    iconClass: 'danger',
+    confirmText: '确认删除',
+  }
+})
 
 // 以下划线开头命名未使用的函数，避免警告
 function _toggleAIEditing() {
@@ -172,6 +196,48 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
 </script>
 
 <template>
+  <!-- 删除确认对话框 -->
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="showDeleteDialog"
+        class="delete-dialog-overlay"
+        @click.self="closeDeleteDialog"
+      >
+        <Transition name="scale">
+          <div v-if="showDeleteDialog" class="delete-dialog">
+            <div class="dialog-icon" :class="deleteDialogConfig.iconClass">
+              <component :is="deleteDialogConfig.icon" class="h-6 w-6" />
+            </div>
+            <h3 class="dialog-title">
+              {{ deleteDialogConfig.title }}
+            </h3>
+            <p class="dialog-description">
+              {{ deleteDialogConfig.description }}
+            </p>
+            <div class="dialog-actions">
+              <button
+                class="btn-cancel"
+                :disabled="isDeleting"
+                @click="closeDeleteDialog"
+              >
+                取消
+              </button>
+              <button
+                class="btn-danger"
+                :class="{ 'is-loading': isDeleting }"
+                :disabled="isDeleting"
+                @click="handleConfirmDelete"
+              >
+                {{ isDeleting ? '删除中...' : deleteDialogConfig.confirmText }}
+              </button>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
+  </Teleport>
+
   <aside
     class="relative flex transition-all duration-300 ease-in-out"
     :class="isSidebarCollapsed ? 'w-16' : 'w-60 sm:w-64'"
@@ -373,7 +439,7 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
                  hover:bg-gray-100/80 hover:text-gray-700
                  focus:outline-none focus:ring-2 focus:ring-gray-400/30
                  dark:text-gray-500 dark:hover:bg-gray-800/80 dark:hover:text-gray-300"
-          @click="confirmDeleteChat"
+          @click="openDeleteCurrentDialog"
         >
           <IconTrashX class="size-4.5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors" />
           删除当前会话
@@ -385,7 +451,7 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
                  hover:bg-red-50/80 hover:text-red-600 hover:shadow-[0_2px_8px_-2px_rgba(239,68,68,0.15)]
                  focus:outline-none focus:ring-2 focus:ring-red-400/30
                  dark:text-red-400/70 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-          @click="confirmWipeDatabase"
+          @click="openDeleteAllDialog"
         >
           <IconTrashX class="size-4.5 transition-colors" />
           删除所有会话
@@ -394,3 +460,182 @@ function formatChatMeta(chat: typeof sortedChats.value[number]): string {
     </div>
   </aside>
 </template>
+
+<style scoped>
+/* 删除对话框遮罩 */
+.delete-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* 删除对话框 */
+.delete-dialog {
+  width: calc(100% - 2rem);
+  max-width: 22rem;
+  padding: var(--space-xl, 2rem);
+  margin: 1rem;
+  background: var(--bg-primary, #ffffff);
+  border-radius: var(--radius-2xl, 1.25rem);
+  box-shadow: var(--shadow-2xl, 0 25px 50px -12px rgb(0 0 0 / 0.25));
+  text-align: center;
+}
+
+.dark .delete-dialog {
+  background: var(--dark-bg-secondary, #25262b);
+  border: 1px solid var(--dark-border-light, #373a40);
+}
+
+/* 对话框图标 */
+.dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: var(--space-md, 1rem);
+  border-radius: var(--radius-full, 9999px);
+  transition: all 0.2s ease;
+}
+
+.dialog-icon.warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #d97706;
+}
+
+.dialog-icon.danger {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  color: #dc2626;
+}
+
+.dark .dialog-icon.warning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
+  color: #fbbf24;
+}
+
+.dark .dialog-icon.danger {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%);
+  color: #f87171;
+}
+
+/* 对话框标题 */
+.dialog-title {
+  font-size: var(--font-size-lg, 1.125rem);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text-primary, #1c1917);
+  margin-bottom: var(--space-sm, 0.5rem);
+}
+
+.dark .dialog-title {
+  color: var(--dark-text-primary, #f8f9fa);
+}
+
+/* 对话框描述 */
+.dialog-description {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--text-secondary, #57534e);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl, 2rem);
+}
+
+.dark .dialog-description {
+  color: var(--dark-text-secondary, #c1c2c5);
+}
+
+/* 对话框操作按钮 */
+.dialog-actions {
+  display: flex;
+  gap: var(--space-sm, 0.5rem);
+}
+
+.btn-cancel,
+.btn-danger {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-lg, 0.75rem);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-medium, 500);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancel {
+  background: var(--bg-tertiary, #f5f5f4);
+  color: var(--text-primary, #1c1917);
+  border: 1px solid var(--border-light, #e7e5e4);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: var(--bg-secondary, #fafaf9);
+  border-color: var(--border-medium, #d6d3d1);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dark .btn-cancel {
+  background: var(--dark-bg-tertiary, #2c2e33);
+  color: var(--dark-text-primary, #f8f9fa);
+  border-color: var(--dark-border-light, #373a40);
+}
+
+.dark .btn-cancel:hover:not(:disabled) {
+  background: var(--dark-bg-elevated, #373a40);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 2px 8px -2px rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(239, 68, 68, 0.5);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-danger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-danger.is-loading {
+  background: #f87171;
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.scale-enter-active,
+.scale-leave-active {
+  transition: all 0.2s ease;
+}
+
+.scale-enter-from,
+.scale-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style>
