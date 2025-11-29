@@ -151,7 +151,16 @@ function clearImage() {
       <textarea
         ref="textarea"
         v-model="userInput"
-        class="chat-input-textarea block max-h-[500px] w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 pl-14 pr-20 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-gray-50 dark:placeholder-gray-400 dark:focus:ring-blue-500 sm:text-base shadow-sm hover:shadow-md transition-shadow duration-200"
+        class="chat-input-textarea block max-h-[500px] w-full resize-none rounded-[20px] p-4 pl-14 pr-20 text-sm sm:text-base text-gray-900 placeholder-gray-400
+               bg-white/95 backdrop-blur-md
+               border border-gray-200/60
+               shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08),0_4px_20px_-4px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]
+               hover:border-gray-300/70 hover:shadow-[0_4px_16px_-3px_rgba(0,0,0,0.1),0_6px_24px_-4px_rgba(0,0,0,0.06)]
+               focus:outline-none focus:border-teal-400/70 focus:shadow-[0_0_0_3px_rgba(20,184,166,0.15),0_4px_16px_-3px_rgba(20,184,166,0.1),0_6px_24px_-4px_rgba(0,0,0,0.06)]
+               dark:bg-gray-800/95 dark:border-gray-700/60 dark:text-gray-50 dark:placeholder-gray-500
+               dark:shadow-[0_2px_12px_-3px_rgba(0,0,0,0.3),0_4px_20px_-4px_rgba(0,0,0,0.2),inset_0_1px_1px_rgba(255,255,255,0.05)]
+               dark:hover:border-gray-600/70 dark:focus:border-teal-500/70 dark:focus:shadow-[0_0_0_3px_rgba(20,184,166,0.2),0_4px_16px_-3px_rgba(20,184,166,0.15)]
+               transition-all duration-300 ease-out"
         placeholder="输入消息... (Shift + Enter 换行)"
         @keydown="onKeydown"
         @compositionstart="handleCompositionStart"
@@ -167,7 +176,7 @@ function clearImage() {
       <button
         type="button"
         title="添加图片"
-        class="absolute bottom-3 left-4 flex size-10 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
+        class="absolute bottom-3 left-4 flex size-10 items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-teal-600 dark:hover:bg-gray-700 dark:hover:text-teal-400 focus:outline-none transition-all duration-200 hover:scale-105 active:scale-95"
         @click="triggerFileInput"
       >
         <IconPhotoPlus :size="22" />
@@ -175,7 +184,20 @@ function clearImage() {
       <button
         type="submit"
         :disabled="!isInputValid && !isAiResponding"
-        class="group absolute bottom-3 right-4 flex size-10 items-center justify-center rounded-xl bg-blue-600 text-sm font-medium text-white transition-all duration-200 ease-in-out hover:bg-blue-700 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:opacity-50 disabled:hover:scale-100 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-500 dark:disabled:bg-gray-600 sm:text-base shadow-lg"
+        class="group absolute bottom-3 right-4 flex size-11 items-center justify-center rounded-[14px]
+               bg-gradient-to-br from-teal-400 via-teal-500 to-emerald-600
+               text-white
+               shadow-[0_2px_8px_-1px_rgba(20,184,166,0.5),0_4px_16px_-2px_rgba(16,185,129,0.3)]
+               hover:shadow-[0_4px_12px_-1px_rgba(20,184,166,0.6),0_6px_20px_-2px_rgba(16,185,129,0.4)]
+               hover:scale-105 hover:-translate-y-0.5
+               active:scale-95 active:translate-y-0
+               focus:outline-none focus:ring-2 focus:ring-teal-400/50 focus:ring-offset-2
+               disabled:from-gray-300 disabled:via-gray-350 disabled:to-gray-400 disabled:opacity-60 disabled:shadow-none disabled:hover:scale-100 disabled:hover:translate-y-0
+               dark:from-teal-500 dark:via-teal-600 dark:to-emerald-700
+               dark:shadow-[0_2px_8px_-1px_rgba(20,184,166,0.4),0_4px_16px_-2px_rgba(0,0,0,0.3)]
+               dark:hover:shadow-[0_4px_12px_-1px_rgba(20,184,166,0.5),0_6px_20px_-2px_rgba(0,0,0,0.4)]
+               dark:disabled:from-gray-600 dark:disabled:via-gray-650 dark:disabled:to-gray-700
+               transition-all duration-300 ease-out"
       >
         <IconPlayerStopFilled
           v-if="isAiResponding"

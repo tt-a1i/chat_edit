@@ -67,7 +67,7 @@ onMounted(() => {
 
 <template>
   <div :class="{ dark: isDarkMode }" class="transition-colors duration-300">
-    <main class="flex h-full w-full flex-1 flex-row items-stretch bg-white dark:bg-gray-900">
+    <main class="flex h-full w-full flex-1 flex-row items-stretch light-elegant-bg dark-elegant-bg">
       <Sidebar />
 
       <!-- Chat Scene -->
@@ -78,14 +78,14 @@ onMounted(() => {
 
         <div v-else class="flex h-screen w-full flex-col">
           <!-- 现代化顶部栏 - 全宽但内容居中 -->
-          <div class="w-full border-b bg-white/50 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/50 sticky top-0 z-[60]">
+          <div class="w-full border-b border-gray-200/60 bg-white/70 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-900/70 sticky top-0 z-[60]">
             <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
               <!-- 左侧：会话信息 -->
               <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                <div class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800">
-                  <span class="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Chat</span>
+                <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-900/30">
+                  <span class="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide">Chat</span>
                 </div>
-                <div class="hidden sm:block h-4 w-px bg-gray-300 dark:bg-gray-600" />
+                <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700" />
                 <CompactModelSelector />
               </div>
 
@@ -119,13 +119,13 @@ onMounted(() => {
                     @keyup.esc="cancelEditing"
                   />
                   <button
-                    class="rounded-lg px-2 py-1 text-sm text-green-600 hover:bg-green-50 font-medium dark:text-green-400 dark:hover:bg-green-900/20 transition-colors"
+                    class="rounded-lg px-2.5 py-1 text-sm text-teal-600 hover:bg-teal-50 font-medium dark:text-teal-400 dark:hover:bg-teal-900/20 transition-colors"
                     @click="confirmRename"
                   >
                     确认
                   </button>
                   <button
-                    class="rounded-lg px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                    class="rounded-lg px-2.5 py-1 text-sm text-gray-500 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
                     @click="cancelEditing"
                   >
                     取消
@@ -139,8 +139,8 @@ onMounted(() => {
           <ChatMessages class="flex-1" />
 
           <!-- 输入区域 - 全宽但内容居中 -->
-          <div class="w-full border-t bg-white/80 backdrop-blur-sm dark:bg-gray-900/80 dark:border-gray-700">
-            <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-2">
+          <div class="w-full border-t border-gray-200/60 bg-gradient-to-t from-white via-white/95 to-white/80 backdrop-blur-md dark:border-gray-700/60 dark:from-gray-900 dark:via-gray-900/95 dark:to-gray-900/80">
+            <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-3">
               <ChatInput />
             </div>
           </div>
@@ -184,6 +184,24 @@ onMounted(() => {
   --text-color-primary-dark: #f3f4f6;
   --border-color: #e5e7eb;
   --border-color-dark: #374151;
+}
+
+/* 亮色模式精致背景 - 更丰富的层次 */
+.light-elegant-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -20%, rgba(20, 184, 166, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(20, 184, 166, 0.02) 0%, transparent 70%),
+    linear-gradient(165deg, #f8fffe 0%, #ffffff 40%, #fffef8 100%);
+}
+
+/* 暗色模式精致背景 */
+.dark .dark-elegant-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -20%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(20, 184, 166, 0.03) 0%, transparent 70%),
+    linear-gradient(165deg, #1a1b1e 0%, #111214 40%, #141516 100%);
 }
 
 /* 暗色模式过渡效果 */

@@ -76,7 +76,7 @@ const lastAiMessageId = computed(() => {
 <template>
   <div
     ref="chatElement"
-    class="flex-1 overflow-y-auto scroll-smooth chat-messages-container w-full"
+    class="flex-1 overflow-y-auto scroll-smooth chat-messages-container w-full bg-gradient-to-b from-transparent via-teal-50/5 to-transparent dark:via-teal-900/5"
   >
     <!-- 内容容器 - 居中且有最大宽度 -->
     <div
