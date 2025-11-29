@@ -31,12 +31,12 @@ declare module 'mammoth' {
 
   export function convertToHtml(
     input: { arrayBuffer: ArrayBuffer } | { path: string },
-    options?: ConvertToHtmlOptions
+    options?: ConvertToHtmlOptions,
   ): Promise<ConversionResult>
 
   export namespace images {
     export function imgElement(
-      callback: (element: any) => ImageAttributes | Promise<ImageAttributes>
+      callback: (element: any) => ImageAttributes | Promise<ImageAttributes>,
     ): (element: any) => Promise<ImageAttributes> | ImageAttributes
   }
 }

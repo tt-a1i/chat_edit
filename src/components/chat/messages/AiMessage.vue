@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Message } from '@/services/database.ts'
-import AIAvatar from '@/components/common/AIAvatar.vue'
-import { useAppStore, useChatStore } from '@/stores'
-import Markdown from '@/utils/markdown.ts'
 import { ArrowPathIcon, CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
+import AIAvatar from '@/components/common/AIAvatar.vue'
+import { useAppStore, useChatStore } from '@/stores'
+import Markdown from '@/utils/markdown.ts'
 import 'highlight.js/styles/github-dark.css'
 
 interface Props {

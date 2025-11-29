@@ -1,3 +1,4 @@
+import type { Message } from './database'
 import type {
   ChatCompletedResponse,
   ChatPartResponse,
@@ -5,9 +6,8 @@ import type {
   Model,
 } from '@/api/api'
 import type { APIMessage, MultiModalContent } from '@/types/api'
-import type { Message } from './database'
-import { useApi } from '@/api/api'
 import { ref } from 'vue'
+import { useApi } from '@/api/api'
 
 type ChatRole = 'user' | 'assistant' | 'system'
 

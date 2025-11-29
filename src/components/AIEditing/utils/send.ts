@@ -5,9 +5,9 @@
  * 包含: handleSend, handleRegenerate
  */
 
-import type { ChatResponse } from '@/types/ai-editing'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
+import type { ChatResponse } from '@/types/ai-editing'
 import * as AIEditingAPI from '@/api/ai-editing'
 
 export interface HandleSendParams {

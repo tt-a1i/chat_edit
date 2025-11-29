@@ -1,9 +1,9 @@
 import type { ChatResponse } from '@/types/ai-editing'
-import { logger } from '@/utils/logger'
 import {
   EventStreamContentType,
   fetchEventSource,
 } from '@microsoft/fetch-event-source'
+import { logger } from '@/utils/logger'
 import { getApiUrl, getHeaders } from './api'
 
 /**

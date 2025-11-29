@@ -8,8 +8,8 @@ export default defineConfig({
     // 测试环境配置
     environment: 'happy-dom',
 
-    // 全局变量
-    globals: true,
+    // 不使用全局变量（避免与 Playwright expect 冲突）
+    globals: false,
 
     // 并行执行配置（提升性能）
     pool: 'threads',

@@ -1,4 +1,3 @@
-import type { ModelInfo } from '@/types/api'
 import type {
   ChatPartResponse,
   ChatRequest,
@@ -19,10 +18,11 @@ import type {
   ShowModelInformationRequest,
   ShowModelInformationResponse,
 } from './types.ts'
+import type { ModelInfo } from '@/types/api'
+import { ref } from 'vue'
 import { useAppStore } from '@/stores'
 import { toError } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
-import { ref } from 'vue'
 
 export type {
   ChatCompletedResponse,

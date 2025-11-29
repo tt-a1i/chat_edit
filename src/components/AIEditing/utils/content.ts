@@ -6,9 +6,9 @@
  */
 
 import type Quill from 'quill'
+import MarkdownIt from 'markdown-it'
 import { createExporter } from '@/lib/export'
 import { AppError, ErrorCode, ErrorHandler } from '@/utils/error-handler'
-import MarkdownIt from 'markdown-it'
 
 export interface InsertContentParams {
   quill: Quill

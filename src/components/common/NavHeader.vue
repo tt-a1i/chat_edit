@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { SCENES, useAppStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { SCENES, useAppStore } from '@/stores'
 
 defineProps({
   title: {

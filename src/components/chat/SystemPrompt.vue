@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAppStore, useConfigStore } from '@/stores'
 import { IconWritingSign } from '@tabler/icons-vue'
 import { useTextareaAutosize } from '@vueuse/core'
 import { createDiscreteApi } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
+import { useAppStore, useConfigStore } from '@/stores'
 import ModelSelector from '../common/ModelSelector.vue'
 
 const appStore = useAppStore()

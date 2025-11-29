@@ -1,5 +1,5 @@
-import { useAppStore } from '@/stores'
 import { watchEffect } from 'vue'
+import { useAppStore } from '@/stores'
 
 // 监听系统暗色模式变化并同步应用设置
 export function syncSystemDarkMode() {
