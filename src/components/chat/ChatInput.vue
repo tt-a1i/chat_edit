@@ -1,52 +1,30 @@
 <script setup lang="ts">
-import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from '@tabler/icons-vue' // Corrected Icon Import Order
+/**
+ * 聊天输入组件 - 简化版
+ * 模型配置已移至环境变量 (env.ts)
+ */
+import { IconPhotoPlus, IconPlayerStopFilled, IconSend, IconWhirl, IconX } from '@tabler/icons-vue'
 import { useTextareaAutosize } from '@vueuse/core'
-import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAI } from '@/services/ai.ts'
-import { useAppStore, useChatStore } from '@/stores'
+import { useChatStore } from '@/stores'
 import { logger } from '@/utils/logger'
 
 const { textarea, input: userInput } = useTextareaAutosize({ input: '' })
 
-const appStore = useAppStore()
 const chatStore = useChatStore()
-const { currentModel } = storeToRefs(appStore)
-
-const { availableModels } = useAI()
 const { addSystemMessage, addUserMessage, abort } = chatStore
 
-const selectedImage = ref<string | null>(null) // To store the base64 image string. Defined before isInputValid
+const selectedImage = ref<string | null>(null)
 const isSystemMessage = ref(false)
-const isInputValid = computed<boolean>(() => !!userInput.value.trim() || !!selectedImage.value) // Input is valid if text or image is present
+const isInputValid = computed<boolean>(() => !!userInput.value.trim() || !!selectedImage.value)
 const isAiResponding = ref(false)
 const flag = ref(true)
-const showModelWarning = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null) // Ref for file input
-
-function checkModelSelected(): boolean {
-  // 检查是否已选择模型
-  if (!currentModel.value && availableModels.value.length > 0) {
-    // 如果没有选择模型但有可用模型，默认选择第一个
-    appStore.currentModel = availableModels.value[0].name
-    return true
-  }
-  return !!currentModel.value
-}
+const fileInput = ref<HTMLInputElement | null>(null)
 
 function onSubmit() {
   if (isAiResponding.value) {
     abort()
     isAiResponding.value = false
-    return
-  }
-
-  // 检查是否选择了模型
-  if (!checkModelSelected()) {
-    showModelWarning.value = true
-    setTimeout(() => {
-      showModelWarning.value = false
-    }, 3000) // 3秒后自动隐藏提示
     return
   }
 
@@ -140,13 +118,6 @@ function clearImage() {
         >
           <IconX :size="16" />
         </button>
-      </div>
-      <!-- 添加模型警告提示 -->
-      <div
-        v-if="showModelWarning"
-        class="absolute top-[-40px] left-0 right-0 bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm dark:bg-red-900/90 dark:text-red-100 backdrop-blur-sm shadow-md"
-      >
-        请先选择一个模型才能发送消息
       </div>
       <textarea
         ref="textarea"

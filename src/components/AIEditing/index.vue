@@ -4,6 +4,7 @@ import type { PromptTemplate } from '@/constants/prompts'
 import { NCard, NModal, NSpace, NText, NUpload, NUploadDragger } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { getAIEditingConfig } from '@/config/env'
 import { SYSTEM_PROMPTS } from '@/constants/prompts'
 import { createImporter } from '@/lib/export/import'
 import { initMonaco } from '@/lib/monaco/config'
@@ -66,6 +67,9 @@ const isMobile = ref(false)
 const monacoLoaded = ref(false)
 const currentLanguage = ref('zh-CN')
 const promptsData = ref({ system: SYSTEM_PROMPTS })
+
+// 获取 AI Editing 使用的模型名称
+const aiEditingModel = getAIEditingConfig().model
 
 // AI 编辑器操作
 const {
@@ -428,6 +432,11 @@ async function handleFileUpload(options: { file: { file: File | null } }) {
 
       <!-- 浮动输入框 -->
       <div id="floatingInput" class="floating-input" tabindex="0">
+        <!-- 模型标签 -->
+        <div class="model-badge">
+          <i class="fas fa-robot" />
+          <span>{{ aiEditingModel }}</span>
+        </div>
         <div class="input-container">
           <textarea
             id="promptInput"

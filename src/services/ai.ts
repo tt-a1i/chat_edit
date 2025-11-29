@@ -3,19 +3,19 @@ import type {
   ChatCompletedResponse,
   ChatPartResponse,
   ChatResponse,
-  Model,
 } from '@/api/api'
 import type { APIMessage, MultiModalContent } from '@/types/api'
-import { ref } from 'vue'
 import { useApi } from '@/api/api'
 
 type ChatRole = 'user' | 'assistant' | 'system'
 
-// Define availableModels outside the function to ensure a shared state.
-const availableModels = ref<Model[]>([])
-
+/**
+ * AI 服务 - 简化版
+ * 模型配置已移至环境变量 (env.ts)
+ */
 export function useAI() {
-  const { generateChat, listLocalModels } = useApi()
+  const { generateChat } = useApi()
+
   const generate = async (
     model: string,
     messages: Message[],
@@ -38,7 +38,7 @@ export function useAI() {
           },
           {
             type: 'text',
-            text: msg.content || '', // Ensure text part is always present, even if empty
+            text: msg.content || '',
           },
         ]
         return {
@@ -61,15 +61,7 @@ export function useAI() {
     })
   }
 
-  const refreshModels = async () => {
-    const response = await listLocalModels()
-    availableModels.value = response.models
-  }
-
-  // Use toRefs to keep reactivity when destructuring in components.
   return {
-    availableModels,
     generate,
-    refreshModels,
   }
 }

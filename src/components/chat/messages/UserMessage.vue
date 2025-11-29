@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { Message } from '@/services/database.ts'
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
-import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import { useAppStore } from '@/stores'
+import { env } from '@/config/env'
 import Markdown from '@/utils/markdown.ts'
 
 interface Props {
@@ -11,8 +10,7 @@ interface Props {
 }
 
 const { message } = defineProps<Props>()
-const appStore = useAppStore()
-const { enableMarkdown } = storeToRefs(appStore)
+const enableMarkdown = env.enableMarkdown
 const copied = ref(false)
 
 function copyToClipboard() {
