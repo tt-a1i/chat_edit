@@ -38,6 +38,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-link-attributes": "^4.0.1",
     "markdown-it-texmath": "^1.0.0",
+    "markstream-vue": "0.0.2-beta.6",
     "monaco-editor": "^0.52.2",
     "naive-ui": "^2.43.2",
     "pinia": "^3.0.4",

@@ -2,11 +2,10 @@
 import type { Message } from '@/services/database.ts'
 import { ArrowPathIcon, CheckIcon, ClipboardDocumentIcon } from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
+import StreamMarkdown from '@/components/chat/StreamMarkdown.vue'
 import AIAvatar from '@/components/common/AIAvatar.vue'
 import { env } from '@/config/env'
 import { useChatStore } from '@/stores'
-import Markdown from '@/utils/markdown.ts'
-import 'highlight.js/styles/github-dark.css'
 
 interface Props {
   message: Message
@@ -57,7 +56,7 @@ function handleRegenerate() {
     <AIAvatar :size="32" variant="default" class="flex-shrink-0 sm:w-9 sm:h-9 mt-0.5" />
 
     <!-- 消息卡片 -->
-    <div class="relative flex-1 min-w-0">
+    <div class="relative flex-1 min-w-0 mr-16 sm:mr-24 md:mr-32">
       <div class="transition-all duration-300 ease-out">
         <!-- 加载动画 - 更精致的脉冲效果 -->
         <div v-if="message.isStreaming || isStreaming" class="flex min-h-10 min-w-20 items-center py-3">
@@ -76,7 +75,7 @@ function handleRegenerate() {
         >{{ message.content }}</code>
         <div
           v-else-if="message.content"
-          class="prose prose-sm dark:prose-invert prose-p:my-0 prose-headings:my-2 prose-a:text-teal-600 dark:prose-a:text-teal-400 prose-code:text-xs prose-pre:text-sm prose-ul:my-0 prose-ol:my-0 [&_*:first-child]:mt-0 [&_*:last-child]:mb-0"
+          class="prose prose-sm max-w-none dark:prose-invert prose-p:my-0 prose-headings:my-2 prose-a:text-teal-600 dark:prose-a:text-teal-400 prose-code:text-xs prose-pre:text-sm prose-ul:my-0 prose-ol:my-0 [&_*:first-child]:mt-0 [&_*:last-child]:mb-0"
         >
           <!-- 思考过程 - 更精致的折叠卡片 -->
           <details
@@ -95,7 +94,10 @@ function handleRegenerate() {
 
           <!-- AI 响应 -->
           <div :class="{ 'animate-pulse': message.isStreaming || isStreaming }">
-            <Markdown :source="thought[1] || ''" />
+            <StreamMarkdown
+              :content="thought[1] || ''"
+              :is-streaming="message.isStreaming || isStreaming"
+            />
           </div>
         </div>
       </div>
