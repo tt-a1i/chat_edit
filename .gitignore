@@ -28,9 +28,8 @@ dist-ssr
 *.sw?
 
 
-# Package manager files
+# Package manager files (keep pnpm-lock.yaml for CI)
 package-lock.json
-pnpm-lock.yaml
 yarn.lock
 .vercel
 .aider*
