@@ -7,11 +7,11 @@
 
 import type { editor } from 'monaco-editor'
 import type Quill from 'quill'
+import * as monaco from 'monaco-editor'
+import { nextTick } from 'vue'
 import { defaultDiffEditorOptions } from '@/lib/monaco/config'
 import { AppError, ErrorCode, ErrorHandler } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
-import * as monaco from 'monaco-editor'
-import { nextTick } from 'vue'
 
 export interface DiffEditorParams {
   currentRange: { index: number, length: number } | null
@@ -228,17 +228,17 @@ export function showDiffEditor({
           // 根据是删除键还是退格键，计算要删除的范围
           const range = e.key === 'Backspace'
             ? new monaco.Range(
-              position.lineNumber,
-              Math.max(1, position.column - 1),
-              position.lineNumber,
-              position.column,
-            )
+                position.lineNumber,
+                Math.max(1, position.column - 1),
+                position.lineNumber,
+                position.column,
+              )
             : new monaco.Range(
-              position.lineNumber,
-              position.column,
-              position.lineNumber,
-              position.column + 1,
-            )
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column + 1,
+              )
 
           // 检查要删除的是否是换行符
           if (e.key === 'Backspace' && position.column === 1 && position.lineNumber > 1) {

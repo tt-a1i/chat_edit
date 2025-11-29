@@ -2,11 +2,11 @@
  * 配置管理 Store（系统提示词等）
  */
 import type { Config } from '@/services/database'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import { showError } from '@/composables/useToast'
 import { db } from '@/services/database'
 import { logger } from '@/utils/logger'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
 export const useConfigStore = defineStore('config', () => {
   // State

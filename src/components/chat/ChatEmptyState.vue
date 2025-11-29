@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useChatStore } from '@/stores'
 import { IconBulb, IconCode, IconPencil, IconSparkles } from '@tabler/icons-vue'
+import { useChatStore } from '@/stores'
 
 const chatStore = useChatStore()
 

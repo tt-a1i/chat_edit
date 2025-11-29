@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAppStore, useChatStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
+import { useAppStore, useChatStore } from '@/stores'
 import ChatEmptyState from './ChatEmptyState.vue'
 import ChatMessage from './ChatMessage.vue'
 

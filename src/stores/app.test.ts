@@ -1,9 +1,9 @@
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it } from 'vitest'
 /**
  * App Store 测试
  */
 import { setupLocalStorageMock } from '@/../tests/helpers/setup'
-import { createPinia, setActivePinia } from 'pinia'
-import { beforeEach, describe, expect, it } from 'vitest'
 import { SCENES, useAppStore } from './app'
 
 describe('useAppStore', () => {

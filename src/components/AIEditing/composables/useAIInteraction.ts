@@ -1,6 +1,6 @@
-import type { ChatResponse } from '@/types/ai-editing'
 import type Quill from 'quill'
 import type { Ref } from 'vue'
+import type { ChatResponse } from '@/types/ai-editing'
 import { ref } from 'vue'
 import { handleSend } from '../utils'
 

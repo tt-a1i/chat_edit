@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAI } from '@/services/ai.ts'
-import { useAppStore, useChatStore } from '@/stores'
-import { simplifyModelName } from '@/utils/format'
 import { IconCheck, IconChevronDown, IconRefresh, IconSearch, IconSparkles, IconStar } from '@tabler/icons-vue'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useAI } from '@/services/ai.ts'
+import { useAppStore, useChatStore } from '@/stores'
+import { simplifyModelName } from '@/utils/format'
 
 const appStore = useAppStore()
 const chatStore = useChatStore()

@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
+import { ref } from 'vue'
 import ExportButton from '@/components/history/ExportButton.vue'
 import ImportButton from '@/components/history/ImportButton.vue'
 import TextInput from '@/components/inputs/TextInput.vue'
 import ToggleInput from '@/components/inputs/ToggleInput.vue'
 import { useAppStore, useChatStore } from '@/stores'
-import { IconFileExport, IconLayoutSidebarRightCollapse, IconTrashX, IconUpload } from '@tabler/icons-vue'
-import { ref } from 'vue'
 
 // Stores
 const appStore = useAppStore()

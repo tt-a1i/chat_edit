@@ -1,10 +1,10 @@
 import type MarkdownIt from 'markdown-it'
-import { logger } from '@/utils/logger'
 import hljs from 'highlight.js'
 import katex from 'katex'
 import MarkdownItConstructor from 'markdown-it'
 import mdLinkAttrs from 'markdown-it-link-attributes'
 import mdKatex from 'markdown-it-texmath'
+import { logger } from '@/utils/logger'
 import 'highlight.js/styles/github.css'
 
 // markdown-it 状态接口

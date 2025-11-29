@@ -3,13 +3,13 @@ import type { ChatCompletedResponse, ChatPartResponse } from '@/api/api'
  * 聊天状态管理 Store
  */
 import type { Chat, Message } from '@/services/database'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import { useApi } from '@/api/api'
 import { showError } from '@/composables/useToast'
 import { useAI } from '@/services/ai'
 import { db } from '@/services/database'
 import { logger } from '@/utils/logger'
-import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
 import { useAppStore } from './app'
 
 interface ChatExport extends Chat {
