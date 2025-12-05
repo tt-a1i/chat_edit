@@ -19,7 +19,7 @@ import type {
 } from './types.ts'
 import { ref } from 'vue'
 import { getChatConfig } from '@/config/env'
-import { toError } from '@/utils/error-handler'
+import { ErrorCode, ErrorHandler, toError } from '@/utils/error-handler'
 import { logger } from '@/utils/logger'
 
 export type {
@@ -95,8 +95,11 @@ export function useApi() {
 
         return await processStreamResponse(response, request.model, onDataReceived)
       } catch (err) {
-        logger.error('生成聊天内容时出错', err)
-        error.value = toError(err)
+        if ((err as Error).name === 'AbortError') {
+          return []
+        }
+        const appError = ErrorHandler.handle(err as Error)
+        error.value = appError
         return []
       }
     },
@@ -121,7 +124,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('创建模型时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -144,7 +147,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('获取模型信息时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -165,7 +168,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('复制模型时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -188,7 +191,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('删除模型时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -209,7 +212,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('下载模型时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -230,7 +233,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('上传模型时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
@@ -256,7 +259,7 @@ export function useApi() {
 
         return await response.json()
       } catch (err) {
-        logger.error('生成嵌入向量时出错', err)
+        ErrorHandler.handle(err as Error)
         error.value = toError(err)
         throw err
       }
