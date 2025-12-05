@@ -9,6 +9,8 @@ import ModelDisplay from './components/common/ModelDisplay.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/inputs/TextInput.vue'
 import Settings from './components/settings/Settings.vue'
+import { NMessageProvider } from 'naive-ui'
+import GlobalMessage from './components/common/GlobalMessage.vue'
 import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
 
@@ -59,11 +61,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :class="{ dark: isDarkMode }" class="transition-colors duration-300">
-    <main class="flex h-full w-full flex-1 flex-row items-stretch light-elegant-bg dark-elegant-bg">
-      <Sidebar />
+  <n-message-provider>
+    <GlobalMessage />
+    <div :class="{ dark: isDarkMode }" class="transition-colors duration-300">
+      <main class="flex h-full w-full flex-1 flex-row items-stretch light-elegant-bg dark-elegant-bg">
+        <Sidebar />
 
-      <!-- Chat Scene -->
+        <!-- Chat Scene -->
       <div v-if="currentScene === SCENES.CHAT" class="mx-auto flex h-screen w-full flex-col">
         <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-4xl flex-col gap-4 px-4 pb-4">
           <SystemPrompt />
@@ -145,25 +149,26 @@ onMounted(async () => {
         <AIEditingMain />
       </div>
 
-      <!-- 设置模态窗口 -->
-      <Transition
-        enter-active-class="transition ease-out duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-150"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="isSettingsOpen"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          @click.self="appStore.toggleSettingsPanel()"
+        <!-- 设置模态窗口 -->
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
         >
-          <Settings />
-        </div>
-      </Transition>
-    </main>
-  </div>
+          <div
+            v-if="isSettingsOpen"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            @click.self="appStore.toggleSettingsPanel()"
+          >
+            <Settings />
+          </div>
+        </Transition>
+      </main>
+    </div>
+  </n-message-provider>
 </template>
 
 <style>
