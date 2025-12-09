@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
+import { applyDarkModeToDocument, syncSystemDarkMode } from '@/composables'
 import AIEditingMain from './components/AIEditing/index.vue'
 import ChatInput from './components/chat/ChatInput.vue'
 import ChatMessages from './components/chat/ChatMessages.vue'
@@ -9,7 +10,6 @@ import ModelDisplay from './components/common/ModelDisplay.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/inputs/TextInput.vue'
 import Settings from './components/settings/Settings.vue'
-import { applyDarkModeToDocument, syncSystemDarkMode } from './composables/useTheme.ts'
 import { SCENES, useAppStore, useChatStore } from './stores'
 
 // Stores
