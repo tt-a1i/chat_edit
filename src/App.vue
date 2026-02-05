@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { NMessageProvider } from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { nextTick, onMounted, ref } from 'vue'
 import { applyDarkModeToDocument, syncSystemDarkMode } from '@/composables'
@@ -6,6 +7,7 @@ import AIEditingMain from './components/AIEditing/index.vue'
 import ChatInput from './components/chat/ChatInput.vue'
 import ChatMessages from './components/chat/ChatMessages.vue'
 import SystemPrompt from './components/chat/SystemPrompt.vue'
+import GlobalMessage from './components/common/GlobalMessage.vue'
 import ModelDisplay from './components/common/ModelDisplay.vue'
 import Sidebar from './components/common/Sidebar.vue'
 import TextInput from './components/inputs/TextInput.vue'
@@ -59,111 +61,114 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :class="{ dark: isDarkMode }" class="transition-colors duration-300">
-    <main class="flex h-full w-full flex-1 flex-row items-stretch light-elegant-bg dark-elegant-bg">
-      <Sidebar />
+  <NMessageProvider>
+    <GlobalMessage />
+    <div :class="{ dark: isDarkMode }" class="transition-colors duration-300">
+      <main class="flex h-full w-full flex-1 flex-row items-stretch light-elegant-bg dark-elegant-bg">
+        <Sidebar />
 
-      <!-- Chat Scene -->
-      <div v-if="currentScene === SCENES.CHAT" class="mx-auto flex h-screen w-full flex-col">
-        <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-4xl flex-col gap-4 px-4 pb-4">
-          <SystemPrompt />
-        </div>
+        <!-- Chat Scene -->
+        <div v-if="currentScene === SCENES.CHAT" class="mx-auto flex h-screen w-full flex-col">
+          <div v-if="isSystemPromptOpen" class="mx-auto flex h-screen w-full max-w-4xl flex-col gap-4 px-4 pb-4">
+            <SystemPrompt />
+          </div>
 
-        <div v-else class="flex h-screen w-full flex-col">
-          <!-- 现代化顶部栏 - 全宽但内容居中 -->
-          <div class="w-full border-b border-gray-200/60 bg-white/70 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-900/70 sticky top-0 z-[60]">
-            <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
-              <!-- 左侧：会话信息 -->
-              <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-900/30">
-                  <span class="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide">Chat</span>
+          <div v-else class="flex h-screen w-full flex-col">
+            <!-- 现代化顶部栏 - 全宽但内容居中 -->
+            <div class="w-full border-b border-gray-200/60 bg-white/70 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-900/70 sticky top-0 z-[60]">
+              <div class="mx-auto flex max-w-7xl items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 lg:px-6">
+                <!-- 左侧：会话信息 -->
+                <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                  <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-teal-50 dark:bg-teal-900/30">
+                    <span class="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide">Chat</span>
+                  </div>
+                  <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700" />
+                  <ModelDisplay />
                 </div>
-                <div class="hidden sm:block h-4 w-px bg-gray-200 dark:bg-gray-700" />
-                <ModelDisplay />
-              </div>
 
-              <!-- 右侧：会话名称 -->
-              <div v-if="currentChat" class="flex items-center gap-2 ml-2 sm:ml-4">
-                <button
-                  v-if="!isEditingChatName"
-                  type="button"
-                  title="点击重命名会话"
-                  class="group relative rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs cursor-pointer"
-                  @click.prevent="startEditing"
-                >
-                  {{ currentChat.name }}
-                  <!-- 编辑图标 - hover 时显示 -->
-                  <svg
-                    class="inline-block ml-1 h-3.5 w-3.5 opacity-0 transition-opacity duration-200 group-hover:opacity-60"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                </button>
-                <div v-else class="flex items-center gap-2">
-                  <TextInput
-                    id="chat-name"
-                    ref="chatNameInput"
-                    v-model="editedChatName"
-                    class="w-48 text-sm"
-                    @keyup.enter="confirmRename"
-                    @keyup.esc="cancelEditing"
-                  />
+                <!-- 右侧：会话名称 -->
+                <div v-if="currentChat" class="flex items-center gap-2 ml-2 sm:ml-4">
                   <button
-                    class="rounded-lg px-2.5 py-1 text-sm text-teal-600 hover:bg-teal-50 font-medium dark:text-teal-400 dark:hover:bg-teal-900/20 transition-colors"
-                    @click="confirmRename"
+                    v-if="!isEditingChatName"
+                    type="button"
+                    title="点击重命名会话"
+                    class="group relative rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100 truncate max-w-xs cursor-pointer"
+                    @click.prevent="startEditing"
                   >
-                    确认
+                    {{ currentChat.name }}
+                    <!-- 编辑图标 - hover 时显示 -->
+                    <svg
+                      class="inline-block ml-1 h-3.5 w-3.5 opacity-0 transition-opacity duration-200 group-hover:opacity-60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
                   </button>
-                  <button
-                    class="rounded-lg px-2.5 py-1 text-sm text-gray-500 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
-                    @click="cancelEditing"
-                  >
-                    取消
-                  </button>
+                  <div v-else class="flex items-center gap-2">
+                    <TextInput
+                      id="chat-name"
+                      ref="chatNameInput"
+                      v-model="editedChatName"
+                      class="w-48 text-sm"
+                      @keyup.enter="confirmRename"
+                      @keyup.esc="cancelEditing"
+                    />
+                    <button
+                      class="rounded-lg px-2.5 py-1 text-sm text-teal-600 hover:bg-teal-50 font-medium dark:text-teal-400 dark:hover:bg-teal-900/20 transition-colors"
+                      @click="confirmRename"
+                    >
+                      确认
+                    </button>
+                    <button
+                      class="rounded-lg px-2.5 py-1 text-sm text-gray-500 hover:bg-gray-100 font-medium dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                      @click="cancelEditing"
+                    >
+                      取消
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- 消息区域 - 全宽滚动，内容居中 -->
-          <ChatMessages class="flex-1" />
+            <!-- 消息区域 - 全宽滚动，内容居中 -->
+            <ChatMessages class="flex-1" />
 
-          <!-- 输入区域 - 全宽但内容居中 -->
-          <div class="w-full border-t border-gray-200/60 bg-gradient-to-t from-white via-white/95 to-white/80 backdrop-blur-md dark:border-gray-700/60 dark:from-gray-900 dark:via-gray-900/95 dark:to-gray-900/80">
-            <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-3">
-              <ChatInput />
+            <!-- 输入区域 - 全宽但内容居中 -->
+            <div class="w-full border-t border-gray-200/60 bg-gradient-to-t from-white via-white/95 to-white/80 backdrop-blur-md dark:border-gray-700/60 dark:from-gray-900 dark:via-gray-900/95 dark:to-gray-900/80">
+              <div class="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 pt-4 pb-3">
+                <ChatInput />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- AI Editing Scene -->
-      <div v-else-if="currentScene === SCENES.AI_EDITING" class="mx-auto flex h-screen w-full flex-col">
-        <AIEditingMain />
-      </div>
+        <!-- AI Editing Scene -->
+        <div v-else-if="currentScene === SCENES.AI_EDITING" class="mx-auto flex h-screen w-full flex-col">
+          <AIEditingMain />
+        </div>
 
-      <!-- 设置模态窗口 -->
-      <Transition
-        enter-active-class="transition ease-out duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-150"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
-        <div
-          v-if="isSettingsOpen"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          @click.self="appStore.toggleSettingsPanel()"
+        <!-- 设置模态窗口 -->
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
         >
-          <Settings />
-        </div>
-      </Transition>
-    </main>
-  </div>
+          <div
+            v-if="isSettingsOpen"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            @click.self="appStore.toggleSettingsPanel()"
+          >
+            <Settings />
+          </div>
+        </Transition>
+      </main>
+    </div>
+  </NMessageProvider>
 </template>
 
 <style>

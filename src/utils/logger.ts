@@ -109,27 +109,17 @@ class Logger {
   /**
    * 上报错误到监控服务（可扩展）
    *
-   * TODO(priority:low): 集成错误监控服务
-   * 未来可以集成以下服务之一：
-   * - Sentry (https://sentry.io) - 推荐用于生产环境
-   * - LogRocket (https://logrocket.com) - 包含会话回放功能
-   * - Rollbar (https://rollbar.com) - 轻量级选择
-   *
-   * 实施时需要：
-   * 1. 选择并配置监控服务
-   * 2. 添加环境变量配置 (VITE_SENTRY_DSN)
-   * 3. 在此处添加错误上报逻辑
-   * 4. 在 vite.config.ts 中配置 source map 上传
+   * 已预留接口用于集成错误监控服务（如 Sentry, LogRocket, Rollbar）。
+   * 实施步骤：
+   * 1. 配置 VITE_SENTRY_DSN 环境变量
+   * 2. 在 main.ts 中初始化监控 SDK
+   * 3. 在此处实现具体上报逻辑
    */
-  private reportError(_message: string, _error?: unknown, _context?: Record<string, unknown>) {
-    // 预留接口，当前仅记录到控制台
-    // 生产环境应该集成专业的错误监控服务
-    // 示例代码：
-    // if (import.meta.env.PROD && window.Sentry) {
-    //   Sentry.captureException(_error, {
-    //     extra: { message: _message, context: _context }
-    //   })
-    // }
+  private reportError(message: string, error?: unknown, context?: Record<string, unknown>) {
+    // 自定义错误上报钩子
+    if (typeof window.reportErrorToService === 'function') {
+      window.reportErrorToService({ message, error, context })
+    }
   }
 
   /**
